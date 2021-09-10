@@ -1,0 +1,17 @@
+﻿#pragma once
+
+#include "AABB.h"
+#include "AABBCreater.h"
+#include "BoxConstantGroup.h"
+#include "BoxHelper.h"
+#include "Circle.h"
+#include "Intersect.h"
+#include "IntersectHelper.h"
+#include "OBB.h"
+#include "OBBCreater.h"
+#include "Ray.h"
+#include "RaycastHit.h"
+#include "Sphere.h"
+#include "SphereHelper.h"
+#include "Square.h"
+#include "Triangle.h"

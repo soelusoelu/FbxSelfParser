@@ -1,0 +1,14 @@
+{
+  "tag": "Light",
+  "transform": {
+    "position": [ 0.0, 15.0, 0.0 ]
+  },
+  "components": [
+    {
+      "type": "DirectionalLight",
+      "properties": {
+        "direction": [ -45.0, 0.0, 0.0 ]
+      }
+    }
+  ]
+}
