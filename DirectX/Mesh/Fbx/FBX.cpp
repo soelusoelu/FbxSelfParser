@@ -36,6 +36,8 @@ void FBX::parse(
 
     const auto& obj = parser.getObjects();
     const auto& vertices = obj.getVertices();
+    const auto& indices = obj.getIndices();
+    const auto& normals = obj.getNormals();
     meshesVerticesPosition[0] = vertices;
     meshesIndices[0] = obj.getIndices();
 
@@ -43,7 +45,9 @@ void FBX::parse(
     auto& meshVertices = meshesVertices[0];
     meshVertices.resize(vertSize);
     for (size_t i = 0; i < vertSize; ++i) {
-        meshVertices[i].pos = vertices[i];
+        auto& vertex = meshVertices[i];
+        vertex.pos = vertices[i];
+        vertex.normal = normals[i / 3];
     }
 }
 

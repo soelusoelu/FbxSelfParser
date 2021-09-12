@@ -27,6 +27,9 @@ void ModelViewerPlane::initialize(
     auto mr = mc->getComponent<MeshRenderer>();
     //床を管理者に追加
     meshManager.add(mr, true);
+
+    mPlane->transform().rotate(Vector3::right, -90.f);
+    mPlane->transform().setScale(100.f);
 }
 
 void ModelViewerPlane::update() {
