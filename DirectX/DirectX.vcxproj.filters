@@ -249,6 +249,9 @@
     <ClCompile Include="Engine\DebugManager\DebugUtility\Log.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxParser.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxObjects.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxMaterial.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxMesh.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -554,6 +557,9 @@
     <ClInclude Include="Engine\DebugManager\DebugUtility\Log.h" />
     <ClInclude Include="Mesh\Fbx\FbxParser.h" />
     <ClInclude Include="Mesh\Fbx\FbxObjects.h" />
+    <ClInclude Include="Mesh\Fbx\FbxMaterial.h" />
+    <ClInclude Include="Mesh\Fbx\FbxMesh.h" />
+    <ClInclude Include="Mesh\Fbx\FbxTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

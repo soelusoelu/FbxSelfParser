@@ -20,11 +20,8 @@ void FbxParser::parse(const std::string& filePath) {
     }
 
     //解析開始
-    while (!ifs.eof()) {
-        //1行ずつ読み込む
-        std::string line;
-        std::getline(ifs, line);
-
+    std::string line;
+    while (std::getline(ifs, line)) {
         //解析に必要な行か判定
         if (isSkip(line)) {
             continue;
@@ -38,10 +35,7 @@ void FbxParser::parse(const std::string& filePath) {
         std::getline(lineStream, key, ':');
 
         if (key == "Objects") {
-            std::getline(ifs, line);
-            if (line.rfind("{") != std::string::npos) {
-                mObjects->parse(ifs);
-            }
+            mObjects->parse(ifs);
         }
     }
 }

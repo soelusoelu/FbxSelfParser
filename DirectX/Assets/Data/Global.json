@@ -30,7 +30,8 @@
             "textureSize": 64,
             "textureDisplayInterval": 32,
             "texturesFilePath": [
-                "Assets\\Model\\sphere_ascii.fbx"
+                "Assets\\Model\\box_ascii.fbx",
+                "Assets\\Model\\octopus_born_ascii.fbx"
             ]
         },
         "AssetsRenderTextureAdder": {

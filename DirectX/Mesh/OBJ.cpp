@@ -203,7 +203,7 @@ void OBJ::loadMaterial(
 }
 
 void OBJ::loadMaterialName(Material& material, std::istringstream& iss) {
-    iss >> material.materialName;
+    //iss >> material.materialName;
 }
 
 void OBJ::loadAmbient(Material& material, std::istringstream& iss) {

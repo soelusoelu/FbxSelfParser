@@ -1,6 +1,10 @@
 ﻿#include "FBX.h"
+#include "FbxMaterial.h"
+#include "FbxMesh.h"
 #include "FbxObjects.h"
 #include "FbxParser.h"
+#include "FbxTexture.h"
+#include "../../System/AssetsManager.h"
 #include "../../Utility/FileUtil.h"
 #include <fstream>
 #include <sstream>
@@ -35,11 +39,12 @@ void FBX::parse(
     parser.parse(filePath);
 
     const auto& obj = parser.getObjects();
-    const auto& vertices = obj.getVertices();
-    const auto& indices = obj.getIndices();
-    const auto& normals = obj.getNormals();
+    const auto& mesh = obj.getMesh();
+    const auto& vertices = mesh.getVertices();
+    const auto& indices = mesh.getIndices();
+    const auto& normals = mesh.getNormals();
     meshesVerticesPosition[0] = vertices;
-    meshesIndices[0] = obj.getIndices();
+    meshesIndices[0] = mesh.getIndices();
 
     auto vertSize = vertices.size();
     auto& meshVertices = meshesVertices[0];
@@ -48,6 +53,14 @@ void FBX::parse(
         auto& vertex = meshVertices[i];
         vertex.pos = vertices[i];
         vertex.normal = normals[i];
+    }
+
+    memcpy(&materials[0], &obj.getMaterial(), sizeof(Material));
+    if (obj.getTexture().isUseBaseTexture()) {
+        const auto& texName = obj.getTexture().getBaseTextureName();
+        auto directoryPath = FileUtil::getDirectryFromFilePath(filePath);
+        const auto& texID = AssetsManager::instance().createTexture(texName, directoryPath);
+        materials[0].textureID = texID;
     }
 }
 
