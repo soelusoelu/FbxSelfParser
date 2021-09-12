@@ -61,22 +61,38 @@ const std::vector<Vector3>& FbxObjects::getNormals() const {
 }
 
 void FbxObjects::parseVertices(std::ifstream& inFile, const std::string& upperLine) {
-    //文字列から数値を取り出し頂点数を取得する
+    //文字列から数値を取り出し頂点数を取得する(3はVector3の要素数)
     int numVertices = getElementCount(upperLine) / 3;
     mVertices.resize(numVertices);
 
-    //1行読み込む
+    //頂点配列の添字(複数回ファイルにアクセスするためループの外で確保)
+    int idx = 0;
+    //ファイルから読み込んだ1行がここに入る
     std::string line;
-    std::getline(inFile, line);
+    while (std::getline(inFile, line)) {
+        //文字列の最後がスペースかカンマなら削除
+        while (line.back() == ' ' || line.back() == ',') {
+            line.erase(line.end() - 1);
+        }
+        //文字列の最後が } ならループを抜ける
+        if (line.back() == '}') {
+            break;
+        }
 
-    //全要素を文字列で取得する
-    auto elementsStr = getElementsString(line);
+        auto elementsStr = getElementsString(line);
+        std::istringstream lineStream(elementsStr);
 
-    //1行分の文字列をストリームに変換して解析しやすくする
-    std::istringstream lineStream(elementsStr);
+        while (idx < numVertices) {
+            //本読み込み
+            auto& v = mVertices[idx];
+            lineStream >> v.x >> v.y >> v.z;
 
-    for (auto&& v : mVertices) {
-        lineStream >> v.x >> v.y >> v.z;
+            ++idx;
+
+            if (lineStream.eof()) {
+                break;
+            }
+        }
     }
 }
 
@@ -85,26 +101,41 @@ void FbxObjects::parseIndices(std::ifstream& inFile, const std::string& upperLin
     int numIndices = getElementCount(upperLine);
     mIndices.resize(numIndices);
 
-    //1行読み込む
+    //頂点配列の添字(複数回ファイルにアクセスするためループの外で確保)
+    int idx = 0;
+    //ファイルから読み込んだ1行がここに入る
     std::string line;
-    std::getline(inFile, line);
-
-    //全要素を文字列で取得する
-    auto elementsStr = getElementsString(line);
-
-    //1行分の文字列をストリームに変換して解析しやすくする
-    std::istringstream lineStream(elementsStr);
-
-    for (auto&& i : mIndices) {
-        int tmp = 0;
-        lineStream >> tmp;
-
-        //何故かマイナスのインデックスがあるから調整する
-        if (tmp < 0) {
-            tmp = Math::abs(tmp) - 1;
+    while (std::getline(inFile, line)) {
+        //文字列の最後がスペースかカンマなら削除
+        while (line.back() == ' ' || line.back() == ',') {
+            line.erase(line.end() - 1);
+        }
+        //文字列の最後が } ならループを抜ける
+        if (line.back() == '}') {
+            break;
         }
 
-        i = static_cast<unsigned short>(tmp);
+        auto elementsStr = getElementsString(line);
+        std::istringstream lineStream(elementsStr);
+
+        while (idx < numIndices) {
+            //本読み込み
+            int tmp = 0;
+            lineStream >> tmp;
+
+            //何故かマイナスのインデックスがあるから調整する
+            if (tmp < 0) {
+                tmp = Math::abs(tmp) - 1;
+            }
+
+            mIndices[idx] = static_cast<unsigned short>(tmp);
+
+            ++idx;
+
+            if (lineStream.eof()) {
+                break;
+            }
+        }
     }
 }
 
@@ -154,6 +185,7 @@ void FbxObjects::parseNormalValues(std::ifstream& inFile, const std::string& upp
         if (readIntermediate) {
             float tmp = 0.f;
             lineStream >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp;
+            readIntermediate = false;
         }
 
         while (idx < numNormals) {
@@ -165,7 +197,7 @@ void FbxObjects::parseNormalValues(std::ifstream& inFile, const std::string& upp
 
             if (lineStream.eof()) {
                 readIntermediate = true;
-                break;
+                //break;
             }
 
             //3頂点分法線が並んでいるが全部値が一緒なので読み飛ばす
@@ -173,7 +205,6 @@ void FbxObjects::parseNormalValues(std::ifstream& inFile, const std::string& upp
             lineStream >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp;
 
             if (lineStream.eof()) {
-                readIntermediate = false;
                 break;
             }
         }

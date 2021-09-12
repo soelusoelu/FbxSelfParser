@@ -30,8 +30,8 @@
             "textureSize": 64,
             "textureDisplayInterval": 32,
             "texturesFilePath": [
-                "Assets\\Model\\box_ascii.fbx",
-                "Assets\\Model\\sphere_ascii.fbx"
+                "Assets\\Model\\sphere_ascii.fbx",
+                "Assets\\Model\\monkey_ascii.fbx"
             ]
         },
         "AssetsRenderTextureAdder": {
