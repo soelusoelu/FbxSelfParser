@@ -60,6 +60,10 @@ const std::vector<Vector3>& FbxObjects::getNormals() const {
     return mSurfaceNormals;
 }
 
+unsigned FbxObjects::getNumSurface() const {
+    return mNumSurface;
+}
+
 void FbxObjects::parseVertices(std::ifstream& inFile, const std::string& upperLine) {
     //文字列から数値を取り出し頂点数を取得する(3はVector3の要素数)
     int numVertices = getElementCount(upperLine) / 3;
@@ -158,14 +162,12 @@ void FbxObjects::parseNormals(std::ifstream& inFile) {
 }
 
 void FbxObjects::parseNormalValues(std::ifstream& inFile, const std::string& upperLine) {
-    //文字列から数値を取り出し頂点数を取得する(9はVector3の要素数 * ポリゴン頂点数)
-    int numNormals = getElementCount(upperLine) / 9;
+    //文字列から数値を取り出し頂点数を取得する(9はVector3の要素数)
+    int numNormals = getElementCount(upperLine) / 3;
     mSurfaceNormals.resize(numNormals);
 
     //法線配列の添字(複数回ファイルにアクセスするためループの外で確保)
     int idx = 0;
-    //読み込み途中か
-    bool readIntermediate = false;
     //ファイルから読み込んだ1行がここに入る
     std::string line;
     while (std::getline(inFile, line)) {
@@ -181,28 +183,12 @@ void FbxObjects::parseNormalValues(std::ifstream& inFile, const std::string& upp
         auto elementsStr = getElementsString(line);
         std::istringstream lineStream(elementsStr);
 
-        //読み込み途中なら残りの分を読み飛ばす
-        if (readIntermediate) {
-            float tmp = 0.f;
-            lineStream >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp;
-            readIntermediate = false;
-        }
-
         while (idx < numNormals) {
             //本読み込み
             auto& n = mSurfaceNormals[idx];
             lineStream >> n.x >> n.y >> n.z;
 
             ++idx;
-
-            if (lineStream.eof()) {
-                readIntermediate = true;
-                //break;
-            }
-
-            //3頂点分法線が並んでいるが全部値が一緒なので読み飛ばす
-            float tmp = 0.f;
-            lineStream >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp;
 
             if (lineStream.eof()) {
                 break;

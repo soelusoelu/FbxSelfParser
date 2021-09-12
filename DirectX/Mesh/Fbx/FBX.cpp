@@ -47,7 +47,7 @@ void FBX::parse(
     for (size_t i = 0; i < vertSize; ++i) {
         auto& vertex = meshVertices[i];
         vertex.pos = vertices[i];
-        vertex.normal = normals[i / 3];
+        vertex.normal = normals[i];
     }
 }
 

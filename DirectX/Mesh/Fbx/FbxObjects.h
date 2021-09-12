@@ -16,6 +16,7 @@ public:
     const std::vector<Vector3>& getVertices() const;
     const std::vector<unsigned short>& getIndices() const;
     const std::vector<Vector3>& getNormals() const;
+    unsigned getNumSurface() const;
 
 private:
     //頂点を読み込む
