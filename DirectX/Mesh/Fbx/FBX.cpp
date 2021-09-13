@@ -43,6 +43,7 @@ void FBX::parse(
     const auto& vertices = mesh.getVertices();
     const auto& indices = mesh.getIndices();
     const auto& normals = mesh.getNormals();
+    const auto& uvs = mesh.getUVs();
     meshesVerticesPosition[0] = vertices;
     meshesIndices[0] = mesh.getIndices();
 
@@ -53,6 +54,7 @@ void FBX::parse(
         auto& vertex = meshVertices[i];
         vertex.pos = vertices[i];
         vertex.normal = normals[i];
+        vertex.uv = uvs[i];
     }
 
     memcpy(&materials[0], &obj.getMaterial(), sizeof(Material));

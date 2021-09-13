@@ -16,6 +16,7 @@ public:
     const std::vector<Vector3>& getVertices() const;
     const std::vector<unsigned short>& getIndices() const;
     const std::vector<Vector3>& getNormals() const;
+    const std::vector<Vector2>& getUVs() const;
     unsigned getNumSurface() const;
 
 private:
@@ -27,6 +28,12 @@ private:
     void parseNormals(std::ifstream& inFile);
     //法線の値を読み込む
     void parseNormalValues(std::ifstream& inFile, const std::string& upperLine);
+    //UVを読み込む
+    void parseUV(std::ifstream& inFile);
+    //UVの値を読み込む
+    void parseUVValues(std::ifstream& inFile, const std::string& upperLine);
+    //UVインデックスを読み込む
+    void parseUVIndices(std::ifstream& inFile, const std::string& upperLine);
     //配列の要素数を取得する
     int getElementCount(const std::string& line) const;
     //配列の要素を文字列で取得する
@@ -43,6 +50,12 @@ private:
     std::vector<unsigned short> mSurfaceIndices;
     //法線配列
     std::vector<Vector3> mSurfaceNormals;
+    //UV配列
+    std::vector<Vector2> mUVs;
+    //面法線用UV配列
+    std::vector<Vector2> mSurfaceUVs;
+    //UVインデックス配列
+    std::vector<unsigned short> mUVIndices;
     //面の数
     unsigned mNumSurface;
 };

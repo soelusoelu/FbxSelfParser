@@ -27,6 +27,8 @@ void FbxMesh::parse(std::ifstream& inFile) {
             mNumSurface = mIndices.size() / 3;
         } else if (key == "LayerElementNormal") {
             parseNormals(inFile);
+        } else if (key == "LayerElementUV") {
+            parseUV(inFile);
             break;
         }
     }
@@ -34,15 +36,12 @@ void FbxMesh::parse(std::ifstream& inFile) {
     unsigned num = mNumSurface * 3;
     mSurfaceVertices.resize(num);
     mSurfaceIndices.resize(num);
+    mSurfaceUVs.resize(num);
 
-    for (size_t i = 0; i < mNumSurface; ++i) {
-        auto idx = i * 3;
-        mSurfaceIndices[idx] = idx;
-        mSurfaceIndices[idx + 1] = idx + 1;
-        mSurfaceIndices[idx + 2] = idx + 2;
-    }
     for (size_t i = 0; i < num; ++i) {
+        mSurfaceIndices[i] = i;
         mSurfaceVertices[i] = mVertices[mIndices[i]];
+        mSurfaceUVs[i] = mUVs[mUVIndices[i]];
     }
 }
 
@@ -56,6 +55,10 @@ const std::vector<unsigned short>& FbxMesh::getIndices() const {
 
 const std::vector<Vector3>& FbxMesh::getNormals() const {
     return mSurfaceNormals;
+}
+
+const std::vector<Vector2>& FbxMesh::getUVs() const {
+    return mSurfaceUVs;
 }
 
 unsigned FbxMesh::getNumSurface() const {
@@ -103,7 +106,7 @@ void FbxMesh::parseIndices(std::ifstream& inFile, const std::string& upperLine) 
     int numIndices = getElementCount(upperLine);
     mIndices.resize(numIndices);
 
-    //頂点配列の添字(複数回ファイルにアクセスするためループの外で確保)
+    //配列の添字(複数回ファイルにアクセスするためループの外で確保)
     int idx = 0;
     //ファイルから読み込んだ1行がここに入る
     std::string line;
@@ -160,7 +163,7 @@ void FbxMesh::parseNormals(std::ifstream& inFile) {
 }
 
 void FbxMesh::parseNormalValues(std::ifstream& inFile, const std::string& upperLine) {
-    //文字列から数値を取り出し頂点数を取得する(9はVector3の要素数)
+    //文字列から数値を取り出し法線数を取得する(3はVector3の要素数)
     int numNormals = getElementCount(upperLine) / 3;
     mSurfaceNormals.resize(numNormals);
 
@@ -185,6 +188,115 @@ void FbxMesh::parseNormalValues(std::ifstream& inFile, const std::string& upperL
             //本読み込み
             auto& n = mSurfaceNormals[idx];
             lineStream >> n.x >> n.y >> n.z;
+
+            ++idx;
+
+            if (lineStream.eof()) {
+                break;
+            }
+        }
+    }
+}
+
+void FbxMesh::parseUV(std::ifstream& inFile) {
+    std::string line;
+    while (std::getline(inFile, line)) {
+        auto foundPos = line.find(':');
+        auto key = line.substr(0, foundPos);
+
+        //タブを削除する
+        while (key[0] == '\t') {
+            key.erase(key.begin());
+        }
+
+        if (key == "UV") {
+            parseUVValues(inFile, line);
+        } else if (key == "UVIndex") {
+            parseUVIndices(inFile, line);
+            return;
+        }
+    }
+}
+
+void FbxMesh::parseUVValues(std::ifstream& inFile, const std::string& upperLine) {
+    //文字列から数値を取り出しUV数を取得する(2はVector2の要素数)
+    int numUVs = getElementCount(upperLine) / 2;
+    mUVs.resize(numUVs);
+
+    //読み込み途中か
+    bool readIntermediate = false;
+    //法線配列の添字(複数回ファイルにアクセスするためループの外で確保)
+    int idx = 0;
+    //ファイルから読み込んだ1行がここに入る
+    std::string line;
+    while (std::getline(inFile, line)) {
+        //文字列の最後がスペースかカンマなら削除
+        while (line.back() == ' ' || line.back() == ',') {
+            line.erase(line.end() - 1);
+        }
+        //文字列の最後が } ならループを抜ける
+        if (line.back() == '}') {
+            break;
+        }
+
+        auto elementsStr = getElementsString(line);
+        std::istringstream lineStream(elementsStr);
+
+        if (readIntermediate) {
+            auto& u = mUVs[idx];
+            lineStream >> u.y;
+            u.y = 1.f - u.y;
+
+            readIntermediate = false;
+            ++idx;
+        }
+
+        while (idx < numUVs) {
+            //本読み込み
+            auto& u = mUVs[idx];
+            lineStream >> u.x;
+            if (lineStream.eof()) {
+                readIntermediate = true;
+                break;
+            }
+
+            lineStream >> u.y;
+            u.y = 1.f - u.y;
+
+            ++idx;
+
+            if (lineStream.eof()) {
+                break;
+            }
+        }
+    }
+}
+
+void FbxMesh::parseUVIndices(std::ifstream& inFile, const std::string& upperLine) {
+    //文字列から数値を取り出しインデックス数を取得する
+    int numIndices = getElementCount(upperLine);
+    mUVIndices.resize(numIndices);
+
+    //配列の添字(複数回ファイルにアクセスするためループの外で確保)
+    int idx = 0;
+    //ファイルから読み込んだ1行がここに入る
+    std::string line;
+    while (std::getline(inFile, line)) {
+        //文字列の最後がスペースかカンマなら削除
+        while (line.back() == ' ' || line.back() == ',') {
+            line.erase(line.end() - 1);
+        }
+        //文字列の最後が } ならループを抜ける
+        if (line.back() == '}') {
+            break;
+        }
+
+        auto elementsStr = getElementsString(line);
+        std::istringstream lineStream(elementsStr);
+
+        while (idx < numIndices) {
+            //本読み込み
+            lineStream >> mUVIndices[idx];
 
             ++idx;
 
