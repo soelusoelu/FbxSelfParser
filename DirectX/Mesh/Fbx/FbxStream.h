@@ -13,6 +13,8 @@ public:
     char peek() const;
     //現在の読み取り位置の次の文字を返す
     char take();
+    //読み取り位置を指定した位置に移動する
+    void seek(unsigned pos);
     //現在の読み取り位置を返す
     unsigned tell() const;
 

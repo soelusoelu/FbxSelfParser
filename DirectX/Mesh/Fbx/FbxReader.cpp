@@ -1,9 +1,9 @@
 ﻿#include "FbxReader.h"
 #include "FbxStream.h"
-#include "FbxValue.h"
+#include "FbxObject.h"
 #include <assert.h>
 
-void FbxReader::parse(FbxStream& in, FbxValue& value) const {
+void FbxReader::parse(FbxStream& in, FbxObject& value) const {
     //中身の先頭までスキップ
     skipSpaceAndComments(in);
 
@@ -13,7 +13,6 @@ void FbxReader::parse(FbxStream& in, FbxValue& value) const {
     } else {
         //全ての要素を解析していく
         while (in.peek() != '\0') {
-            //auto& v = value.values.emplace_back();
             std::string name;
             parseValueName(in, name);
             assert(in.peek() == ':');
@@ -21,12 +20,13 @@ void FbxReader::parse(FbxStream& in, FbxValue& value) const {
             skipSpace(in);
 
             parseAttributesOrValue(in, value, name);
+
             skipSpaceAndComments(in);
         }
     }
 }
 
-void FbxReader::parseAttributesOrValue(FbxStream& in, FbxValue& value, const std::string& key) const {
+void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const std::string& key) const {
     std::string s;
     char c = in.peek();
     if (c == '{') {
@@ -43,69 +43,44 @@ void FbxReader::parseAttributesOrValue(FbxStream& in, FbxValue& value, const std
     skipSpaceAndComments(in);
 
     c = in.peek();
+    //attributeが続くか、数値が続いている
     if (c == ',') {
-        auto& back = value.children.back();
-        if (back.name.empty() && back.values.empty() && back.children.empty()) {
-            back.attributes.emplace_back(s);
-        } else {
-            auto& v = value.children.emplace_back();
-            v.attributes.emplace_back(s);
-        }
+        getObjectAddAttribute(value).attributes.emplace_back(s);
 
         in.take(); //skip ,
-        skipSpaceAndComments(in);
+        skipSpace(in);
 
         parseAttributesOrValue(in, value, key);
-    } else if (c == '{') {
-        auto& back = value.children.back();
-        if (back.name.empty() && back.values.empty() && back.children.empty()) {
-            back.attributes.emplace_back(s);
-        } else {
-            auto& v = value.children.emplace_back();
-            v.attributes.emplace_back(s);
-        }
+    } 
+    //attributeの終わり
+    else if (c == '{') {
+        auto& v = getObjectAddAttribute(value);
 
-        auto& v = value.children.back();
+        v.attributes.emplace_back(s);
         v.name = key;
+
         parseObject(in, v);
-    } else {
+    } 
+    //attributeではない
+    else {
         value.values.emplace(key, s);
     }
 }
 
-void FbxReader::parseAttributes(FbxStream& in, FbxValue& value, const std::string& key) const {
-    std::string s;
+void FbxReader::parseValue(FbxStream& in, std::string& value) const {
     char c = in.peek();
     if (c == '{') {
-        parseObject(in, value);
-        return;
+        assert(false);
     } else if (c == '"') {
-        parseString(in, s);
+        parseString(in, value);
     } else {
-        parseNumber(in, s);
+        parseNumber(in, value);
     }
 
     skipSpaceAndComments(in);
-
-    c = in.peek();
-    if (c == ',') {
-        value.attributes.emplace_back(s);
-
-        skipSpaceAndComments(in);
-
-        parseAttributes(in, value, key);
-    } else if (c == '{') {
-        value.attributes.emplace_back(s);
-
-        skipSpaceAndComments(in);
-
-        value.attributes.emplace_back(s);
-    } else {
-        value.values.emplace(key, s);
-    }
 }
 
-void FbxReader::parseObject(FbxStream& in, FbxValue& out) const {
+void FbxReader::parseObject(FbxStream& in, FbxObject& out) const {
     assert(in.peek() == '{');
     in.take(); //skip {
     skipSpaceAndComments(in);
@@ -115,7 +90,6 @@ void FbxReader::parseObject(FbxStream& in, FbxValue& out) const {
         return;
     }
 
-    unsigned memberCount = 0;
     while (true) {
         std::string name;
         parseValueName(in, name);
@@ -124,11 +98,13 @@ void FbxReader::parseObject(FbxStream& in, FbxValue& out) const {
 
         skipSpaceAndComments(in);
 
-        parseAttributesOrValue(in, out, name);
+        if (name == "Properties70") {
+            parseProperties70(in, out);
+        } else {
+            parseAttributesOrValue(in, out, name);
+        }
 
         skipSpaceAndComments(in);
-
-        ++memberCount;
 
         if (consume(in, '}')) {
             return;
@@ -145,12 +121,33 @@ void FbxReader::parseValueName(FbxStream& in, std::string& out) const {
 }
 
 void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
-    assert(in.peek() >= '0' && in.peek() <= '9');
+    if (consume(in, '-')) {
+        out += '-';
+    }
 
     char c = in.peek();
-    while (c >= '0' && c <= '9') {
+    while ((c >= '0' && c <= '9') || c == '.') {
         out += c;
         c = in.take();
+    }
+
+    if (out == "22315728") {
+        int a = 0;
+    }
+
+    skipSpace(in);
+    while (in.peek() == ',') {
+        auto pos = in.tell();
+        in.take(); //skip ,
+        skipSpace(in);
+
+        if (in.peek() >= '0' && in.peek() <= '9') {
+            out += ',';
+            parseNumber(in, out);
+        } else {
+            in.seek(pos);
+            break;
+        }
     }
 }
 
@@ -164,6 +161,65 @@ void FbxReader::parseString(FbxStream& in, std::string& out) const {
     }
 
     in.take(); //skip "
+}
+
+void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {
+    assert(in.peek() == '{');
+    in.take(); //skip {
+
+    skipSpaceAndComments(in);
+
+    char c = in.peek();
+    while (c != '}') {
+        assert(c == 'P');
+        c = in.take(); //skip P
+        assert(c == ':');
+        c = in.take(); //skip :
+
+        skipSpace(in);
+
+        parseProperties70Value(in, out.properties.emplace_back());
+
+        c = in.peek();
+    }
+
+    in.take(); //skip }
+}
+
+void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) const {
+    parseString(in, out.name);
+    skipSpace(in);
+    assert(in.peek() == ',');
+    in.take(); //skip ,
+    skipSpace(in);
+
+    parseString(in, out.type);
+    skipSpace(in);
+    assert(in.peek() == ',');
+    in.take(); //skip ,
+    skipSpace(in);
+
+    parseString(in, out.type2);
+    skipSpace(in);
+    assert(in.peek() == ',');
+    in.take(); //skip ,
+    skipSpace(in);
+
+    parseString(in, out.unknown);
+    skipSpace(in);
+
+    //5つ目の値がないこともあるためチェック
+    if (in.peek() != ',') {
+        return;
+    }
+
+    //Vector3など値が一つではないこともあるので、カンマが続く限り文字列を繋げていく
+    while (in.peek() == ',') {
+        in.take(); //skip ,
+        skipSpace(in);
+
+        parseValue(in, out.value);
+    }
 }
 
 void FbxReader::skipSpaceAndComments(FbxStream& in) const {
@@ -185,11 +241,24 @@ void FbxReader::skipSpace(FbxStream& in) const {
     }
 }
 
-bool FbxReader::consume(FbxStream& in, const char expect) const {
+bool FbxReader::consume(FbxStream& in, char expect) const {
     if (static_cast<char>(in.peek()) == expect) {
         in.take();
         return true;
     } else {
         return false;
+    }
+}
+
+FbxObject& FbxReader::getObjectAddAttribute(FbxObject& value) const {
+    if (value.children.empty()) {
+        return value.children.emplace_back();
+    }
+
+    auto& back = value.children.back();
+    if (back.name.empty() && back.values.empty() && back.children.empty()) {
+        return back;
+    } else {
+        return value.children.emplace_back();
     }
 }

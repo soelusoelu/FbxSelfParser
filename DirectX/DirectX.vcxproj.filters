@@ -564,7 +564,7 @@
     <ClInclude Include="Mesh\Fbx\FbxTexture.h" />
     <ClInclude Include="Mesh\Fbx\FbxReader.h" />
     <ClInclude Include="Mesh\Fbx\FbxStream.h" />
-    <ClInclude Include="Mesh\Fbx\FbxValue.h" />
+    <ClInclude Include="Mesh\Fbx\FbxObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

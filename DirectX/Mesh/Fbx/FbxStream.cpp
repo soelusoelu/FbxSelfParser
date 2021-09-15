@@ -34,6 +34,10 @@ char FbxStream::take() {
     return mFileStr[mReadPos];
 }
 
+void FbxStream::seek(unsigned pos) {
+    mReadPos = pos;
+}
+
 unsigned FbxStream::tell() const {
     return mReadPos;
 }

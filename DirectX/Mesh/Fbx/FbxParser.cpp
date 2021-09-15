@@ -3,9 +3,9 @@
 #include "../../Engine/DebugManager/DebugUtility/Debug.h"
 #include <fstream>
 #include <sstream>
+#include "FbxObject.h"
 #include "FbxReader.h"
 #include "FbxStream.h"
-#include "FbxValue.h"
 
 FbxParser::FbxParser()
     : mObjects(std::make_unique<FbxObjects>())
@@ -43,7 +43,7 @@ void FbxParser::parse(const std::string& filePath) {
     //}
 
     FbxStream stream(filePath.c_str());
-    FbxValue root;
+    FbxObject root;
     FbxReader reader;
     reader.parse(stream, root);
 }
