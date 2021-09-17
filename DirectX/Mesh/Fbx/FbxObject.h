@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_map>
 
+using FbxArrayValue = std::vector<std::string>;
+
 struct FbxProperties70 {
     std::string name;
     std::string type;
@@ -22,5 +24,6 @@ struct FbxObject {
     //子オブジェクト
     std::vector<FbxObject> children;
 
+    std::unordered_map<std::string, FbxArrayValue> arrayValues;
     std::vector<FbxProperties70> properties;
 };

@@ -36,8 +36,11 @@ void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const st
         return;
     } else if (c == '"') {
         parseString(in, s);
+    } else if (c == '*') {
+        parseArray(in, value, key);
+        return;
     } else {
-        parseNumber(in, s);
+        parseNumberArray(in, s);
     }
 
     skipSpaceAndComments(in);
@@ -65,6 +68,8 @@ void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const st
     else {
         value.values.emplace(key, s);
     }
+
+    value.values.emplace(key, s);
 }
 
 void FbxReader::parseValue(FbxStream& in, std::string& value) const {
@@ -73,8 +78,10 @@ void FbxReader::parseValue(FbxStream& in, std::string& value) const {
         assert(false);
     } else if (c == '"') {
         parseString(in, value);
+    } else if (c == '*') {
+        assert(false);
     } else {
-        parseNumber(in, value);
+        parseNumberArray(in, value);
     }
 
     skipSpaceAndComments(in);
@@ -130,10 +137,10 @@ void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
         out += c;
         c = in.take();
     }
+}
 
-    if (out == "22315728") {
-        int a = 0;
-    }
+void FbxReader::parseNumberArray(FbxStream& in, std::string& out) const {
+    parseNumber(in, out);
 
     skipSpace(in);
     while (in.peek() == ',') {
@@ -141,7 +148,8 @@ void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
         in.take(); //skip ,
         skipSpace(in);
 
-        if (in.peek() >= '0' && in.peek() <= '9') {
+        char c = in.peek();
+        if ((c >= '0' && c <= '9') || c == '-') {
             out += ',';
             parseNumber(in, out);
         } else {
@@ -161,6 +169,56 @@ void FbxReader::parseString(FbxStream& in, std::string& out) const {
     }
 
     in.take(); //skip "
+}
+
+void FbxReader::parseArray(FbxStream& in, FbxObject& out, const std::string& key) const {
+    assert(in.peek() == '*');
+    in.take(); //skip *
+
+    skipSpace(in);
+
+    //要素数を文字列で取得する
+    std::string numValueStr;
+    parseNumber(in, numValueStr);
+
+    skipSpace(in);
+
+    assert(in.peek() == '{');
+    in.take(); //skip {
+
+    //空配列かチェック
+    if (consume(in, '}')) {
+        return;
+    }
+
+    skipSpace(in);
+
+    //文字列から要素数を取得する
+    unsigned numValue = static_cast<unsigned>(std::stoi(numValueStr));
+
+    FbxArrayValue values(numValue);
+
+    assert(in.peek() == 'a');
+    in.take(); //skip a
+    assert(in.peek() == ':');
+    in.take(); //skip :
+
+    skipSpace(in);
+
+    for (unsigned i = 0; i < numValue; ++i) {
+        parseNumber(in, values[i]);
+
+        skipSpace(in);
+
+        if (consume(in, ',')) {
+            skipSpace(in);
+        }
+    }
+
+    assert(in.peek() == '}');
+    in.take(); //skip }
+
+    out.arrayValues.emplace(key, values);
 }
 
 void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {

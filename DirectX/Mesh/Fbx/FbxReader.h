@@ -21,8 +21,12 @@ private:
     void parseValueName(FbxStream& in, std::string& out) const;
     //数値を解析する
     void parseNumber(FbxStream& in, std::string& out) const;
+    //数値、配列なら数値配列を解析する
+    void parseNumberArray(FbxStream& in, std::string& out) const;
     //""で囲まれた文字列を解析する
     void parseString(FbxStream& in, std::string& out) const;
+    //配列を解析する
+    void parseArray(FbxStream& in, FbxObject& out, const std::string& key) const;
     //Properties70を解析する
     void parseProperties70(FbxStream& in, FbxObject& out) const;
     //Properties70の値を解析する
