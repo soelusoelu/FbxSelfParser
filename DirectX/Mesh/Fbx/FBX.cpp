@@ -1,11 +1,6 @@
 ﻿#include "FBX.h"
-#include "FbxMaterial.h"
 #include "FbxMesh.h"
-#include "FbxObjects.h"
 #include "FbxParser.h"
-#include "FbxTexture.h"
-#include "../../System/AssetsManager.h"
-#include "../../Utility/FileUtil.h"
 #include <fstream>
 #include <sstream>
 
@@ -22,11 +17,9 @@ void FBX::parse(
     std::vector<Motion>& motions,
     std::vector<Bone>& bones
 ) {
-    //fbxファイルを開いて内容を読み込む
-    std::ifstream ifs(filePath, std::ios_base::in | std::ios_base::binary);
-    if (ifs.fail()) {
-        return;
-    }
+    //解析開始
+    FbxParser parser;
+    parser.parse(filePath);
 
     //現状1つ
     meshesVertices.resize(1);
@@ -34,48 +27,23 @@ void FBX::parse(
     meshesIndices.resize(1);
     materials.resize(1);
 
-    //解析開始
-    FbxParser parser;
-    parser.parse(filePath);
-
-    const auto& obj = parser.getObjects();
-    const auto& mesh = obj.getMesh();
+    const auto& mesh = parser.getMesh();
     const auto& vertices = mesh.getVertices();
     const auto& indices = mesh.getIndices();
     const auto& normals = mesh.getNormals();
     const auto& uvs = mesh.getUVs();
-    meshesVerticesPosition[0] = vertices;
-    meshesIndices[0] = mesh.getIndices();
+    auto size = vertices.size();
 
-    auto vertSize = vertices.size();
     auto& meshVertices = meshesVertices[0];
-    meshVertices.resize(vertSize);
-    for (size_t i = 0; i < vertSize; ++i) {
-        auto& vertex = meshVertices[i];
-        vertex.pos = vertices[i];
-        vertex.normal = normals[i];
-        vertex.uv = uvs[i];
-    }
+    auto& meshIndices = meshesIndices[0];
+    meshVertices.resize(size);
+    meshIndices.resize(size);
+    for (size_t i = 0; i < size; ++i) {
+        auto& v = meshVertices[i];
+        v.pos = vertices[i];
+        v.normal = normals[i];
+        v.uv = uvs[i];
 
-    memcpy(&materials[0], &obj.getMaterial(), sizeof(Material));
-    if (obj.getTexture().isUseBaseTexture()) {
-        const auto& texName = obj.getTexture().getBaseTextureName();
-        auto directoryPath = FileUtil::getDirectryFromFilePath(filePath);
-        const auto& texID = AssetsManager::instance().createTexture(texName, directoryPath);
-        materials[0].textureID = texID;
+        meshIndices[i] = indices[i];
     }
-}
-
-bool FBX::isSkip(const std::string& line) const {
-    //文字列が空ならスキップ
-    if (line.empty()) {
-        return true;
-    }
-    //文字列の先頭がセミコロン(コメント)ならスキップ
-    if (line[0] == ';') {
-        return true;
-    }
-
-    //スキップしない
-    return false;
 }

@@ -21,7 +21,4 @@ public:
         std::vector<Motion>& motions,
         std::vector<Bone>& bones
     ) override;
-
-private:
-    bool isSkip(const std::string& line) const;
 };

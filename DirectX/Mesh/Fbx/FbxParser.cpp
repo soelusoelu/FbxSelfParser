@@ -1,14 +1,14 @@
 ﻿#include "FbxParser.h"
-#include "FbxObjects.h"
-#include "../../Engine/DebugManager/DebugUtility/Debug.h"
-#include <fstream>
-#include <sstream>
-#include "FbxObject.h"
-#include "FbxReader.h"
-#include "FbxStream.h"
+#include "FbxMesh.h"
+#include "Reader/FbxObject.h"
+#include "Reader/FbxReader.h"
+#include "Reader/FbxStream.h"
+#include <cassert>
 
 FbxParser::FbxParser()
-    : mObjects(std::make_unique<FbxObjects>())
+    : mReader(std::make_unique<FbxReader>())
+    , mRootObject(std::make_unique<FbxObject>())
+    , mMeshObject(nullptr)
 {
 }
 
@@ -16,25 +16,21 @@ FbxParser::~FbxParser() = default;
 
 void FbxParser::parse(const std::string& filePath) {
     FbxStream stream(filePath.c_str());
-    FbxObject root;
-    FbxReader reader;
-    reader.parse(stream, root);
+    mReader->parse(stream, *mRootObject);
+
+    const auto& objects = getObject("Objects");
+    const auto& geometry = objects.getObject("Geometry");
+    mMeshObject = std::make_unique<FbxMesh>(geometry);
 }
 
-const FbxObjects& FbxParser::getObjects() const {
-    return *mObjects;
+const FbxObject& FbxParser::getRootObject() const {
+    return *mRootObject;
 }
 
-bool FbxParser::isSkip(const std::string& line) const {
-    //文字列が空ならスキップ
-    if (line.empty()) {
-        return true;
-    }
-    //文字列の先頭がセミコロン(コメント)ならスキップ
-    if (line[0] == ';') {
-        return true;
-    }
+const FbxObject& FbxParser::getObject(const std::string& name) const {
+    return mRootObject->getObject(name);
+}
 
-    //スキップしない
-    return false;
+const FbxMesh& FbxParser::getMesh() const {
+    return *mMeshObject;
 }

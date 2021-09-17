@@ -248,12 +248,9 @@
     <ClCompile Include="Engine\DebugManager\DebugUtility\DebugUtility.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\Log.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxParser.cpp" />
-    <ClCompile Include="Mesh\Fbx\FbxObjects.cpp" />
-    <ClCompile Include="Mesh\Fbx\FbxMaterial.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxMesh.cpp" />
-    <ClCompile Include="Mesh\Fbx\FbxTexture.cpp" />
-    <ClCompile Include="Mesh\Fbx\FbxReader.cpp" />
-    <ClCompile Include="Mesh\Fbx\FbxStream.cpp" />
+    <ClCompile Include="Mesh\Fbx\Reader\FbxReader.cpp" />
+    <ClCompile Include="Mesh\Fbx\Reader\FbxStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -558,13 +555,10 @@
     <ClInclude Include="Engine\DebugManager\DebugUtility\DebugUtility.h" />
     <ClInclude Include="Engine\DebugManager\DebugUtility\Log.h" />
     <ClInclude Include="Mesh\Fbx\FbxParser.h" />
-    <ClInclude Include="Mesh\Fbx\FbxObjects.h" />
-    <ClInclude Include="Mesh\Fbx\FbxMaterial.h" />
     <ClInclude Include="Mesh\Fbx\FbxMesh.h" />
-    <ClInclude Include="Mesh\Fbx\FbxTexture.h" />
-    <ClInclude Include="Mesh\Fbx\FbxReader.h" />
-    <ClInclude Include="Mesh\Fbx\FbxStream.h" />
-    <ClInclude Include="Mesh\Fbx\FbxObject.h" />
+    <ClInclude Include="Mesh\Fbx\Reader\FbxReader.h" />
+    <ClInclude Include="Mesh\Fbx\Reader\FbxStream.h" />
+    <ClInclude Include="Mesh\Fbx\Reader\FbxObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

@@ -3,6 +3,10 @@
 #include "FbxObject.h"
 #include <assert.h>
 
+FbxReader::FbxReader() = default;
+
+FbxReader::~FbxReader() = default;
+
 void FbxReader::parse(FbxStream& in, FbxObject& value) const {
     //中身の先頭までスキップ
     skipSpaceAndComments(in);
@@ -19,20 +23,18 @@ void FbxReader::parse(FbxStream& in, FbxObject& value) const {
             in.take(); //skip :
             skipSpace(in);
 
-            parseAttributesOrValue(in, value, name);
+            parseAttributesOrValues(in, value, name);
 
             skipSpaceAndComments(in);
         }
     }
 }
 
-void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const std::string& key) const {
+void FbxReader::parseAttributesOrValues(FbxStream& in, FbxObject& value, const std::string& key) const {
     std::string s;
     char c = in.peek();
     if (c == '{') {
-        auto& v = value.children.emplace_back();
-        v.name = key;
-        parseObject(in, v);
+        parseObject(in, value, key, nullptr);
         return;
     } else if (c == '"') {
         parseString(in, s);
@@ -49,32 +51,28 @@ void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const st
     if (in.peek() == ',') {
         std::vector<std::string> values(1, s);
 
-        while (in.peek() == ',') {
+        do {
             in.take(); //skip ,
             skipSpace(in);
 
             parseValue(in, values.emplace_back());
-        }
+        } while (in.peek() == ',');
 
         //値配列の終わり
         if (in.peek() != '{') {
-            value.arrayValues.emplace(key, values);
+            value.valueArray.emplace(key, values);
         }
         //attributeの終わり
         else {
-            auto& v = value.children.emplace_back();
-            v.attributes = values;
-            v.name = key;
-            parseObject(in, v);
+            parseObject(in, value, key, &values);
         }
 
         return;
     }
     //attributeの終わり
     else if (in.peek() == '{') {
-        auto& v = value.children.emplace_back();
-        v.name = key;
-        parseObject(in, v);
+        std::vector<std::string> tmp(1, s);
+        parseObject(in, value, key, &tmp);
     } 
     //attributeではない(値である)
     else {
@@ -97,10 +95,17 @@ void FbxReader::parseValue(FbxStream& in, std::string& value) const {
     skipSpaceAndComments(in);
 }
 
-void FbxReader::parseObject(FbxStream& in, FbxObject& out) const {
+void FbxReader::parseObject(FbxStream& in, FbxObject& parent, const std::string& name, const std::vector<std::string>* attributes) const {
     assert(in.peek() == '{');
     in.take(); //skip {
     skipSpaceAndComments(in);
+
+    //子オブジェクトを作成する
+    auto& child = parent.children.emplace_back();
+    child.name = name;
+    if (attributes) {
+        child.attributes = *attributes;
+    }
 
     //空オブジェクトかチェック
     if (consume(in, '}')) {
@@ -116,9 +121,9 @@ void FbxReader::parseObject(FbxStream& in, FbxObject& out) const {
         skipSpaceAndComments(in);
 
         if (name == "Properties70") {
-            parseProperties70(in, out);
+            parseProperties70(in, child);
         } else {
-            parseAttributesOrValue(in, out, name);
+            parseAttributesOrValues(in, child, name);
         }
 
         skipSpaceAndComments(in);
@@ -146,6 +151,12 @@ void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
     while ((c >= '0' && c <= '9') || c == '.') {
         out += c;
         c = in.take();
+    }
+
+    if (c == 'e') {
+        out += 'e';
+        in.take(); //skip e
+        parseNumber(in, out);
     }
 }
 
@@ -186,7 +197,7 @@ void FbxReader::parseArray(FbxStream& in, FbxObject& out, const std::string& key
     //文字列から要素数を取得する
     unsigned numValue = static_cast<unsigned>(std::stoi(numValueStr));
 
-    FbxArrayValue values(numValue);
+    FbxValueArray values(numValue);
 
     assert(in.peek() == 'a');
     in.take(); //skip a
@@ -208,7 +219,7 @@ void FbxReader::parseArray(FbxStream& in, FbxObject& out, const std::string& key
     assert(in.peek() == '}');
     in.take(); //skip }
 
-    out.arrayValues.emplace(key, values);
+    out.valueArray.emplace(key, values);
 }
 
 void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {

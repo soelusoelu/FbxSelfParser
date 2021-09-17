@@ -29,7 +29,9 @@
         "AssetsRenderTextureList": {
             "textureSize": 64,
             "textureDisplayInterval": 32,
-            "texturesFilePath": []
+            "texturesFilePath": [
+                "Assets\\Model\\box_ascii.fbx"
+            ]
         },
         "AssetsRenderTextureAdder": {
             "renderPosition": [
@@ -41,8 +43,8 @@
         "ModelViewerLight": {
             "direction": [
                 0.9659258127212524,
-                -0.000001114472411245515,
-                -0.000001114472411245515,
+                -5.387357759900624e-7,
+                -9.602042609913042e-7,
                 -0.258819043636322
             ],
             "color": [

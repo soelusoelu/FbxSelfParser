@@ -7,16 +7,21 @@ class FbxStream;
 
 class FbxReader {
 public:
+    FbxReader();
+    ~FbxReader();
+    FbxReader(const FbxReader&) = delete;
+    FbxReader& operator=(const FbxReader&) = delete;
+
     //FbxStreamの中身を解析する
     void parse(FbxStream& in, FbxObject& value) const;
 
 private:
     //attributeかvalueか判断し解析する
-    void parseAttributesOrValue(FbxStream& in, FbxObject& value, const std::string& key) const;
+    void parseAttributesOrValues(FbxStream& in, FbxObject& value, const std::string& key) const;
     //値を解析する
     void parseValue(FbxStream& in, std::string& value) const;
     //{}で囲まれたオブジェクトを解析する
-    void parseObject(FbxStream& in, FbxObject& out) const;
+    void parseObject(FbxStream& in, FbxObject& parent, const std::string& name, const std::vector<std::string>* attributes) const;
     //値名を解析する
     void parseValueName(FbxStream& in, std::string& out) const;
     //数値を解析する
@@ -29,6 +34,7 @@ private:
     void parseProperties70(FbxStream& in, FbxObject& out) const;
     //Properties70の値を解析する
     void parseProperties70Value(FbxStream& in, FbxProperties70& out) const;
+
     //スペースとコメントをスキップする
     void skipSpaceAndComments(FbxStream& in) const;
     //スペースをスキップする

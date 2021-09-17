@@ -1,9 +1,11 @@
 ﻿#pragma once
 
+#include "Reader/FbxObject.h"
 #include <memory>
 #include <string>
 
-class FbxObjects;
+class FbxReader;
+class FbxMesh;
 
 class FbxParser {
 public:
@@ -13,11 +15,13 @@ public:
     FbxParser& operator=(const FbxParser&) = delete;
 
     void parse(const std::string& filePath);
-    const FbxObjects& getObjects() const;
+
+    const FbxObject& getRootObject() const;
+    const FbxObject& getObject(const std::string& name) const;
+    const FbxMesh& getMesh() const;
 
 private:
-    bool isSkip(const std::string& line) const;
-
-private:
-    std::unique_ptr<FbxObjects> mObjects;
+    std::unique_ptr<FbxReader> mReader;
+    std::unique_ptr<FbxObject> mRootObject;
+    std::unique_ptr<FbxMesh> mMeshObject;
 };
