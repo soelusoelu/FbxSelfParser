@@ -21,8 +21,6 @@ private:
     void parseValueName(FbxStream& in, std::string& out) const;
     //数値を解析する
     void parseNumber(FbxStream& in, std::string& out) const;
-    //数値、配列なら数値配列を解析する
-    void parseNumberArray(FbxStream& in, std::string& out) const;
     //""で囲まれた文字列を解析する
     void parseString(FbxStream& in, std::string& out) const;
     //配列を解析する
@@ -37,6 +35,4 @@ private:
     void skipSpace(FbxStream& in) const;
     //expectが現在の読み取り位置の文字と一致していたら、読み取り位置を一つ進める
     bool consume(FbxStream& in, char expect) const;
-    //attributeを追加する対象のオブジェクトを取得する
-    FbxObject& getObjectAddAttribute(FbxObject& value) const;
 };

@@ -40,36 +40,46 @@ void FbxReader::parseAttributesOrValue(FbxStream& in, FbxObject& value, const st
         parseArray(in, value, key);
         return;
     } else {
-        parseNumberArray(in, s);
+        parseNumber(in, s);
     }
 
     skipSpaceAndComments(in);
 
-    c = in.peek();
-    //attributeが続くか、数値が続いている
-    if (c == ',') {
-        getObjectAddAttribute(value).attributes.emplace_back(s);
+    //attributeが続くか、値が続いている
+    if (in.peek() == ',') {
+        std::vector<std::string> values(1, s);
 
-        in.take(); //skip ,
-        skipSpace(in);
+        while (in.peek() == ',') {
+            in.take(); //skip ,
+            skipSpace(in);
 
-        parseAttributesOrValue(in, value, key);
-    } 
+            parseValue(in, values.emplace_back());
+        }
+
+        //値配列の終わり
+        if (in.peek() != '{') {
+            value.arrayValues.emplace(key, values);
+        }
+        //attributeの終わり
+        else {
+            auto& v = value.children.emplace_back();
+            v.attributes = values;
+            v.name = key;
+            parseObject(in, v);
+        }
+
+        return;
+    }
     //attributeの終わり
-    else if (c == '{') {
-        auto& v = getObjectAddAttribute(value);
-
-        v.attributes.emplace_back(s);
+    else if (in.peek() == '{') {
+        auto& v = value.children.emplace_back();
         v.name = key;
-
         parseObject(in, v);
     } 
-    //attributeではない
+    //attributeではない(値である)
     else {
         value.values.emplace(key, s);
     }
-
-    value.values.emplace(key, s);
 }
 
 void FbxReader::parseValue(FbxStream& in, std::string& value) const {
@@ -81,7 +91,7 @@ void FbxReader::parseValue(FbxStream& in, std::string& value) const {
     } else if (c == '*') {
         assert(false);
     } else {
-        parseNumberArray(in, value);
+        parseNumber(in, value);
     }
 
     skipSpaceAndComments(in);
@@ -136,26 +146,6 @@ void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
     while ((c >= '0' && c <= '9') || c == '.') {
         out += c;
         c = in.take();
-    }
-}
-
-void FbxReader::parseNumberArray(FbxStream& in, std::string& out) const {
-    parseNumber(in, out);
-
-    skipSpace(in);
-    while (in.peek() == ',') {
-        auto pos = in.tell();
-        in.take(); //skip ,
-        skipSpace(in);
-
-        char c = in.peek();
-        if ((c >= '0' && c <= '9') || c == '-') {
-            out += ',';
-            parseNumber(in, out);
-        } else {
-            in.seek(pos);
-            break;
-        }
     }
 }
 
@@ -272,11 +262,17 @@ void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) cons
     }
 
     //Vector3など値が一つではないこともあるので、カンマが続く限り文字列を繋げていく
-    while (in.peek() == ',') {
+    while (true) {
         in.take(); //skip ,
         skipSpace(in);
 
         parseValue(in, out.value);
+
+        if (in.peek() == ',') {
+            out.value += ',';
+        } else {
+            break;
+        }
     }
 }
 
@@ -305,18 +301,5 @@ bool FbxReader::consume(FbxStream& in, char expect) const {
         return true;
     } else {
         return false;
-    }
-}
-
-FbxObject& FbxReader::getObjectAddAttribute(FbxObject& value) const {
-    if (value.children.empty()) {
-        return value.children.emplace_back();
-    }
-
-    auto& back = value.children.back();
-    if (back.name.empty() && back.values.empty() && back.children.empty()) {
-        return back;
-    } else {
-        return value.children.emplace_back();
     }
 }
