@@ -19,8 +19,7 @@ void FbxParser::parse(const std::string& filePath) {
     mReader->parse(stream, *mRootObject);
 
     const auto& objects = getObject("Objects");
-    const auto& geometry = objects.getObject("Geometry");
-    mMeshObject = std::make_unique<FbxMesh>(geometry);
+    mMeshObject = std::make_unique<FbxMesh>(objects);
 }
 
 const FbxObject& FbxParser::getRootObject() const {

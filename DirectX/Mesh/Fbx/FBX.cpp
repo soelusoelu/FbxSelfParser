@@ -35,14 +35,18 @@ void FBX::parse(
     auto size = vertices.size();
 
     auto& meshVertices = meshesVertices[0];
+    auto& meshVerticesPosition = meshesVerticesPosition[0];
     auto& meshIndices = meshesIndices[0];
     meshVertices.resize(size);
+    meshVerticesPosition.resize(size);
     meshIndices.resize(size);
     for (size_t i = 0; i < size; ++i) {
         auto& v = meshVertices[i];
         v.pos = vertices[i];
         v.normal = normals[i];
         v.uv = uvs[i];
+
+        meshVerticesPosition[i] = vertices[i];
 
         meshIndices[i] = indices[i];
     }

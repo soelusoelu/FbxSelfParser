@@ -245,7 +245,7 @@ void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {
     in.take(); //skip }
 }
 
-void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) const {
+void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties& out) const {
     parseString(in, out.name);
     skipSpace(in);
     assert(in.peek() == ',');
@@ -280,7 +280,8 @@ void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) cons
         parseValue(in, out.value);
 
         if (in.peek() == ',') {
-            out.value += ',';
+            //std::istringstreamで読み取る前提でスペースを入れる
+            out.value += ' ';
         } else {
             break;
         }

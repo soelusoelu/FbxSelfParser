@@ -6,7 +6,7 @@
 
 class FbxMesh {
 public:
-    FbxMesh(const FbxObject& geometryObject);
+    FbxMesh(const FbxObject& objectsObject);
     ~FbxMesh();
     FbxMesh(const FbxMesh&) = delete;
     FbxMesh& operator=(const FbxMesh&) = delete;
@@ -18,17 +18,19 @@ public:
 
 private:
     void parse();
+    void parseLclMatrix();
     //頂点を読み込む
-    void parseVertices();
+    void parseVertices(const FbxObject& geometryObject);
     //インデックスを読み込む
-    void parseIndices();
+    void parseIndices(const FbxObject& geometryObject);
     //法線を読み込む
-    void parseNormals();
+    void parseNormals(const FbxObject& geometryObject);
     //UVを読み込む
-    void parseUV();
+    void parseUV(const FbxObject& geometryObject);
 
 private:
-    const FbxObject& mGeometryObject;
+    const FbxObject& mObjectsObject;
+
     //頂点配列
     std::vector<Vector3> mVertices;
     //面法線用頂点配列
@@ -45,4 +47,9 @@ private:
     std::vector<Vector2> mSurfaceUVs;
     //UVインデックス配列
     std::vector<unsigned short> mUVIndices;
+
+    Vector3 mLclTranslation;
+    Quaternion mLclRotation;
+    Vector3 mLclScaling;
+    Matrix4 mLclMatrix;
 };

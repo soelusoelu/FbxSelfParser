@@ -5,15 +5,16 @@
 #include <vector>
 #include <unordered_map>
 
-using FbxValueArray = std::vector<std::string>;
-
-struct FbxProperties70 {
+struct FbxProperties {
     std::string name;
     std::string type;
     std::string type2;
     std::string unknown;
     std::string value;
 };
+
+using FbxValueArray = std::vector<std::string>;
+using FbxProperties70 = std::vector<FbxProperties>;
 
 struct FbxObject {
     //オブジェクト名
@@ -27,7 +28,7 @@ struct FbxObject {
     //子オブジェクト
     std::vector<FbxObject> children;
     //プロパティ
-    std::vector<FbxProperties70> properties;
+    FbxProperties70 properties;
 
 
 
@@ -36,6 +37,25 @@ struct FbxObject {
         for (const auto& c : children) {
             if (c.name == name) {
                 return c;
+            }
+        }
+
+        assert(false);
+    }
+
+    //nameとattributeに一致する子オブジェクトを取得する
+    const FbxObject& getObject(const std::string& name, const std::string& attribute) const {
+        for (const auto& c : children) {
+            //まずnameと一致するか確かめる
+            if (c.name != name) {
+                continue;
+            }
+
+            //次にattributeと一致するか確かめる
+            for (const auto& a : c.attributes) {
+                if (a == attribute) {
+                    return c;
+                }
             }
         }
 
@@ -53,7 +73,7 @@ struct FbxObject {
     }
 
     //nameと一致するプロパティを取得する
-    const FbxProperties70& getProperties(const std::string& name) const {
+    const FbxProperties& getProperties(const std::string& name) const {
         for (const auto& p : properties) {
             if (p.name == name) {
                 return p;
@@ -61,5 +81,16 @@ struct FbxObject {
         }
 
         assert(false);
+    }
+
+    //nameと一致するプロパティが存在するか
+    bool hasProperties(const std::string& name) const {
+        for (const auto& p : properties) {
+            if (p.name == name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 };
