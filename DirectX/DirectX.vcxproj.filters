@@ -251,6 +251,7 @@
     <ClCompile Include="Mesh\Fbx\FbxMesh.cpp" />
     <ClCompile Include="Mesh\Fbx\Reader\FbxReader.cpp" />
     <ClCompile Include="Mesh\Fbx\Reader\FbxStream.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -559,6 +560,7 @@
     <ClInclude Include="Mesh\Fbx\Reader\FbxReader.h" />
     <ClInclude Include="Mesh\Fbx\Reader\FbxStream.h" />
     <ClInclude Include="Mesh\Fbx\Reader\FbxObject.h" />
+    <ClInclude Include="Mesh\Fbx\FbxMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

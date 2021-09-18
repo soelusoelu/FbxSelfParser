@@ -1,4 +1,5 @@
 ﻿#include "FbxParser.h"
+#include "FbxMaterial.h"
 #include "FbxMesh.h"
 #include "Reader/FbxObject.h"
 #include "Reader/FbxReader.h"
@@ -9,6 +10,7 @@ FbxParser::FbxParser()
     : mReader(std::make_unique<FbxReader>())
     , mRootObject(std::make_unique<FbxObject>())
     , mMeshObject(nullptr)
+    , mMaterialObject(nullptr)
 {
 }
 
@@ -20,6 +22,7 @@ void FbxParser::parse(const std::string& filePath) {
 
     const auto& objects = getObject("Objects");
     mMeshObject = std::make_unique<FbxMesh>(objects);
+    mMaterialObject = std::make_unique<FbxMaterial>(objects);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
@@ -32,4 +35,8 @@ const FbxObject& FbxParser::getObject(const std::string& name) const {
 
 const FbxMesh& FbxParser::getMesh() const {
     return *mMeshObject;
+}
+
+const FbxMaterial& FbxParser::getMaterial() const {
+    return *mMaterialObject;
 }

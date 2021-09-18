@@ -6,6 +6,7 @@
 
 class FbxReader;
 class FbxMesh;
+class FbxMaterial;
 
 class FbxParser {
 public:
@@ -19,9 +20,11 @@ public:
     const FbxObject& getRootObject() const;
     const FbxObject& getObject(const std::string& name) const;
     const FbxMesh& getMesh() const;
+    const FbxMaterial& getMaterial() const;
 
 private:
     std::unique_ptr<FbxReader> mReader;
     std::unique_ptr<FbxObject> mRootObject;
     std::unique_ptr<FbxMesh> mMeshObject;
+    std::unique_ptr<FbxMaterial> mMaterialObject;
 };

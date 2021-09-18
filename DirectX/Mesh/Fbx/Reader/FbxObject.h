@@ -62,6 +62,17 @@ struct FbxObject {
         assert(false);
     }
 
+    //nameと一致するプロパティが存在するか
+    bool hasObject(const std::string& name) const {
+        for (const auto& c : children) {
+            if (c.name == name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //keyに対応する値を取得する
     const std::string& getValue(const std::string& key) const {
         return values.at(key);

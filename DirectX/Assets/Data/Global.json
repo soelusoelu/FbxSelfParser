@@ -30,7 +30,7 @@
             "textureSize": 64,
             "textureDisplayInterval": 32,
             "texturesFilePath": [
-                "Assets\\Model\\box_ascii.fbx"
+                "Assets\\Model\\octopus_born_ascii.fbx"
             ]
         },
         "AssetsRenderTextureAdder": {
@@ -43,9 +43,9 @@
         "ModelViewerLight": {
             "direction": [
                 0.9659258127212524,
-                -1.828516360546928e-7,
-                -7.668554644624237e-7,
-                0.258819043636322
+                -0.000001114472411245515,
+                -0.000001114472411245515,
+                -0.258819043636322
             ],
             "color": [
                 1.0,

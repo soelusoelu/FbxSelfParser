@@ -1,6 +1,9 @@
 ﻿#include "FBX.h"
+#include "FbxMaterial.h"
 #include "FbxMesh.h"
 #include "FbxParser.h"
+#include "../../System/AssetsManager.h"
+#include "../../Utility/FileUtil.h"
 #include <fstream>
 #include <sstream>
 
@@ -49,5 +52,16 @@ void FBX::parse(
         meshVerticesPosition[i] = vertices[i];
 
         meshIndices[i] = indices[i];
+    }
+
+    const auto& material = parser.getMaterial();
+    const auto& mat = material.getMaterial();
+    auto& outMat = materials[0];
+    memcpy(&outMat, &mat, sizeof(Material));
+
+    const auto& baseTexture = material.getBaseTextureName();
+    if (baseTexture.size() > 0) {
+        auto directryPath = FileUtil::getDirectryFromFilePath(filePath);
+        outMat.textureID = AssetsManager::instance().createTexture(baseTexture, directryPath);
     }
 }

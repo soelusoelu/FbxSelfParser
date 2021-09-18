@@ -12,7 +12,6 @@ struct Material {
     float transparency; //透明値
     float shininess;
     int textureID;
-    int normalMapTextureID;
 
     static constexpr int INVALID_ID = -1;
 
@@ -25,7 +24,6 @@ struct Material {
         , transparency(1.f)
         , shininess(1.f)
         , textureID(INVALID_ID)
-        , normalMapTextureID(INVALID_ID)
     {
     }
 };
