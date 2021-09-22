@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Reader/FbxObject.h"
+#include "../IMeshLoader.h"
 #include "../../Math/Math.h"
 #include <vector>
 
@@ -11,13 +12,9 @@ public:
     FbxMesh(const FbxMesh&) = delete;
     FbxMesh& operator=(const FbxMesh&) = delete;
 
-    const std::vector<Vector3>& getVertices() const;
-    const std::vector<unsigned short>& getIndices() const;
-    const std::vector<Vector3>& getNormals() const;
-    const std::vector<Vector2>& getUVs() const;
+    void parse(MeshVertices& meshVertices, Indices& indices) const;
 
 private:
-    void parse();
     void parseLclMatrix();
     //頂点を読み込む
     void parseVertices(const FbxObject& geometryObject);
@@ -33,18 +30,12 @@ private:
 
     //頂点配列
     std::vector<Vector3> mVertices;
-    //面法線用頂点配列
-    std::vector<Vector3> mSurfaceVertices;
     //インデックス配列
     std::vector<unsigned short> mIndices;
-    //面法線用インデックス配列
-    std::vector<unsigned short> mSurfaceIndices;
     //法線配列
-    std::vector<Vector3> mSurfaceNormals;
+    std::vector<Vector3> mNormals;
     //UV配列
     std::vector<Vector2> mUVs;
-    //面法線用UV配列
-    std::vector<Vector2> mSurfaceUVs;
     //UVインデックス配列
     std::vector<unsigned short> mUVIndices;
 

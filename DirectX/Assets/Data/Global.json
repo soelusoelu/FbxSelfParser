@@ -30,7 +30,7 @@
             "textureSize": 64,
             "textureDisplayInterval": 32,
             "texturesFilePath": [
-                "Assets\\Model\\octopus_born_ascii.fbx"
+                "Assets\\Model\\cylinderSkel02_Anim_ascii.fbx"
             ]
         },
         "AssetsRenderTextureAdder": {
@@ -43,9 +43,9 @@
         "ModelViewerLight": {
             "direction": [
                 0.9659258127212524,
-                -0.000001114472411245515,
-                -0.000001114472411245515,
-                -0.258819043636322
+                -6.434408987843199e-7,
+                -6.434408987843199e-7,
+                0.258819043636322
             ],
             "color": [
                 1.0,

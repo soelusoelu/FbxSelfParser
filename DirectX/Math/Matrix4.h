@@ -86,5 +86,9 @@ private:
     float createDeterminant(const float src[3][3]);
 
 public:
+    //行数
+    static constexpr int ROW_COUNT = 4;
+    //列数
+    static constexpr int COLUMN_COUNT = 4;
     static const Matrix4 identity;
 };

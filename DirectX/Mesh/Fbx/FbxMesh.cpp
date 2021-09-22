@@ -10,46 +10,28 @@ FbxMesh::FbxMesh(const FbxObject& objectsObject)
     , mLclScaling(Vector3::one)
     , mLclMatrix(Matrix4::identity)
 {
-    parse();
-}
-
-FbxMesh::~FbxMesh() = default;
-
-const std::vector<Vector3>& FbxMesh::getVertices() const {
-    return mSurfaceVertices;
-}
-
-const std::vector<unsigned short>& FbxMesh::getIndices() const {
-    return mSurfaceIndices;
-}
-
-const std::vector<Vector3>& FbxMesh::getNormals() const {
-    return mSurfaceNormals;
-}
-
-const std::vector<Vector2>& FbxMesh::getUVs() const {
-    return mSurfaceUVs;
-}
-
-void FbxMesh::parse() {
     const auto& geometryObject = mObjectsObject.getObject("Geometry");
 
     parseLclMatrix();
-
     parseVertices(geometryObject);
     parseIndices(geometryObject);
     parseNormals(geometryObject);
     parseUV(geometryObject);
+}
 
-    auto size = mSurfaceNormals.size();
-    mSurfaceVertices.resize(size);
-    mSurfaceIndices.resize(size);
-    mSurfaceUVs.resize(size);
+FbxMesh::~FbxMesh() = default;
+
+void FbxMesh::parse(MeshVertices& meshVertices, Indices& indices) const {
+    auto size = mNormals.size();
+    meshVertices.resize(size);
+    indices.resize(size);
 
     for (size_t i = 0; i < size; ++i) {
-        mSurfaceIndices[i] = i;
-        mSurfaceVertices[i] = mVertices[mIndices[i]];
-        mSurfaceUVs[i] = mUVs[mUVIndices[i]];
+        auto& v = meshVertices[i];
+        indices[i] = static_cast<unsigned short>(i);
+        v.pos = mVertices[mIndices[i]];
+        v.normal = mNormals[i];
+        v.uv = mUVs[mUVIndices[i]];
     }
 }
 
@@ -119,10 +101,10 @@ void FbxMesh::parseNormals(const FbxObject& geometryObject) {
     const auto& normalObject = geometryObject.getObject("LayerElementNormal");
     const auto& normals = normalObject.getArray("Normals");
     auto size = normals.size() / 3;
-    mSurfaceNormals.resize(size);
+    mNormals.resize(size);
 
     for (size_t i = 0; i < size; ++i) {
-        auto& n = mSurfaceNormals[i];
+        auto& n = mNormals[i];
         auto idx = i * 3;
         n.x = std::stof(normals[idx]);
         n.y = std::stof(normals[idx + 1]);

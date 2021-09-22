@@ -122,6 +122,8 @@ void FbxReader::parseObject(FbxStream& in, FbxObject& parent, const std::string&
 
         if (name == "Properties70") {
             parseProperties70(in, child);
+        } else if (name == "C") {
+            parseConnections(in, child.connections.emplace_back());
         } else {
             parseAttributesOrValues(in, child, name);
         }
@@ -156,6 +158,11 @@ void FbxReader::parseNumber(FbxStream& in, std::string& out) const {
     if (c == 'e') {
         out += 'e';
         in.take(); //skip e
+
+        if (consume(in, '+')) {
+            out += '+';
+        }
+
         parseNumber(in, out);
     }
 }
@@ -288,6 +295,37 @@ void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties& out) const 
     }
 }
 
+void FbxReader::parseConnections(FbxStream& in, FbxConnections& out) const {
+    parseString(in, out.unknown);
+    skipSpace(in);
+    assert(in.peek() == ',');
+    in.take(); //skip ,
+    skipSpace(in);
+
+    std::string tmp;
+    parseNumber(in, tmp);
+    out.child = std::stoi(tmp);
+    skipSpace(in);
+    assert(in.peek() == ',');
+    in.take(); //skip ,
+    skipSpace(in);
+
+    tmp.clear();
+    parseNumber(in, tmp);
+    out.parent = std::stoi(tmp);
+    skipSpace(in);
+
+    //4つ目の値がないこともあるためチェック
+    if (in.peek() != ',') {
+        return;
+    }
+
+    in.take(); //skip ,
+    skipSpace(in);
+
+    parseString(in, out.unknown2);
+}
+
 void FbxReader::skipSpaceAndComments(FbxStream& in) const {
     skipSpace(in);
 
@@ -308,7 +346,7 @@ void FbxReader::skipSpace(FbxStream& in) const {
 }
 
 bool FbxReader::consume(FbxStream& in, char expect) const {
-    if (static_cast<char>(in.peek()) == expect) {
+    if (in.peek() == expect) {
         in.take();
         return true;
     } else {

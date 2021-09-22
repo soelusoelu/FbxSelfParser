@@ -13,6 +13,13 @@ struct FbxProperties {
     std::string value;
 };
 
+struct FbxConnections {
+    std::string unknown;
+    unsigned child = 0;
+    unsigned parent = 0;
+    std::string unknown2;
+};
+
 using FbxValueArray = std::vector<std::string>;
 using FbxProperties70 = std::vector<FbxProperties>;
 
@@ -29,6 +36,8 @@ struct FbxObject {
     std::vector<FbxObject> children;
     //プロパティ
     FbxProperties70 properties;
+    //コネクション
+    std::vector<FbxConnections> connections;
 
 
 

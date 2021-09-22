@@ -11,18 +11,14 @@ public:
     FbxMaterial(const FbxMaterial&) = delete;
     FbxMaterial& operator=(const FbxMaterial&) = delete;
 
-    const Material& getMaterial() const;
-    const std::string& getBaseTextureName() const;
+    void parse(Material& material, const std::string& filePath) const;
 
 private:
-    void parse();
     //マテリアルを読み込む
-    void parseMaterial(const FbxObject& materialObject);
+    void parseMaterial(Material& material, const FbxObject& materialObject) const;
     //テクスチャを読み込む
-    void parseTexture(const FbxObject& textureObject);
+    void parseTexture(Material& material, const std::string& filePath, const FbxObject& textureObject) const;
 
 private:
     const FbxObject& mObjectsObject;
-    Material mMaterial;
-    std::string mBaseTextureName;
 };

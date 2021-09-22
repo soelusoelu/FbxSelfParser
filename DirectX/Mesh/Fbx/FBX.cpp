@@ -1,11 +1,10 @@
 ﻿#include "FBX.h"
+#include "FbxBone.h"
 #include "FbxMaterial.h"
 #include "FbxMesh.h"
 #include "FbxParser.h"
 #include "../../System/AssetsManager.h"
 #include "../../Utility/FileUtil.h"
-#include <fstream>
-#include <sstream>
 
 FBX::FBX() = default;
 
@@ -30,38 +29,16 @@ void FBX::parse(
     meshesIndices.resize(1);
     materials.resize(1);
 
-    const auto& mesh = parser.getMesh();
-    const auto& vertices = mesh.getVertices();
-    const auto& indices = mesh.getIndices();
-    const auto& normals = mesh.getNormals();
-    const auto& uvs = mesh.getUVs();
-    auto size = vertices.size();
-
     auto& meshVertices = meshesVertices[0];
+    parser.getMeshParser().parse(meshVertices, meshesIndices[0]);
+
     auto& meshVerticesPosition = meshesVerticesPosition[0];
-    auto& meshIndices = meshesIndices[0];
-    meshVertices.resize(size);
+    auto size = meshVertices.size();
     meshVerticesPosition.resize(size);
-    meshIndices.resize(size);
     for (size_t i = 0; i < size; ++i) {
-        auto& v = meshVertices[i];
-        v.pos = vertices[i];
-        v.normal = normals[i];
-        v.uv = uvs[i];
-
-        meshVerticesPosition[i] = vertices[i];
-
-        meshIndices[i] = indices[i];
+        meshVerticesPosition[i] = meshVertices[i].pos;
     }
 
-    const auto& material = parser.getMaterial();
-    const auto& mat = material.getMaterial();
-    auto& outMat = materials[0];
-    memcpy(&outMat, &mat, sizeof(Material));
-
-    const auto& baseTexture = material.getBaseTextureName();
-    if (baseTexture.size() > 0) {
-        auto directryPath = FileUtil::getDirectryFromFilePath(filePath);
-        outMat.textureID = AssetsManager::instance().createTexture(baseTexture, directryPath);
-    }
+    parser.getMaterialParser().parse(materials[0], filePath);
+    parser.getBoneParser().parse(bones);
 }
