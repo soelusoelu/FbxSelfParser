@@ -15,11 +15,12 @@ public:
     void parse(std::vector<Bone>& bones);
 
 private:
+    void parseLimbNode(std::vector<Bone>& bones);
     void parseBone(std::vector<Bone>& bones, const FbxObject& poseObject);
     void connect(std::vector<Bone>& bones);
 
 private:
     const FbxObject& mObjectsObject;
     const FbxObject& mConnectionsObject;
-    std::unordered_map<unsigned, unsigned> mConnections;
+    std::unordered_map<unsigned, unsigned short> mConnections;
 };

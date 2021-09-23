@@ -11,26 +11,56 @@ FbxBone::~FbxBone() = default;
 
 void FbxBone::parse(std::vector<Bone>& bones) {
     if (mObjectsObject.hasObject("Pose")) {
+        parseLimbNode(bones);
+
         const auto& poseObject = mObjectsObject.getObject("Pose");
         parseBone(bones, poseObject);
+
         connect(bones);
     }
 }
 
-void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) {
-    const auto& poseNodes = poseObject.getValue("NbPoseNodes");
-    int boneCount = std::stoi(poseNodes) - 1;
-    bones.resize(boneCount);
+void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
+    const auto& children = mObjectsObject.children;
+    for (const auto& c : children) {
+        if (c.name != "Model") {
+            continue;
+        }
+        const auto& attributes = c.attributes;
+        if (attributes[2] != "LimbNode") {
+            continue;
+        }
 
+        auto& bone = bones.emplace_back();
+        auto boneNo = static_cast<unsigned short>(bones.size() - 1);
+        bone.number = boneNo;
+        bone.name = attributes[1].substr(7); //7はModel::の文字数分
+
+        unsigned nodeNo = static_cast<unsigned>(std::stoi(attributes[0]));
+        mConnections.emplace(nodeNo, boneNo);
+    }
+}
+
+void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) {
     const auto& children = poseObject.children;
-    for (int i = 0; i < boneCount; ++i) {
-        auto& bone = bones[i];
-        const auto& c = children[i + 1];
+    auto childCount = children.size();
+    assert(std::stoi(poseObject.getValue("NbPoseNodes")) == childCount);
+
+    for (size_t i = 0; i < childCount; ++i) {
+        const auto& c = children[i];
 
         assert(c.name == "PoseNode");
 
-        //for文のインデックスをそのままボーンの番号に
-        bone.number = static_cast<unsigned short>(i);
+        //ノード番号を取得する
+        unsigned nodeNo = static_cast<unsigned>(std::stoi(c.getValue("Node")));
+
+        //mConnectionsに含まれていなければ使用しないボーン(謎)
+        auto itr = mConnections.find(nodeNo);
+        if (itr == mConnections.end()) {
+            continue;
+        }
+
+        auto& bone = bones[itr->second];
 
         const auto& matrixArray = c.getArray("Matrix");
         assert(matrixArray.size() == Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT);
@@ -45,11 +75,6 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) {
 
         //初期姿勢からオフセット行列を求める
         bone.offsetMat = Matrix4::inverse(bone.initMat);
-
-        //ノード番号を取得する
-        unsigned nodeNo = static_cast<unsigned>(std::stoi(c.getValue("Node")));
-
-        mConnections.emplace(nodeNo, i);
     }
 }
 
