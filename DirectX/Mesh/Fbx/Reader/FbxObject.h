@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cassert>
+#include <map>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -24,8 +25,6 @@ using FbxValueArray = std::vector<std::string>;
 using FbxProperties70 = std::vector<FbxProperties>;
 
 struct FbxObject {
-    //オブジェクト名
-    std::string name;
     //オブジェクトの属性
     std::vector<std::string> attributes;
     //key: 要素名、value: 文字列要素
@@ -33,7 +32,7 @@ struct FbxObject {
     //key: 要素名、value: 配列文字列要素
     std::unordered_map<std::string, FbxValueArray> valueArray;
     //子オブジェクト
-    std::vector<FbxObject> children;
+    std::multimap<std::string, FbxObject> children;
     //プロパティ
     FbxProperties70 properties;
     //コネクション
@@ -43,27 +42,19 @@ struct FbxObject {
 
     //子オブジェクトを取得する
     const FbxObject& getObject(const std::string& name) const {
-        for (const auto& c : children) {
-            if (c.name == name) {
-                return c;
-            }
-        }
-
-        assert(false);
+        return children.find(name)->second;
     }
 
     //nameとattributeに一致する子オブジェクトを取得する
     const FbxObject& getObject(const std::string& name, const std::string& attribute) const {
-        for (const auto& c : children) {
-            //まずnameと一致するか確かめる
-            if (c.name != name) {
-                continue;
-            }
-
+        //まずnameと一致する子オブジェクトを取得する
+        auto range = children.equal_range(name);
+        for (auto& r = range.first; r != range.second; ++r) {
             //次にattributeと一致するか確かめる
-            for (const auto& a : c.attributes) {
+            const auto& atributes = r->second.attributes;
+            for (const auto& a : attributes) {
                 if (a == attribute) {
-                    return c;
+                    return r->second;
                 }
             }
         }
@@ -73,13 +64,7 @@ struct FbxObject {
 
     //nameと一致するプロパティが存在するか
     bool hasObject(const std::string& name) const {
-        for (const auto& c : children) {
-            if (c.name == name) {
-                return true;
-            }
-        }
-
-        return false;
+        return (children.find(name) != children.end());
     }
 
     //keyに対応する値を取得する
@@ -112,5 +97,12 @@ struct FbxObject {
         }
 
         return false;
+    }
+
+    //オブジェクトのノードIDを取得する
+    //アトリビュートの1番目が数値である必要あり
+    unsigned getNodeId() const {
+        auto id = std::stoi(attributes[0]);
+        return static_cast<unsigned>(id);
     }
 };

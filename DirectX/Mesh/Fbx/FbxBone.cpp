@@ -34,11 +34,10 @@ void FbxBone::parse(
 
 void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
     const auto& children = mObjectsObject.children;
-    for (const auto& c : children) {
-        if (c.name != "Model") {
-            continue;
-        }
-        const auto& attributes = c.attributes;
+    auto range = children.equal_range("Model");
+    for (auto& r = range.first; r != range.second; ++r) {
+        const auto& obj = r->second;
+        const auto& attributes = obj.attributes;
         if (attributes[2] != "LimbNode") {
             continue;
         }
@@ -48,8 +47,8 @@ void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
         bone.number = boneNo;
         bone.name = attributes[1].substr(7); //7はModel::の文字数分
 
-        unsigned nodeNo = static_cast<unsigned>(std::stoi(attributes[0]));
-        mBoneConnections.emplace(nodeNo, boneNo);
+        unsigned nodeId = obj.getNodeId();
+        mBoneConnections.emplace(nodeId, boneNo);
     }
 }
 
@@ -58,13 +57,12 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) c
     auto childCount = children.size();
     assert(std::stoi(poseObject.getValue("NbPoseNodes")) == childCount);
 
-    for (size_t i = 0; i < childCount; ++i) {
-        const auto& c = children[i];
-
-        assert(c.name == "PoseNode");
+    auto range = children.equal_range("PoseNode");
+    for (auto& r = range.first; r != range.second; ++r) {
+        const auto& obj = r->second;
 
         //ノード番号を取得する
-        unsigned nodeNo = static_cast<unsigned>(std::stoi(c.getValue("Node")));
+        unsigned nodeNo = static_cast<unsigned>(std::stoi(obj.getValue("Node")));
 
         //mConnectionsに含まれていなければ使用しないボーン(謎)
         auto itr = mBoneConnections.find(nodeNo);
@@ -74,7 +72,7 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) c
 
         auto& bone = bones[itr->second];
 
-        const auto& matrixArray = c.getArray("Matrix");
+        const auto& matrixArray = obj.getArray("Matrix");
         assert(matrixArray.size() == Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT);
 
         //初期姿勢を取得する

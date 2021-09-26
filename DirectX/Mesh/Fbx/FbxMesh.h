@@ -16,25 +16,48 @@ class FbxMesh {
     };
 
 public:
-    FbxMesh(const FbxObject& objectsObject, const std::multimap<unsigned, unsigned>& connections);
+    FbxMesh(
+        const FbxObject& objectsObject,
+        const std::multimap<unsigned, unsigned>& connections
+    );
     ~FbxMesh();
     FbxMesh(const FbxMesh&) = delete;
     FbxMesh& operator=(const FbxMesh&) = delete;
 
-    void parse(std::vector<MeshVertices>& meshesVertices, std::vector<Indices>& meshesIndices) const;
+    void parse(
+        std::vector<MeshVertices>& meshesVertices,
+        std::vector<Indices>& meshesIndices
+    ) const;
     const std::vector<unsigned short>& getIndices() const;
     const std::unordered_map<unsigned, unsigned>& getLclModelNodeIDs() const;
 
 private:
-    void parseLclMatrix(const FbxObject& modelObject, unsigned nodeID);
+    void parseLclMatrix(
+        const FbxObject& lclModelObject
+    );
     //頂点を読み込む
-    void parseVertices(std::vector<Vector3>& out, const FbxObject& geometryObject, const Matrix4& lclMatrix);
+    void parseVertices(
+        std::vector<Vector3>& out,
+        const FbxObject& geometryObject,
+        const Matrix4& lclMatrix
+    );
     //インデックスを読み込む
-    void parseIndices(std::vector<unsigned short>& out, const FbxObject& geometryObject);
+    void parseIndices(
+        std::vector<unsigned short>& out,
+        const FbxObject& geometryObject
+    );
     //法線を読み込む
-    void parseNormals(std::vector<Vector3>& out, const FbxObject& geometryObject, const Quaternion& lclRotation);
+    void parseNormals(
+        std::vector<Vector3>& out,
+        const FbxObject& geometryObject,
+        const Quaternion& lclRotation
+    );
     //UVを読み込む
-    void parseUV(std::vector<Vector2>& outUV, std::vector<unsigned short>& outUVIndices, const FbxObject& geometryObject);
+    void parseUV(
+        std::vector<Vector2>& outUV,
+        std::vector<unsigned short>& outUVIndices,
+        const FbxObject& geometryObject
+    );
 
 private:
     const FbxObject& mObjectsObject;

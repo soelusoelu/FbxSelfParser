@@ -52,13 +52,10 @@ void FbxAnimation::parseTime() {
 
 void FbxAnimation::parseAnimationStack(std::vector<Motion>& motions) {
     const auto& children = mObjectsObject.children;
-    for (const auto& c : children) {
-        if (c.name != "AnimationStack") {
-            continue;
-        }
-
+    auto range = children.equal_range("AnimationStack");
+    for (auto& itr = range.first; itr != range.second; ++itr) {
         auto& motion = motions.emplace_back();
-        motion.name = c.attributes[1].substr(11); //11はAnimStack::の文字数分
+        motion.name = itr->second.attributes[1].substr(11); //11はAnimStack::の文字数分
     }
 }
 

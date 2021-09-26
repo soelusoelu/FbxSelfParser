@@ -19,16 +19,14 @@ void FbxWeight::parse(
 
         unsigned boneIndex = 0;
         const auto& children = mObjectsObject.children;
-        for (const auto& c : children) {
-            if (c.name != "Deformer") {
-                continue;
-            }
-            const auto& attributes = c.attributes;
-            if (attributes[2] != "Cluster") {
+        auto range = children.equal_range("Deformer");
+        for (auto& itr = range.first; itr != range.second; ++itr) {
+            const auto& obj = itr->second;
+            if (obj.attributes[2] != "Cluster") {
                 continue;
             }
 
-            parseWeight(meshVertices, meshIndices, mesh, c, boneIndex);
+            parseWeight(meshVertices, meshIndices, mesh, obj, boneIndex);
             ++boneIndex;
         }
 

@@ -21,31 +21,35 @@ void FbxMaterial::parse(
     const std::unordered_map<unsigned, unsigned>& lclModelNodeIDMap
 ) {
     const auto& children = mObjectsObject.children;
-    for (const auto& child : children) {
-        if (child.name == "Material") {
-            unsigned nodeID = static_cast<unsigned>(std::stoi(child.attributes[0]));
-            auto range = mConnections.equal_range(nodeID);
-            for (auto& r = range.first; r != range.second; ++r) {
-                auto itr = lclModelNodeIDMap.find(r->second);
-                if (itr == lclModelNodeIDMap.end()) {
-                    continue;
-                }
-
-                auto index = itr->second;
-                parseMaterial(materials[index], child);
-                mMaterialMap.emplace(nodeID, index);
+    auto matRange = children.equal_range("Material");
+    for (auto& r = matRange.first; r != matRange.second; ++r) {
+        const auto& obj = r->second;
+        unsigned nodeID = obj.getNodeId();
+        auto range = mConnections.equal_range(nodeID);
+        for (auto& r = range.first; r != range.second; ++r) {
+            auto itr = lclModelNodeIDMap.find(r->second);
+            if (itr == lclModelNodeIDMap.end()) {
+                continue;
             }
-        } else if (child.name == "Texture") {
-            unsigned nodeID = static_cast<unsigned>(std::stoi(child.attributes[0]));
-            auto range = mConnections.equal_range(nodeID);
-            for (auto& r = range.first; r != range.second; ++r) {
-                auto itr = mMaterialMap.find(r->second);
-                if (itr == mMaterialMap.end()) {
-                    continue;
-                }
 
-                parseTexture(materials[itr->second], filePath, child);
+            auto index = itr->second;
+            parseMaterial(materials[index], obj);
+            mMaterialMap.emplace(nodeID, index);
+        }
+    }
+
+    auto texRange = children.equal_range("Texture");
+    for (auto& r = texRange.first; r != texRange.second; ++r) {
+        const auto& obj = r->second;
+        unsigned nodeID = obj.getNodeId();
+        auto range = mConnections.equal_range(nodeID);
+        for (auto& r = range.first; r != range.second; ++r) {
+            auto itr = mMaterialMap.find(r->second);
+            if (itr == mMaterialMap.end()) {
+                continue;
             }
+
+            parseTexture(materials[itr->second], filePath, obj);
         }
     }
 }

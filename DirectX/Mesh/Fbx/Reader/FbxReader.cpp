@@ -101,8 +101,7 @@ void FbxReader::parseObject(FbxStream& in, FbxObject& parent, const std::string&
     skipSpaceAndComments(in);
 
     //子オブジェクトを作成する
-    auto& child = parent.children.emplace_back();
-    child.name = name;
+    auto& child = parent.children.emplace(name, FbxObject{})->second;
     if (attributes) {
         child.attributes = *attributes;
     }
