@@ -13,6 +13,7 @@ public:
     FbxMesh& operator=(const FbxMesh&) = delete;
 
     void parse(MeshVertices& meshVertices, Indices& indices) const;
+    const std::vector<unsigned short>& getIndices() const;
 
 private:
     void parseLclMatrix();

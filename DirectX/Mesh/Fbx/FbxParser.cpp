@@ -1,4 +1,5 @@
 ﻿#include "FbxParser.h"
+#include "FbxAnimation.h"
 #include "FbxBone.h"
 #include "FbxMaterial.h"
 #include "FbxMesh.h"
@@ -13,6 +14,7 @@ FbxParser::FbxParser()
     , mMeshObject(nullptr)
     , mMaterialObject(nullptr)
     , mBoneObject(nullptr)
+    , mAnimationObject(nullptr)
 {
 }
 
@@ -26,6 +28,7 @@ void FbxParser::parse(const std::string& filePath) {
     mMeshObject = std::make_unique<FbxMesh>(objects);
     mMaterialObject = std::make_unique<FbxMaterial>(objects);
     mBoneObject = std::make_unique<FbxBone>(objects, getObject("Connections"));
+    mAnimationObject = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
@@ -46,4 +49,8 @@ const FbxMaterial& FbxParser::getMaterialParser() const {
 
 FbxBone& FbxParser::getBoneParser() const {
     return *mBoneObject;
+}
+
+FbxAnimation& FbxParser::getAnimationParser() const {
+    return *mAnimationObject;
 }

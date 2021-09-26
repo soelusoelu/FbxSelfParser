@@ -35,6 +35,10 @@ void FbxMesh::parse(MeshVertices& meshVertices, Indices& indices) const {
     }
 }
 
+const std::vector<unsigned short>& FbxMesh::getIndices() const {
+    return mIndices;
+}
+
 void FbxMesh::parseLclMatrix() {
     const auto& lclMesh = mObjectsObject.getObject("Model", "Mesh");
 

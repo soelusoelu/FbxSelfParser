@@ -1,15 +1,17 @@
 ﻿#include "FbxBone.h"
+#include "FbxWeight.h"
 #include <cassert>
 
 FbxBone::FbxBone(const FbxObject& objectsObject, const FbxObject& connectionsObject)
     : mObjectsObject(objectsObject)
     , mConnectionsObject(connectionsObject)
+    , mWeightParser(std::make_unique<FbxWeight>(objectsObject))
 {
 }
 
 FbxBone::~FbxBone() = default;
 
-void FbxBone::parse(std::vector<Bone>& bones) {
+void FbxBone::parse(std::vector<Bone>& bones, MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh) {
     if (mObjectsObject.hasObject("Pose")) {
         parseLimbNode(bones);
 
@@ -17,6 +19,8 @@ void FbxBone::parse(std::vector<Bone>& bones) {
         parseBone(bones, poseObject);
 
         connect(bones);
+
+        mWeightParser->parse(meshVertices, indices, mesh);
     }
 }
 
@@ -41,7 +45,7 @@ void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
     }
 }
 
-void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) {
+void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) const {
     const auto& children = poseObject.children;
     auto childCount = children.size();
     assert(std::stoi(poseObject.getValue("NbPoseNodes")) == childCount);
@@ -78,23 +82,22 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) {
     }
 }
 
-void FbxBone::connect(std::vector<Bone>& bones) {
+void FbxBone::connect(std::vector<Bone>& bones) const {
     const auto& connections = mConnectionsObject.connections;
     for (const auto& c : connections) {
         //子の番号が全ボーンのノード番号と一致しなければ次へ
-        if (mConnections.find(c.child) == mConnections.end()) {
+        auto itrC = mConnections.find(c.child);
+        if (itrC == mConnections.end()) {
             continue;
         }
         //親の番号が全ボーンのノード番号と一致しなければ次へ
-        if (mConnections.find(c.parent) == mConnections.end()) {
+        auto itrP = mConnections.find(c.parent);
+        if (itrP == mConnections.end()) {
             continue;
         }
 
-        auto childNo = mConnections[c.child];
-        auto parentNo = mConnections[c.parent];
-
-        auto& child = bones[childNo];
-        auto& parent = bones[parentNo];
+        auto& child = bones[itrC->second];
+        auto& parent = bones[itrP->second];
 
         child.parent = &parent;
         parent.children.emplace_back(&child);

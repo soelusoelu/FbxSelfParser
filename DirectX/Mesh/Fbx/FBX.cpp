@@ -1,4 +1,5 @@
 ﻿#include "FBX.h"
+#include "FbxAnimation.h"
 #include "FbxBone.h"
 #include "FbxMaterial.h"
 #include "FbxMesh.h"
@@ -40,5 +41,6 @@ void FBX::parse(
     }
 
     parser.getMaterialParser().parse(materials[0], filePath);
-    parser.getBoneParser().parse(bones);
+    parser.getBoneParser().parse(bones, meshVertices, meshesIndices[0], parser.getMeshParser());
+    parser.getAnimationParser().parse(motions, bones);
 }

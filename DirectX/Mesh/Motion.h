@@ -10,9 +10,7 @@ struct Motion {
     std::string name;
     //フレーム時姿勢
     //ボーン数 * フレーム数
-    std::vector<std::vector<Matrix4>> frameMat;
-    //スタートフレーム
-    int startFrame;
+    std::vector<std::vector<Matrix4>> frameMatrix;
     //フレーム数
     int numFrame;
 };

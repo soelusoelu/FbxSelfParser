@@ -8,6 +8,7 @@ class FbxReader;
 class FbxMesh;
 class FbxMaterial;
 class FbxBone;
+class FbxAnimation;
 
 class FbxParser {
 public:
@@ -23,6 +24,7 @@ public:
     const FbxMesh& getMeshParser() const;
     const FbxMaterial& getMaterialParser() const;
     FbxBone& getBoneParser() const;
+    FbxAnimation& getAnimationParser() const;
 
 private:
     std::unique_ptr<FbxReader> mReader;
@@ -30,4 +32,5 @@ private:
     std::unique_ptr<FbxMesh> mMeshObject;
     std::unique_ptr<FbxMaterial> mMaterialObject;
     std::unique_ptr<FbxBone> mBoneObject;
+    std::unique_ptr<FbxAnimation> mAnimationObject;
 };

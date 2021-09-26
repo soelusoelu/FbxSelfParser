@@ -253,6 +253,8 @@
     <ClCompile Include="Mesh\Fbx\Reader\FbxStream.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxMaterial.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxBone.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxAnimation.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxWeight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -563,6 +565,10 @@
     <ClInclude Include="Mesh\Fbx\Reader\FbxObject.h" />
     <ClInclude Include="Mesh\Fbx\FbxMaterial.h" />
     <ClInclude Include="Mesh\Fbx\FbxBone.h" />
+    <ClInclude Include="Mesh\Fbx\FbxAnimation.h" />
+    <ClInclude Include="Mesh\Fbx\FbxTimeMode.h" />
+    <ClInclude Include="Mesh\Fbx\FbxAnimationTime.h" />
+    <ClInclude Include="Mesh\Fbx\FbxWeight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

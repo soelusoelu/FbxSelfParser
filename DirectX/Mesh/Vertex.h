@@ -16,7 +16,7 @@ struct MeshVertex {
         : pos(Vector3::zero)
         , normal(Vector3::zero)
         , uv(Vector2::zero)
-        , weight{ 1.f, 0.f, 0.f, 0.f }
+        , weight{ 0.f, 0.f, 0.f, 0.f }
         , index{ 0, 0, 0, 0 }
     {
     }

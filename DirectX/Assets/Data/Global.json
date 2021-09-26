@@ -30,7 +30,7 @@
             "textureSize": 64,
             "textureDisplayInterval": 32,
             "texturesFilePath": [
-                "Assets\\Model\\cylinderSkel02_Anim_ascii.fbx"
+                "Assets\\Model\\box_sphere_ascii.fbx"
             ]
         },
         "AssetsRenderTextureAdder": {
