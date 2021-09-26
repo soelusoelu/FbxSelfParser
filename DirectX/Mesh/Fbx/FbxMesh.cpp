@@ -82,8 +82,8 @@ void FbxMesh::parse(
     }
 }
 
-const std::vector<unsigned short>& FbxMesh::getIndices() const {
-    return mIndices[0];
+const std::vector<unsigned short>& FbxMesh::getIndices(unsigned index) const {
+    return mIndices[index];
 }
 
 const std::unordered_map<unsigned, unsigned>& FbxMesh::getLclModelNodeIDs() const {

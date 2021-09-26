@@ -1,6 +1,7 @@
 ﻿#include "FbxMaterial.h"
 #include "../../System/AssetsManager.h"
 #include "../../Utility/FileUtil.h"
+#include <cassert>
 #include <sstream>
 #include <string>
 
@@ -58,6 +59,7 @@ void FbxMaterial::parseMaterial(
     Material& material,
     const FbxObject& materialObject
 ) const {
+    //それぞれが絶対に読み込めるか確証がないため1つ1つ確認してから読み込む
     if (materialObject.hasProperties("Ambient")) {
         const auto& value = materialObject.getProperties("Ambient").value;
         std::istringstream iss(value);
@@ -72,13 +74,6 @@ void FbxMaterial::parseMaterial(
         auto& d = material.diffuse;
         iss >> d.x >> d.y >> d.z;
     }
-    if (materialObject.hasProperties("Specular")) {
-        const auto& value = materialObject.getProperties("Specular").value;
-        std::istringstream iss(value);
-
-        auto& s = material.specular;
-        iss >> s.x >> s.y >> s.z;
-    }
     if (materialObject.hasProperties("Emissive")) {
         const auto& value = materialObject.getProperties("Emissive").value;
         std::istringstream iss(value);
@@ -86,13 +81,24 @@ void FbxMaterial::parseMaterial(
         auto& e = material.emissive;
         iss >> e.x >> e.y >> e.z;
     }
-    if (materialObject.hasProperties("Opacity")) {
-        const auto& value = materialObject.getProperties("Opacity").value;
+    if (materialObject.hasProperties("TransparencyFactor")) {
+        const auto& value = materialObject.getProperties("TransparencyFactor").value;
         material.transparency = std::stof(value);
     }
-    if (materialObject.hasProperties("Shininess")) {
-        const auto& value = materialObject.getProperties("Shininess").value;
-        material.shininess = std::stof(value);
+
+    //ShadingModelがphongのときは追加で読み込む
+    if (materialObject.getValue("ShadingModel") == "phong") {
+        if (materialObject.hasProperties("Specular")) {
+            const auto& value = materialObject.getProperties("Specular").value;
+            std::istringstream iss(value);
+
+            auto& s = material.specular;
+            iss >> s.x >> s.y >> s.z;
+        }
+        if (materialObject.hasProperties("Shininess")) {
+            const auto& value = materialObject.getProperties("Shininess").value;
+            material.shininess = std::stof(value);
+        }
     }
 }
 

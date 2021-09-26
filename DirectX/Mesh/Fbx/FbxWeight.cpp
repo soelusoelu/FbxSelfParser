@@ -13,7 +13,8 @@ void FbxWeight::parse(
     const std::vector<Indices>& meshesIndices,
     const FbxMesh& mesh
 ) {
-    for (size_t i = 0; i < meshesVertices.size(); i++) {
+    auto meshCount = meshesVertices.size();
+    for (size_t i = 0; i < meshCount; ++i) {
         auto& meshVertices = meshesVertices[i];
         const auto& meshIndices = meshesIndices[i];
 
@@ -26,7 +27,7 @@ void FbxWeight::parse(
                 continue;
             }
 
-            parseWeight(meshVertices, meshIndices, mesh, obj, boneIndex);
+            parseWeight(meshVertices, meshIndices, mesh, obj, i, boneIndex);
             ++boneIndex;
         }
 
@@ -42,6 +43,7 @@ void FbxWeight::parseWeight(
     const Indices& indices,
     const FbxMesh& mesh,
     const FbxObject& deformerObject,
+    unsigned meshIndex,
     unsigned boneIndex
 ) {
     //重み
@@ -51,7 +53,7 @@ void FbxWeight::parseWeight(
     //このボーンによって移動する頂点のインデックスの配列
     const auto& weightIndices = deformerObject.getArray("Indexes");
     //頂点のインデックス
-    const auto& meshIndices = mesh.getIndices();
+    const auto& meshIndices = mesh.getIndices(meshIndex);
 
     for (unsigned i = 0; i < weightCount; ++i) {
         int index = std::stoi(weightIndices[i]);

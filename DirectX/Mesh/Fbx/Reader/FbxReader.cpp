@@ -243,7 +243,7 @@ void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {
 
         skipSpace(in);
 
-        parseProperties70Value(in, out.properties.emplace_back());
+        parseProperties70Value(in, out.properties);
 
         c = in.peek();
     }
@@ -251,47 +251,55 @@ void FbxReader::parseProperties70(FbxStream& in, FbxObject& out) const {
     in.take(); //skip }
 }
 
-void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties& out) const {
-    parseString(in, out.name);
+void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) const {
+    std::string name;
+    parseString(in, name);
     skipSpace(in);
     assert(in.peek() == ',');
     in.take(); //skip ,
     skipSpace(in);
 
-    parseString(in, out.type);
+    std::string type;
+    parseString(in, type);
     skipSpace(in);
     assert(in.peek() == ',');
     in.take(); //skip ,
     skipSpace(in);
 
-    parseString(in, out.type2);
+    std::string type2;
+    parseString(in, type2);
     skipSpace(in);
     assert(in.peek() == ',');
     in.take(); //skip ,
     skipSpace(in);
 
-    parseString(in, out.unknown);
+    std::string unknown;
+    parseString(in, unknown);
     skipSpace(in);
 
     //5つ目の値がないこともあるためチェック
     if (in.peek() != ',') {
+        out.emplace(name, FbxProperties{ type, type2, unknown, "" });
         return;
     }
 
     //Vector3など値が一つではないこともあるので、カンマが続く限り文字列を繋げていく
+    std::string value;
     while (true) {
         in.take(); //skip ,
         skipSpace(in);
 
-        parseValue(in, out.value);
+        parseValue(in, value);
 
         if (in.peek() == ',') {
             //std::istringstreamで読み取る前提でスペースを入れる
-            out.value += ' ';
+            value += ' ';
         } else {
             break;
         }
     }
+
+    out.emplace(name, FbxProperties{ type, type2, unknown, value });
 }
 
 void FbxReader::parseConnections(FbxStream& in, FbxConnections& out) const {

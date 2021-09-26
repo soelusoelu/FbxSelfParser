@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 struct FbxProperties {
-    std::string name;
     std::string type;
     std::string type2;
     std::string unknown;
@@ -22,7 +21,7 @@ struct FbxConnections {
 };
 
 using FbxValueArray = std::vector<std::string>;
-using FbxProperties70 = std::vector<FbxProperties>;
+using FbxProperties70 = std::unordered_map<std::string, FbxProperties>;
 
 struct FbxObject {
     //オブジェクトの属性
@@ -79,24 +78,12 @@ struct FbxObject {
 
     //nameと一致するプロパティを取得する
     const FbxProperties& getProperties(const std::string& name) const {
-        for (const auto& p : properties) {
-            if (p.name == name) {
-                return p;
-            }
-        }
-
-        assert(false);
+        return properties.at(name);
     }
 
     //nameと一致するプロパティが存在するか
     bool hasProperties(const std::string& name) const {
-        for (const auto& p : properties) {
-            if (p.name == name) {
-                return true;
-            }
-        }
-
-        return false;
+        return (properties.find(name) != properties.end());
     }
 
     //オブジェクトのノードIDを取得する

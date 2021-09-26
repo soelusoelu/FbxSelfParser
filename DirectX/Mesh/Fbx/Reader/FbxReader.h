@@ -33,7 +33,7 @@ private:
     //Properties70を解析する
     void parseProperties70(FbxStream& in, FbxObject& out) const;
     //Properties70の値を解析する
-    void parseProperties70Value(FbxStream& in, FbxProperties& out) const;
+    void parseProperties70Value(FbxStream& in, FbxProperties70& out) const;
     //Connectionsを解析する
     void parseConnections(FbxStream& in, FbxConnections& out) const;
 

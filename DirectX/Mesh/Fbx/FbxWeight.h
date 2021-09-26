@@ -24,6 +24,7 @@ private:
         const Indices& indices,
         const FbxMesh& mesh,
         const FbxObject& deformerObject,
+        unsigned meshIndex,
         unsigned boneIndex
     );
 
