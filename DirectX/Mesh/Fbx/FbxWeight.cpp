@@ -53,7 +53,7 @@ void FbxWeight::parseWeight(
     //このボーンによって移動する頂点のインデックスの配列
     const auto& weightIndices = deformerObject.getArray("Indexes");
     //頂点のインデックス
-    const auto& meshIndices = mesh.getIndices(meshIndex);
+    const auto& meshIndices = mesh.getDefaultIndices(meshIndex);
 
     for (unsigned i = 0; i < weightCount; ++i) {
         int index = std::stoi(weightIndices[i]);

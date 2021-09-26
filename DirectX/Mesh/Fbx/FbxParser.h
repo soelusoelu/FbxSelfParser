@@ -40,5 +40,5 @@ private:
     std::unique_ptr<FbxBone> mBoneParser;
     std::unique_ptr<FbxAnimation> mAnimationParser;
 
-    std::unordered_multimap<unsigned, unsigned> mConnectionsMultiMap;
+    std::unordered_multimap<unsigned, unsigned> mConnectionsMultimap;
 };

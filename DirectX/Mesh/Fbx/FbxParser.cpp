@@ -33,12 +33,12 @@ void FbxParser::parse(
     const auto& objects = getObject("Objects");
     const auto& connections = getObject("Connections").connections;
     for (const auto& c : connections) {
-        mConnectionsMultiMap.emplace(c.child, c.parent);
+        mConnectionsMultimap.emplace(c.child, c.parent);
     }
 
-    mMeshParser = std::make_unique<FbxMesh>(objects, mConnectionsMultiMap);
-    mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultiMap);
-    mBoneParser = std::make_unique<FbxBone>(objects, mConnectionsMultiMap);
+    mMeshParser = std::make_unique<FbxMesh>(objects, mConnectionsMultimap);
+    mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultimap);
+    mBoneParser = std::make_unique<FbxBone>(objects, mConnectionsMultimap);
     mAnimationParser = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
 
     mMeshParser->parse(meshesVertices, meshesIndices);

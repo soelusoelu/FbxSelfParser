@@ -82,7 +82,7 @@ void FbxMesh::parse(
     }
 }
 
-const std::vector<unsigned short>& FbxMesh::getIndices(unsigned index) const {
+const std::vector<unsigned short>& FbxMesh::getDefaultIndices(unsigned index) const {
     return mIndices[index];
 }
 

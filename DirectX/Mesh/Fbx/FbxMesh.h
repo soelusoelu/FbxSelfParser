@@ -27,7 +27,7 @@ public:
         std::vector<MeshVertices>& meshesVertices,
         std::vector<Indices>& meshesIndices
     ) const;
-    const std::vector<unsigned short>& getIndices(unsigned index) const;
+    const std::vector<unsigned short>& getDefaultIndices(unsigned index) const;
     const std::unordered_map<unsigned, unsigned>& getLclModelNodeIDs() const;
 
 private:
