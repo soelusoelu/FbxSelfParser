@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "Reader/FbxObject.h"
+#include "../IMeshLoader.h"
+#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 class FbxReader;
 class FbxMesh;
@@ -17,14 +20,17 @@ public:
     FbxParser(const FbxParser&) = delete;
     FbxParser& operator=(const FbxParser&) = delete;
 
-    void parse(const std::string& filePath);
+    void parse(
+        const std::string& filePath,
+        std::vector<MeshVertices>& meshesVertices,
+        std::vector<Indices>& meshesIndices,
+        std::vector<Material>& materials,
+        std::vector<Bone>& bones,
+        std::vector<Motion>& motions
+    );
 
     const FbxObject& getRootObject() const;
     const FbxObject& getObject(const std::string& name) const;
-    const FbxMesh& getMeshParser() const;
-    FbxMaterial& getMaterialParser() const;
-    FbxBone& getBoneParser() const;
-    FbxAnimation& getAnimationParser() const;
 
 private:
     std::unique_ptr<FbxReader> mReader;
@@ -33,4 +39,6 @@ private:
     std::unique_ptr<FbxMaterial> mMaterialParser;
     std::unique_ptr<FbxBone> mBoneParser;
     std::unique_ptr<FbxAnimation> mAnimationParser;
+
+    std::multimap<unsigned, unsigned> mConnectionsMultiMap;
 };

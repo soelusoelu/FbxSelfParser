@@ -3,6 +3,7 @@
 #include "Reader/FbxObject.h"
 #include "../IMeshLoader.h"
 #include "../../Math/Math.h"
+#include <map>
 #include <unordered_map>
 #include <vector>
 
@@ -15,14 +16,14 @@ class FbxMesh {
     };
 
 public:
-    FbxMesh(const FbxObject& objectsObject, const FbxObject& connectionsObject);
+    FbxMesh(const FbxObject& objectsObject, const std::multimap<unsigned, unsigned>& connections);
     ~FbxMesh();
     FbxMesh(const FbxMesh&) = delete;
     FbxMesh& operator=(const FbxMesh&) = delete;
 
     void parse(std::vector<MeshVertices>& meshesVertices, std::vector<Indices>& meshesIndices) const;
     const std::vector<unsigned short>& getIndices() const;
-    const std::vector<unsigned>& getModelNodeIDs() const;
+    const std::unordered_map<unsigned, unsigned>& getLclModelNodeIDs() const;
 
 private:
     void parseLclMatrix(const FbxObject& modelObject, unsigned nodeID);
@@ -37,7 +38,7 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const FbxObject& mConnectionsObject;
+    const std::multimap<unsigned, unsigned>& mConnections;
 
     //頂点配列
     std::vector<std::vector<Vector3>> mVertices;
@@ -52,7 +53,6 @@ private:
 
     //lcl行列とノードIDのマップ
     std::unordered_map<unsigned, LclMatrix> mLclMatrixConnections;
-
-    //ModelオブジェクトのノードID配列(読み込んだ順)
-    std::vector<unsigned> mModelNodeIDs;
+    //key: lclModelオブジェクトのノードID, value: 添字
+    std::unordered_map<unsigned, unsigned> mLclModelNodeIDMap;
 };

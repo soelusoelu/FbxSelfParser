@@ -8,29 +8,44 @@ FbxWeight::FbxWeight(const FbxObject& objectsObject)
 
 FbxWeight::~FbxWeight() = default;
 
-void FbxWeight::parse(MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh) {
-    const auto& children = mObjectsObject.children;
-    unsigned boneIndex = 0;
-    for (const auto& c : children) {
-        if (c.name != "Deformer") {
-            continue;
-        }
-        const auto& attributes = c.attributes;
-        if (attributes[2] != "Cluster") {
-            continue;
+void FbxWeight::parse(
+    std::vector<MeshVertices>& meshesVertices,
+    const std::vector<Indices>& meshesIndices,
+    const FbxMesh& mesh
+) {
+    for (size_t i = 0; i < meshesVertices.size(); i++) {
+        auto& meshVertices = meshesVertices[i];
+        const auto& meshIndices = meshesIndices[i];
+
+        unsigned boneIndex = 0;
+        const auto& children = mObjectsObject.children;
+        for (const auto& c : children) {
+            if (c.name != "Deformer") {
+                continue;
+            }
+            const auto& attributes = c.attributes;
+            if (attributes[2] != "Cluster") {
+                continue;
+            }
+
+            parseWeight(meshVertices, meshIndices, mesh, c, boneIndex);
+            ++boneIndex;
         }
 
-        parseWeight(meshVertices, indices, mesh, c, boneIndex);
-        ++boneIndex;
-    }
-
-    //ウェイト正規化
-    if (boneIndex > 0) {
-        normalizeWeight(meshVertices);
+        //ウェイト正規化
+        if (boneIndex > 0) {
+            normalizeWeight(meshVertices);
+        }
     }
 }
 
-void FbxWeight::parseWeight(MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh, const FbxObject& deformerObject, unsigned boneIndex) {
+void FbxWeight::parseWeight(
+    MeshVertices& meshVertices,
+    const Indices& indices,
+    const FbxMesh& mesh,
+    const FbxObject& deformerObject,
+    unsigned boneIndex
+) {
     //重み
     const auto& weights = deformerObject.getArray("Weights");
     //影響する頂点の数

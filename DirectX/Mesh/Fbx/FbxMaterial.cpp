@@ -4,44 +4,42 @@
 #include <sstream>
 #include <string>
 
-FbxMaterial::FbxMaterial(const FbxObject& objectsObject, const FbxObject& connectionsObject)
+FbxMaterial::FbxMaterial(
+    const FbxObject& objectsObject,
+    const std::multimap<unsigned, unsigned>& connections
+)
     : mObjectsObject(objectsObject)
-    , mConnectionsObject(connectionsObject)
+    , mConnections(connections)
 {
 }
 
 FbxMaterial::~FbxMaterial() = default;
 
-void FbxMaterial::parse(std::vector<Material>& materials, const std::string& filePath, const std::vector<unsigned>& modelNodeIDs) {
+void FbxMaterial::parse(
+    std::vector<Material>& materials,
+    const std::string& filePath,
+    const std::unordered_map<unsigned, unsigned>& lclModelNodeIDMap
+) {
     const auto& children = mObjectsObject.children;
     for (const auto& child : children) {
         if (child.name == "Material") {
             unsigned nodeID = static_cast<unsigned>(std::stoi(child.attributes[0]));
-            const auto& connections = mConnectionsObject.connections;
-            for (const auto& c : connections) {
-                if (c.child != nodeID) {
+            auto range = mConnections.equal_range(nodeID);
+            for (auto& r = range.first; r != range.second; ++r) {
+                auto itr = lclModelNodeIDMap.find(r->second);
+                if (itr == lclModelNodeIDMap.end()) {
                     continue;
                 }
 
-                auto modelIdCount = modelNodeIDs.size();
-                for (size_t i = 0; i < modelIdCount; ++i) {
-                    if (c.parent != modelNodeIDs[i]) {
-                        continue;
-                    }
-
-                    parseMaterial(materials[i], child);
-                    mMaterialMap.emplace(nodeID, i);
-                }
+                auto index = itr->second;
+                parseMaterial(materials[index], child);
+                mMaterialMap.emplace(nodeID, index);
             }
         } else if (child.name == "Texture") {
             unsigned nodeID = static_cast<unsigned>(std::stoi(child.attributes[0]));
-            const auto& connections = mConnectionsObject.connections;
-            for (const auto& c : connections) {
-                if (c.child != nodeID) {
-                    continue;
-                }
-
-                auto itr = mMaterialMap.find(c.parent);
+            auto range = mConnections.equal_range(nodeID);
+            for (auto& r = range.first; r != range.second; ++r) {
+                auto itr = mMaterialMap.find(r->second);
                 if (itr == mMaterialMap.end()) {
                     continue;
                 }
@@ -52,7 +50,10 @@ void FbxMaterial::parse(std::vector<Material>& materials, const std::string& fil
     }
 }
 
-void FbxMaterial::parseMaterial(Material& material, const FbxObject& materialObject) const {
+void FbxMaterial::parseMaterial(
+    Material& material,
+    const FbxObject& materialObject
+) const {
     if (materialObject.hasProperties("Ambient")) {
         const auto& value = materialObject.getProperties("Ambient").value;
         std::istringstream iss(value);
@@ -91,7 +92,11 @@ void FbxMaterial::parseMaterial(Material& material, const FbxObject& materialObj
     }
 }
 
-void FbxMaterial::parseTexture(Material& material, const std::string& filePath, const FbxObject& textureObject) const {
+void FbxMaterial::parseTexture(
+    Material& material,
+    const std::string& filePath,
+    const FbxObject& textureObject
+) const {
     const auto& value = textureObject.getValue("Media");
     //7は"Video::"の文字数
     auto baseTextureName = value.substr(7);

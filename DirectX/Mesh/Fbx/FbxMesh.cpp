@@ -3,9 +3,9 @@
 #include <sstream>
 #include <string>
 
-FbxMesh::FbxMesh(const FbxObject& objectsObject, const FbxObject& connectionsObject)
+FbxMesh::FbxMesh(const FbxObject& objectsObject, const std::multimap<unsigned, unsigned>& connections)
     : mObjectsObject(objectsObject)
-    , mConnectionsObject(connectionsObject)
+    , mConnections(connections)
 {
     const auto& children = mObjectsObject.children;
     //Lcl行列は先に取得しておく必要がある
@@ -28,12 +28,9 @@ FbxMesh::FbxMesh(const FbxObject& objectsObject, const FbxObject& connectionsObj
         }
 
         unsigned nodeID = static_cast<unsigned>(std::stoi(child.attributes[0]));
-        const auto& connections = mConnectionsObject.connections;
-        for (const auto& c : connections) {
-            if (c.child != nodeID) {
-                continue;
-            }
-            auto itr = mLclMatrixConnections.find(c.parent);
+        auto range = mConnections.equal_range(nodeID);
+        for (auto& r = range.first; r != range.second; ++r) {
+            auto itr = mLclMatrixConnections.find(r->second);
             if (itr == mLclMatrixConnections.end()) {
                 continue;
             }
@@ -80,8 +77,8 @@ const std::vector<unsigned short>& FbxMesh::getIndices() const {
     return mIndices[0];
 }
 
-const std::vector<unsigned>& FbxMesh::getModelNodeIDs() const {
-    return mModelNodeIDs;
+const std::unordered_map<unsigned, unsigned>& FbxMesh::getLclModelNodeIDs() const {
+    return mLclModelNodeIDMap;
 }
 
 void FbxMesh::parseLclMatrix(const FbxObject& modelObject, unsigned nodeID) {
@@ -115,7 +112,7 @@ void FbxMesh::parseLclMatrix(const FbxObject& modelObject, unsigned nodeID) {
     }
 
     mLclMatrixConnections.emplace(nodeID, lclMatrix);
-    mModelNodeIDs.emplace_back(nodeID);
+    mLclModelNodeIDMap.emplace(nodeID, mLclModelNodeIDMap.size());
 }
 
 void FbxMesh::parseVertices(std::vector<Vector3>& out, const FbxObject& geometryObject, const Matrix4& lclMatrix) {

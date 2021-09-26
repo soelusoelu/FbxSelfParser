@@ -2,16 +2,24 @@
 #include "FbxWeight.h"
 #include <cassert>
 
-FbxBone::FbxBone(const FbxObject& objectsObject, const FbxObject& connectionsObject)
+FbxBone::FbxBone(
+    const FbxObject& objectsObject,
+    const std::multimap<unsigned, unsigned>& connections
+)
     : mObjectsObject(objectsObject)
-    , mConnectionsObject(connectionsObject)
+    , mConnections(connections)
     , mWeightParser(std::make_unique<FbxWeight>(objectsObject))
 {
 }
 
 FbxBone::~FbxBone() = default;
 
-void FbxBone::parse(std::vector<Bone>& bones, MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh) {
+void FbxBone::parse(
+    std::vector<Bone>& bones,
+    std::vector<MeshVertices>& meshesVertices,
+    const std::vector<Indices>& meshesIndices,
+    const FbxMesh& mesh
+) {
     if (mObjectsObject.hasObject("Pose")) {
         parseLimbNode(bones);
 
@@ -20,7 +28,7 @@ void FbxBone::parse(std::vector<Bone>& bones, MeshVertices& meshVertices, const 
 
         connect(bones);
 
-        mWeightParser->parse(meshVertices, indices, mesh);
+        mWeightParser->parse(meshesVertices, meshesIndices, mesh);
     }
 }
 
@@ -41,7 +49,7 @@ void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
         bone.name = attributes[1].substr(7); //7はModel::の文字数分
 
         unsigned nodeNo = static_cast<unsigned>(std::stoi(attributes[0]));
-        mConnections.emplace(nodeNo, boneNo);
+        mBoneConnections.emplace(nodeNo, boneNo);
     }
 }
 
@@ -59,8 +67,8 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) c
         unsigned nodeNo = static_cast<unsigned>(std::stoi(c.getValue("Node")));
 
         //mConnectionsに含まれていなければ使用しないボーン(謎)
-        auto itr = mConnections.find(nodeNo);
-        if (itr == mConnections.end()) {
+        auto itr = mBoneConnections.find(nodeNo);
+        if (itr == mBoneConnections.end()) {
             continue;
         }
 
@@ -83,16 +91,15 @@ void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) c
 }
 
 void FbxBone::connect(std::vector<Bone>& bones) const {
-    const auto& connections = mConnectionsObject.connections;
-    for (const auto& c : connections) {
+    for (const auto& c : mConnections) {
         //子の番号が全ボーンのノード番号と一致しなければ次へ
-        auto itrC = mConnections.find(c.child);
-        if (itrC == mConnections.end()) {
+        auto itrC = mBoneConnections.find(c.first);
+        if (itrC == mBoneConnections.end()) {
             continue;
         }
         //親の番号が全ボーンのノード番号と一致しなければ次へ
-        auto itrP = mConnections.find(c.parent);
-        if (itrP == mConnections.end()) {
+        auto itrP = mBoneConnections.find(c.second);
+        if (itrP == mBoneConnections.end()) {
             continue;
         }
 

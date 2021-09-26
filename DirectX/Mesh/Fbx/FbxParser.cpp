@@ -20,17 +20,34 @@ FbxParser::FbxParser()
 
 FbxParser::~FbxParser() = default;
 
-void FbxParser::parse(const std::string& filePath) {
+void FbxParser::parse(
+    const std::string& filePath,
+    std::vector<MeshVertices>& meshesVertices,
+    std::vector<Indices>& meshesIndices,
+    std::vector<Material>& materials,
+    std::vector<Bone>& bones,
+    std::vector<Motion>& motions
+) {
     FbxStream stream(filePath.c_str());
     mReader->parse(stream, *mRootObject);
 
     const auto& objects = getObject("Objects");
-    const auto& connections = getObject("Connections");
+    const auto& connections = getObject("Connections").connections;
+    for (const auto& c : connections) {
+        mConnectionsMultiMap.emplace(c.child, c.parent);
+    }
 
-    mMeshParser = std::make_unique<FbxMesh>(objects, connections);
-    mMaterialParser = std::make_unique<FbxMaterial>(objects, connections);
-    mBoneParser = std::make_unique<FbxBone>(objects, connections);
+    mMeshParser = std::make_unique<FbxMesh>(objects, mConnectionsMultiMap);
+    mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultiMap);
+    mBoneParser = std::make_unique<FbxBone>(objects, mConnectionsMultiMap);
     mAnimationParser = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
+
+    mMeshParser->parse(meshesVertices, meshesIndices);
+    auto meshCount = meshesVertices.size();
+    materials.resize(meshCount);
+    mMaterialParser->parse(materials, filePath, mMeshParser->getLclModelNodeIDs());
+    //mBoneParser->parse(bones, meshesVertices, meshesIndices, *mMeshParser);
+    //mAnimationParser->parse(motions, bones);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
@@ -39,20 +56,4 @@ const FbxObject& FbxParser::getRootObject() const {
 
 const FbxObject& FbxParser::getObject(const std::string& name) const {
     return mRootObject->getObject(name);
-}
-
-const FbxMesh& FbxParser::getMeshParser() const {
-    return *mMeshParser;
-}
-
-FbxMaterial& FbxParser::getMaterialParser() const {
-    return *mMaterialParser;
-}
-
-FbxBone& FbxParser::getBoneParser() const {
-    return *mBoneParser;
-}
-
-FbxAnimation& FbxParser::getAnimationParser() const {
-    return *mAnimationParser;
 }

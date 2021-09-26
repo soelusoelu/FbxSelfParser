@@ -12,10 +12,20 @@ public:
     FbxWeight(const FbxWeight&) = delete;
     FbxWeight& operator=(const FbxWeight&) = delete;
 
-    void parse(MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh);
+    void parse(
+        std::vector<MeshVertices>& meshesVertices,
+        const std::vector<Indices>& meshesIndices,
+        const FbxMesh& mesh
+    );
 
 private:
-    void parseWeight(MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh, const FbxObject& deformerObject, unsigned boneIndex);
+    void parseWeight(
+        MeshVertices& meshVertices,
+        const Indices& indices,
+        const FbxMesh& mesh,
+        const FbxObject& deformerObject,
+        unsigned boneIndex
+    );
 
     //新しいウェイトを格納する
     void addWeight(MeshVertex& vertex, float weight, int boneIndex);

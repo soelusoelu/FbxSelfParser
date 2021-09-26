@@ -3,21 +3,30 @@
 #include "Reader/FbxObject.h"
 #include "../Bone.h"
 #include "../IMeshLoader.h"
+#include <map>
 #include <memory>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 class FbxMesh;
 class FbxWeight;
 
 class FbxBone {
 public:
-    FbxBone(const FbxObject& objectsObject, const FbxObject& connectionsObject);
+    FbxBone(
+        const FbxObject& objectsObject,
+        const std::multimap<unsigned, unsigned>& connections
+    );
     ~FbxBone();
     FbxBone(const FbxBone&) = delete;
     FbxBone& operator=(const FbxBone&) = delete;
 
-    void parse(std::vector<Bone>& bones, MeshVertices& meshVertices, const Indices& indices, const FbxMesh& mesh);
+    void parse(
+        std::vector<Bone>& bones,
+        std::vector<MeshVertices>& meshesVertices,
+        const std::vector<Indices>& meshesIndices,
+        const FbxMesh& mesh
+    );
 
 private:
     void parseLimbNode(std::vector<Bone>& bones);
@@ -26,7 +35,7 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const FbxObject& mConnectionsObject;
+    const std::multimap<unsigned, unsigned>& mConnections;
     std::unique_ptr<FbxWeight> mWeightParser;
-    std::unordered_map<unsigned, unsigned short> mConnections;
+    std::unordered_map<unsigned, unsigned short> mBoneConnections;
 };
