@@ -11,10 +11,10 @@
 FbxParser::FbxParser()
     : mReader(std::make_unique<FbxReader>())
     , mRootObject(std::make_unique<FbxObject>())
-    , mMeshObject(nullptr)
-    , mMaterialObject(nullptr)
-    , mBoneObject(nullptr)
-    , mAnimationObject(nullptr)
+    , mMeshParser(nullptr)
+    , mMaterialParser(nullptr)
+    , mBoneParser(nullptr)
+    , mAnimationParser(nullptr)
 {
 }
 
@@ -25,10 +25,12 @@ void FbxParser::parse(const std::string& filePath) {
     mReader->parse(stream, *mRootObject);
 
     const auto& objects = getObject("Objects");
-    mMeshObject = std::make_unique<FbxMesh>(objects);
-    mMaterialObject = std::make_unique<FbxMaterial>(objects);
-    mBoneObject = std::make_unique<FbxBone>(objects, getObject("Connections"));
-    mAnimationObject = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
+    const auto& connections = getObject("Connections");
+
+    mMeshParser = std::make_unique<FbxMesh>(objects, connections);
+    mMaterialParser = std::make_unique<FbxMaterial>(objects, connections);
+    mBoneParser = std::make_unique<FbxBone>(objects, connections);
+    mAnimationParser = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
@@ -40,17 +42,17 @@ const FbxObject& FbxParser::getObject(const std::string& name) const {
 }
 
 const FbxMesh& FbxParser::getMeshParser() const {
-    return *mMeshObject;
+    return *mMeshParser;
 }
 
-const FbxMaterial& FbxParser::getMaterialParser() const {
-    return *mMaterialObject;
+FbxMaterial& FbxParser::getMaterialParser() const {
+    return *mMaterialParser;
 }
 
 FbxBone& FbxParser::getBoneParser() const {
-    return *mBoneObject;
+    return *mBoneParser;
 }
 
 FbxAnimation& FbxParser::getAnimationParser() const {
-    return *mAnimationObject;
+    return *mAnimationParser;
 }

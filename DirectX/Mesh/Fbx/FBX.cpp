@@ -24,23 +24,24 @@ void FBX::parse(
     FbxParser parser;
     parser.parse(filePath);
 
-    //現状1つ
-    meshesVertices.resize(1);
-    meshesVerticesPosition.resize(1);
-    meshesIndices.resize(1);
-    materials.resize(1);
+    parser.getMeshParser().parse(meshesVertices, meshesIndices);
 
-    auto& meshVertices = meshesVertices[0];
-    parser.getMeshParser().parse(meshVertices, meshesIndices[0]);
+    auto meshCount = meshesVertices.size();
+    meshesVerticesPosition.resize(meshCount);
+    for (size_t i = 0; i < meshCount; ++i) {
+        auto& meshVerticesPosition = meshesVerticesPosition[i];
+        const auto& meshVertices = meshesVertices[i];
 
-    auto& meshVerticesPosition = meshesVerticesPosition[0];
-    auto size = meshVertices.size();
-    meshVerticesPosition.resize(size);
-    for (size_t i = 0; i < size; ++i) {
-        meshVerticesPosition[i] = meshVertices[i].pos;
+        auto size = meshVertices.size();
+        meshVerticesPosition.resize(size);
+
+        for (size_t j = 0; j < size; ++j) {
+            meshVerticesPosition[j] = meshVertices[j].pos;
+        }
     }
 
-    parser.getMaterialParser().parse(materials[0], filePath);
-    parser.getBoneParser().parse(bones, meshVertices, meshesIndices[0], parser.getMeshParser());
-    parser.getAnimationParser().parse(motions, bones);
+    materials.resize(meshCount);
+    parser.getMaterialParser().parse(materials, filePath, parser.getMeshParser().getModelNodeIDs());
+    //parser.getBoneParser().parse(bones, meshVertices, meshesIndices[0], parser.getMeshParser());
+    //parser.getAnimationParser().parse(motions, bones);
 }

@@ -22,15 +22,15 @@ public:
     const FbxObject& getRootObject() const;
     const FbxObject& getObject(const std::string& name) const;
     const FbxMesh& getMeshParser() const;
-    const FbxMaterial& getMaterialParser() const;
+    FbxMaterial& getMaterialParser() const;
     FbxBone& getBoneParser() const;
     FbxAnimation& getAnimationParser() const;
 
 private:
     std::unique_ptr<FbxReader> mReader;
     std::unique_ptr<FbxObject> mRootObject;
-    std::unique_ptr<FbxMesh> mMeshObject;
-    std::unique_ptr<FbxMaterial> mMaterialObject;
-    std::unique_ptr<FbxBone> mBoneObject;
-    std::unique_ptr<FbxAnimation> mAnimationObject;
+    std::unique_ptr<FbxMesh> mMeshParser;
+    std::unique_ptr<FbxMaterial> mMaterialParser;
+    std::unique_ptr<FbxBone> mBoneParser;
+    std::unique_ptr<FbxAnimation> mAnimationParser;
 };
