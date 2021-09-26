@@ -2,7 +2,6 @@
 
 #include "Reader/FbxObject.h"
 #include "../Material.h"
-#include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -11,7 +10,7 @@ class FbxMaterial {
 public:
     FbxMaterial(
         const FbxObject& objectsObject,
-        const std::multimap<unsigned, unsigned>& connections
+        const std::unordered_multimap<unsigned, unsigned>& connections
     );
     ~FbxMaterial();
     FbxMaterial(const FbxMaterial&) = delete;
@@ -39,7 +38,7 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const std::multimap<unsigned, unsigned>& mConnections;
+    const std::unordered_multimap<unsigned, unsigned>& mConnections;
     //key: ノードID, value: マテリアルの添字
     std::unordered_map<unsigned, unsigned> mMaterialMap;
 };

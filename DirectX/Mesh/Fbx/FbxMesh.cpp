@@ -5,7 +5,7 @@
 
 FbxMesh::FbxMesh(
     const FbxObject& objectsObject,
-    const std::multimap<unsigned, unsigned>& connections
+    const std::unordered_multimap<unsigned, unsigned>& connections
 )
     : mObjectsObject(objectsObject)
     , mConnections(connections)

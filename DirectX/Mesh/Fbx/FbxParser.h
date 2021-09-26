@@ -2,9 +2,9 @@
 
 #include "Reader/FbxObject.h"
 #include "../IMeshLoader.h"
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class FbxReader;
@@ -40,5 +40,5 @@ private:
     std::unique_ptr<FbxBone> mBoneParser;
     std::unique_ptr<FbxAnimation> mAnimationParser;
 
-    std::multimap<unsigned, unsigned> mConnectionsMultiMap;
+    std::unordered_multimap<unsigned, unsigned> mConnectionsMultiMap;
 };

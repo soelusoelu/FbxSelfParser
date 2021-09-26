@@ -3,7 +3,6 @@
 #include "Reader/FbxObject.h"
 #include "../Bone.h"
 #include "../IMeshLoader.h"
-#include <map>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -15,7 +14,7 @@ class FbxBone {
 public:
     FbxBone(
         const FbxObject& objectsObject,
-        const std::multimap<unsigned, unsigned>& connections
+        const std::unordered_multimap<unsigned, unsigned>& connections
     );
     ~FbxBone();
     FbxBone(const FbxBone&) = delete;
@@ -35,7 +34,7 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const std::multimap<unsigned, unsigned>& mConnections;
+    const std::unordered_multimap<unsigned, unsigned>& mConnections;
     std::unique_ptr<FbxWeight> mWeightParser;
     std::unordered_map<unsigned, unsigned short> mBoneConnections;
 };

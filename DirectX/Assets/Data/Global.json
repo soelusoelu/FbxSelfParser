@@ -29,7 +29,9 @@
         "AssetsRenderTextureList": {
             "textureSize": 64,
             "textureDisplayInterval": 32,
-            "texturesFilePath": []
+            "texturesFilePath": [
+                "Assets\\Model\\box_sphere_cone_ascii.fbx"
+            ]
         },
         "AssetsRenderTextureAdder": {
             "renderPosition": [

@@ -6,7 +6,6 @@
 #include "Reader/FbxObject.h"
 #include "Reader/FbxReader.h"
 #include "Reader/FbxStream.h"
-#include <cassert>
 
 FbxParser::FbxParser()
     : mReader(std::make_unique<FbxReader>())

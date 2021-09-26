@@ -3,7 +3,6 @@
 #include "Reader/FbxObject.h"
 #include "../IMeshLoader.h"
 #include "../../Math/Math.h"
-#include <map>
 #include <unordered_map>
 #include <vector>
 
@@ -18,7 +17,7 @@ class FbxMesh {
 public:
     FbxMesh(
         const FbxObject& objectsObject,
-        const std::multimap<unsigned, unsigned>& connections
+        const std::unordered_multimap<unsigned, unsigned>& connections
     );
     ~FbxMesh();
     FbxMesh(const FbxMesh&) = delete;
@@ -61,7 +60,7 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const std::multimap<unsigned, unsigned>& mConnections;
+    const std::unordered_multimap<unsigned, unsigned>& mConnections;
 
     //頂点配列
     std::vector<std::vector<Vector3>> mVertices;

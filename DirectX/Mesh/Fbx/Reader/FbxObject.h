@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <cassert>
-#include <map>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -31,7 +30,7 @@ struct FbxObject {
     //key: 要素名、value: 配列文字列要素
     std::unordered_map<std::string, FbxValueArray> valueArray;
     //子オブジェクト
-    std::multimap<std::string, FbxObject> children;
+    std::unordered_multimap<std::string, FbxObject> children;
     //プロパティ
     FbxProperties70 properties;
     //コネクション
