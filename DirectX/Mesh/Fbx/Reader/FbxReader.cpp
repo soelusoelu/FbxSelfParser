@@ -193,12 +193,12 @@ void FbxReader::parseArray(FbxStream& in, FbxObject& out, const std::string& key
     assert(in.peek() == '{');
     in.take(); //skip {
 
+    skipSpace(in);
+
     //空配列かチェック
     if (consume(in, '}')) {
         return;
     }
-
-    skipSpace(in);
 
     //文字列から要素数を取得する
     unsigned numValue = static_cast<unsigned>(std::stoi(numValueStr));

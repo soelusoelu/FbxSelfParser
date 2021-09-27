@@ -255,6 +255,8 @@
     <ClCompile Include="Mesh\Fbx\FbxBone.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxAnimation.cpp" />
     <ClCompile Include="Mesh\Fbx\FbxWeight.cpp" />
+    <ClCompile Include="System\Json\JsonReader.cpp" />
+    <ClCompile Include="System\Json\JsonStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -569,6 +571,9 @@
     <ClInclude Include="Mesh\Fbx\FbxTimeMode.h" />
     <ClInclude Include="Mesh\Fbx\FbxAnimationTime.h" />
     <ClInclude Include="Mesh\Fbx\FbxWeight.h" />
+    <ClInclude Include="System\Json\JsonReader.h" />
+    <ClInclude Include="System\Json\JsonStream.h" />
+    <ClInclude Include="System\Json\JsonObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

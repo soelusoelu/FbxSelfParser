@@ -2,8 +2,8 @@
 
 #include <cassert>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 struct FbxProperties {
     std::string type;

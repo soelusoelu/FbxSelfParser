@@ -17,6 +17,10 @@
 #include "../Sound/XAudio2/SoundEngine.h"
 #include "../Utility/LevelLoader.h"
 #include "../Utility/Random.h"
+#include "Json/JsonStream.h"
+#include "Json/JsonObject.h"
+#include "Json/JsonReader.h"
+#include "../Device/TimeMeasurement.h"
 
 Game::Game()
     : mWindow(nullptr)
@@ -81,7 +85,18 @@ void Game::initialize() {
     mSceneManager = new SceneManager();
 
     //ファイルから値を読み込む
-    LevelLoader::loadGlobal(this, GLOBAL_DATA_FILE_NAME);
+    //TimeMeasurement timer1;
+    //timer1.start();
+    //LevelLoader::loadGlobal(this, GLOBAL_DATA_FILE_NAME);
+    //auto dur1 = timer1.end();
+
+    TimeMeasurement timer2;
+    timer2.start();
+    JsonReader reader;
+    JsonStream stream("Assets\\Data\\Global.json");
+    auto rootObject = std::make_unique<JsonObject>();
+    reader.parse(stream, *rootObject);
+    auto dur2 = timer2.end();
 
     mWindow->initialize(&InputManager::mouse());
     mWindow->createWindow(mInstance);
