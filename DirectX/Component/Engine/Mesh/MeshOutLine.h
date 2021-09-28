@@ -15,8 +15,11 @@ class MeshOutLine : public Component, public IDrawBefore {
 public:
     MeshOutLine();
     ~MeshOutLine();
+    MeshOutLine(const MeshOutLine&) = delete;
+    MeshOutLine& operator=(const MeshOutLine&) = delete;
+
     virtual void start() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //メッシュ描画前描画
@@ -42,9 +45,6 @@ public:
     bool getActiveOutLine() const;
 
 private:
-    MeshOutLine(const MeshOutLine&) = delete;
-    MeshOutLine& operator=(const MeshOutLine&) = delete;
-
     //アウトラインを描画する
     void drawOutLine(const Matrix4& view, const Matrix4& projection) const;
 

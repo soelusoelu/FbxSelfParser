@@ -23,7 +23,7 @@ public:
     virtual void awake() override;
     virtual void update() override;
     virtual void finalize() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //使用可能状態か

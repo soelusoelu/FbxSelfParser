@@ -14,7 +14,10 @@ class MeshShader
 public:
     MeshShader();
     ~MeshShader();
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    MeshShader(const MeshShader&) = delete;
+    MeshShader& operator=(const MeshShader&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //シェーダーをバインドする
@@ -40,10 +43,6 @@ public:
     void setInterface(const IMesh* mesh, const IAnimation* anim);
     //デフォルトのシェーダーに変更する
     void setDefaultShader();
-
-private:
-    MeshShader(const MeshShader&) = delete;
-    MeshShader& operator=(const MeshShader&) = delete;
 
 private:
     const IMesh* mMesh;

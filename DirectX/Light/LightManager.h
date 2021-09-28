@@ -19,6 +19,12 @@ class LightManager
 public:
     LightManager();
     ~LightManager();
+    LightManager(const LightManager&) = delete;
+    LightManager& operator=(const LightManager&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+    virtual void childSaveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize();
     void createDirectionalLight();
     //ディレクショナルライト
@@ -30,13 +36,6 @@ public:
     void addPointLight(const PointLightPtr& pointLight);
     void removePointLight(const PointLightPtr& pointLight);
     void drawPointLights(const Camera& camera);
-
-private:
-    LightManager(const LightManager&) = delete;
-    LightManager& operator=(const LightManager&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-    virtual void childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     Vector3 mAmbientLight;

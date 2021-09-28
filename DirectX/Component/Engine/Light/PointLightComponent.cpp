@@ -34,11 +34,11 @@ void PointLightComponent::finalize() {
     }
 }
 
-void PointLightComponent::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mLightColor, "color", inObj, alloc, mode);
-    JsonHelper::getSet(mInnerRadius, "innerRadius", inObj, alloc, mode);
-    JsonHelper::getSet(mOuterRadius, "outerRadius", inObj, alloc, mode);
-    JsonHelper::getSet(mIntensity, "intensity", inObj, alloc, mode);
+void PointLightComponent::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mLightColor, "color", inObj, mode);
+    JsonHelper::getSet(mInnerRadius, "innerRadius", inObj, mode);
+    JsonHelper::getSet(mOuterRadius, "outerRadius", inObj, mode);
+    JsonHelper::getSet(mIntensity, "intensity", inObj, mode);
 }
 
 void PointLightComponent::drawInspector() {

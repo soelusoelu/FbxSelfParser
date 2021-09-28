@@ -16,6 +16,11 @@ class DrawString
 public:
     DrawString();
     ~DrawString();
+    DrawString(const DrawString&) = delete;
+    DrawString& operator=(const DrawString&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize();
     //保持してる文字列を一括描画
     void drawAll(const Matrix4& proj) const;
@@ -49,9 +54,6 @@ public:
     );
 
 private:
-    DrawString(const DrawString&) = delete;
-    DrawString& operator=(const DrawString&) = delete;
-
     struct ParamInt {
         int number;
         Vector2 position;
@@ -77,8 +79,6 @@ private:
         float alpha;
         Pivot pivot;
     };
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
     void drawInt(const ParamInt& param, const Matrix4& proj) const;
     void drawFloat(const ParamFloat& param, const Matrix4& proj) const;

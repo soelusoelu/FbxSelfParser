@@ -46,12 +46,12 @@ void ModelViewer::callbackModelChange(const std::function<void(GameObject&)>& f)
     mCallbackModelChange += f;
 }
 
-void ModelViewer::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
+void ModelViewer::saveAndLoad(JsonObject& inObj, FileMode mode) {
     if (mode == FileMode::LOAD) {
-        mMeshManager->saveAndLoad(inObj, alloc, mode);
+        mMeshManager->saveAndLoad(inObj, mode);
     }
 
-    mLight->writeAndRead(inObj, alloc, mode);
+    mLight->writeAndRead(inObj, mode);
 }
 
 void ModelViewer::initialize(

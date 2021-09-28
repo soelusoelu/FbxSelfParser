@@ -18,6 +18,10 @@ class EngineFunctionManager
 public:
     EngineFunctionManager();
     ~EngineFunctionManager();
+    EngineFunctionManager(const EngineFunctionManager&) = delete;
+    EngineFunctionManager& operator=(const EngineFunctionManager&) = delete;
+
+    virtual void childSaveAndLoad(JsonObject& inObj, FileMode mode) override;
 
     virtual DebugManager& debug() const override;
     virtual AssetsRenderTextureManager& getAssetsRenderTextureManager() const override;
@@ -37,12 +41,6 @@ public:
 
     //3D関連の描画
     void draw3D(const Renderer& renderer) const;
-
-private:
-    EngineFunctionManager(const EngineFunctionManager&) = delete;
-    EngineFunctionManager& operator=(const EngineFunctionManager&) = delete;
-
-    virtual void childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     std::unique_ptr<DebugManager> mDebugManager;

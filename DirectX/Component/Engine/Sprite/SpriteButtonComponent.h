@@ -14,10 +14,13 @@ class SpriteButtonComponent : public Component {
 public:
     SpriteButtonComponent();
     ~SpriteButtonComponent();
+    SpriteButtonComponent(const SpriteButtonComponent&) = delete;
+    SpriteButtonComponent& operator=(const SpriteButtonComponent&) = delete;
+
     virtual void start() override;
     virtual void update() override;
     virtual void lateUpdate() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
     virtual void onEnable(bool value) override;
 
@@ -31,9 +34,6 @@ public:
     void callbackClick(const std::function<void()>& onClick);
 
 private:
-    SpriteButtonComponent(const SpriteButtonComponent&) = delete;
-    SpriteButtonComponent& operator=(const SpriteButtonComponent&) = delete;
-
     //2枚のスプライトにアクセスできるか
     bool canAccessSprites() const;
     //スプライトの設定を共通化する

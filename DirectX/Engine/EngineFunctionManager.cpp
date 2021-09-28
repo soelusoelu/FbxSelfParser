@@ -15,6 +15,12 @@ EngineFunctionManager::EngineFunctionManager()
 
 EngineFunctionManager::~EngineFunctionManager() = default;
 
+void EngineFunctionManager::childSaveAndLoad(JsonObject& inObj, FileMode mode) {
+    mDebugManager->writeAndRead(inObj, mode);
+    mAssetsRenderTextureManager->saveAndLoad(inObj, mode);
+    mModelViewer->saveAndLoad(inObj, mode);
+}
+
 DebugManager& EngineFunctionManager::debug() const {
     return *mDebugManager;
 }
@@ -54,10 +60,4 @@ void EngineFunctionManager::drawDebug2D(Matrix4& proj) const {
 void EngineFunctionManager::draw3D(const Renderer& renderer) const {
     mAssetsRenderTextureManager->drawMeshes();
     mModelViewer->draw(renderer);
-}
-
-void EngineFunctionManager::childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mDebugManager->writeAndRead(inObj, alloc, mode);
-    mAssetsRenderTextureManager->saveAndLoad(inObj, alloc, mode);
-    mModelViewer->saveAndLoad(inObj, alloc, mode);
 }

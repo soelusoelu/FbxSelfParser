@@ -79,8 +79,8 @@ void ImGuiInspector::drawInspect() const {
     ImGui::PopStyleColor(3);
 }
 
-void ImGuiInspector::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mInspectorPositionX, "inspectorPositionX", inObj, alloc, mode);
+void ImGuiInspector::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mInspectorPositionX, "inspectorPositionX", inObj, mode);
 }
 
 void ImGuiInspector::drawName(const GameObject& target) const {

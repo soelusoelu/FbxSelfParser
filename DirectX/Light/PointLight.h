@@ -2,7 +2,6 @@
 
 #include "../Device/FileOperator.h"
 #include "../Math/Math.h"
-#include "../System/GlobalFunction.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -21,10 +20,8 @@ struct PointLight
 
     PointLight();
     ~PointLight();
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     void initialize();
-
-private:
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     std::string mMeshFileName;

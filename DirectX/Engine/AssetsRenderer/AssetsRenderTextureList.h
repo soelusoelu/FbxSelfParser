@@ -20,9 +20,16 @@ class AssetsRenderTextureList
 public:
     AssetsRenderTextureList();
     ~AssetsRenderTextureList();
+    AssetsRenderTextureList(const AssetsRenderTextureList&) = delete;
+    AssetsRenderTextureList& operator=(const AssetsRenderTextureList&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     virtual void add(const std::string& filePath) override;
     virtual void add(const std::string& fileName, const std::string& directoryPath) override;
+
     virtual void deleteTexture(const std::string& filePath) override;
+
     virtual const AssetsRenderTexturePtrArray& getTextures() const override;
 
     void initialize();
@@ -32,11 +39,6 @@ public:
     void drawTexture(const Matrix4& proj) const;
 
 private:
-    AssetsRenderTextureList(const AssetsRenderTextureList&) = delete;
-    AssetsRenderTextureList& operator=(const AssetsRenderTextureList&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-
     //テクスチャを作成し格納する
     void createTexture(const std::string& fileName, const std::string& directoryPath);
     void createTexture(const std::string& filePath);

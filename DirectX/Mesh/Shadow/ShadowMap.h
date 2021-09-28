@@ -14,6 +14,11 @@ class ShadowMap
 public:
     ShadowMap();
     ~ShadowMap();
+    ShadowMap(const ShadowMap&) = delete;
+    ShadowMap& operator=(const ShadowMap&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize();
     //描画準備
     void drawBegin(const Vector3& dirLightDirection);
@@ -27,12 +32,6 @@ public:
     void transferShadowTexture(unsigned constantBufferIndex = 1);
     //レンダーターゲットテクスチャの使用後処理
     void drawEndShadowTexture();
-
-private:
-    ShadowMap(const ShadowMap&) = delete;
-    ShadowMap& operator=(const ShadowMap&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     int mDepthTextureCreateShaderID;

@@ -19,11 +19,14 @@ class MeshRenderOnTextureComponent
 public:
     MeshRenderOnTextureComponent();
     ~MeshRenderOnTextureComponent();
+    MeshRenderOnTextureComponent(const MeshRenderOnTextureComponent&) = delete;
+    MeshRenderOnTextureComponent& operator=(const MeshRenderOnTextureComponent&) = delete;
+
     virtual void start() override;
     virtual void update() override;
     virtual void finalize() override;
     virtual void onEnable(bool value) override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
 
     //メッシュをテクスチャ上に描画する
     void drawMeshOnTexture() const;
@@ -51,9 +54,6 @@ public:
     static void setMeshRenderOnTextureManager(MeshRenderOnTextureManager* manager);
 
 private:
-    MeshRenderOnTextureComponent(const MeshRenderOnTextureComponent&) = delete;
-    MeshRenderOnTextureComponent& operator=(const MeshRenderOnTextureComponent&) = delete;
-
     void calcView();
 
 private:

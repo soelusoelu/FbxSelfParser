@@ -12,6 +12,11 @@ class Window
 public:
     Window();
     ~Window();
+    Window(const Window&) = delete;
+    Window& operator=(const Window&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize(IMouseWheelScrollValueSetter* setter);
     void createWindow(HINSTANCE hInstance);
     LRESULT msgProc(HWND, UINT, WPARAM, LPARAM);
@@ -30,11 +35,6 @@ public:
     static Vector2 getWindowCorrect();
 
 private:
-    Window(const Window&) = delete;
-    Window& operator=(const Window&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-
     void updateWindowToClientSize();
 
 private:

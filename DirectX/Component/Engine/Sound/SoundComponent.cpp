@@ -43,9 +43,9 @@ void SoundComponent::finalize() {
     }
 }
 
-void SoundComponent::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mFileName, "fileName", inObj, alloc, mode);
-    JsonHelper::getSet(mUse3DSound, "use3D", inObj, alloc, mode);
+void SoundComponent::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mFileName, "fileName", inObj, mode);
+    JsonHelper::getSet(mUse3DSound, "use3D", inObj, mode);
 }
 
 void SoundComponent::drawInspector() {

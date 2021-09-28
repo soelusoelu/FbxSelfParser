@@ -41,8 +41,8 @@ void MeshRenderOnTextureComponent::onEnable(bool value) {
     mMeshRenderOnTexture->getSprite().setActive(value);
 }
 
-void MeshRenderOnTextureComponent::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mMeshRenderOnTexture->saveAndLoad(inObj, alloc, mode);
+void MeshRenderOnTextureComponent::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    mMeshRenderOnTexture->saveAndLoad(inObj, mode);
     calcView();
 }
 

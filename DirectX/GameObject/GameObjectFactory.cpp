@@ -106,28 +106,28 @@ GameObjectFactory::~GameObjectFactory() {
 }
 
 std::shared_ptr<GameObject> GameObjectFactory::createGameObjectFromFile(const std::string& type, const std::string& directoryPath) {
-    rapidjson::Document document;
+    auto obj = std::make_unique<JsonObject>();
     const auto& fileName = type + ".json";
-    if (!LevelLoader::loadJSON(document, fileName, directoryPath)) {
+    if (!LevelLoader::loadJson(*obj, fileName, directoryPath)) {
         Debug::windowMessage(directoryPath + fileName + ": ファイルのロードに失敗しました");
         return nullptr;
     }
 
-    return createGameObject(document, type, directoryPath);
+    return createGameObject(*obj, type, directoryPath);
 }
 
-std::shared_ptr<GameObject> GameObjectFactory::createGameObject(rapidjson::Document& inDocument, const std::string& type, const std::string& directoryPath) {
+std::shared_ptr<GameObject> GameObjectFactory::createGameObject(JsonObject& inObj, const std::string& type, const std::string& directoryPath) {
     //タグを読み込む
-    const auto& tag = loadTag(inDocument);
+    const auto& tag = loadTag(inObj);
     //ゲームオブジェクトを生成
     auto gameObject = GameObject::create(type, tag);
     //プロパティを読み込む
-    loadGameObjectProperties(*gameObject, inDocument);
+    loadGameObjectProperties(*gameObject, inObj);
 
     //継承コンポーネントがあれば取得
-    loadPrototypeComponents(*gameObject, inDocument, directoryPath);
+    loadPrototypeComponents(*gameObject, inObj, directoryPath);
     //コンポーネントがあれば取得
-    loadComponents(*gameObject, inDocument);
+    loadComponents(*gameObject, inObj);
 
     //全コンポーネントのstartを呼び出す
     gameObject->componentManager().start();
@@ -135,66 +135,61 @@ std::shared_ptr<GameObject> GameObjectFactory::createGameObject(rapidjson::Docum
     return gameObject;
 }
 
-std::string GameObjectFactory::loadTag(const rapidjson::Document& inDocument) {
+std::string GameObjectFactory::loadTag(const JsonObject& inObj) {
     //初期タグをNoneにする
     std::string tag = "None";
     //タグ属性があれば読み込む
-    JsonHelper::getString(tag, "tag", inDocument);
+    JsonHelper::getString(tag, "tag", inObj);
 
     return tag;
 }
 
-void GameObjectFactory::loadGameObjectProperties(GameObject& gameObject,  rapidjson::Document& inDocument) {
-    if (inDocument.HasMember("transform")) {
-        gameObject.saveAndLoad(inDocument["transform"], inDocument.GetAllocator(), FileMode::LOAD);
+void GameObjectFactory::loadGameObjectProperties(GameObject& gameObject,  JsonObject& inObj) {
+    if (inObj.hasObject("transform")) {
+        gameObject.saveAndLoad(inObj.getObject("transform"), FileMode::LOAD);
     }
 }
 
-void GameObjectFactory::loadPrototypeComponents(GameObject& gameObject, const rapidjson::Document& inDocument, const std::string& directoryPath) const {
+void GameObjectFactory::loadPrototypeComponents(GameObject& gameObject, const JsonObject& inObj, const std::string& directoryPath) const {
     //ファイルにprototypeメンバがなければ終了
-    if (!inDocument.HasMember("prototype")) {
+    if (!inObj.hasValue("prototype")) {
         return;
     }
 
     //継承コンポーネントのファイル名を取得する
     std::string prototype;
-    JsonHelper::getString(prototype, "prototype", inDocument);
+    JsonHelper::getString(prototype, "prototype", inObj);
 
-    rapidjson::Document document;
+    auto document = std::make_unique<JsonObject>();
     const auto& fileName = prototype + ".json";
-    if (!LevelLoader::loadJSON(document, fileName, directoryPath)) {
+    if (!LevelLoader::loadJson(*document, fileName, directoryPath)) {
         Debug::windowMessage(directoryPath + fileName + ": ファイルのロードに失敗しました");
         return;
     }
 
     //継承コンポーネント読み込み
-    loadComponents(gameObject, document);
+    loadComponents(gameObject, *document);
 }
 
-void GameObjectFactory::loadComponents(GameObject& gameObject, rapidjson::Document& inDocument) const {
+void GameObjectFactory::loadComponents(GameObject& gameObject, JsonObject& inObj) const {
     //ファイルにcomponentsメンバがなければ終了
-    if (!inDocument.HasMember("components")) {
+    if (!inObj.hasObjects("components")) {
         return;
     }
 
-    auto& components = inDocument["components"];
-    //componentsメンバが配列じゃなければなければ終了
-    if (!components.IsArray()) {
+    const auto& components = inObj.getObjects("components");
+    //componentsが空なら終了
+    if (components.empty()) {
         return;
     }
 
-    rapidjson::Document::AllocatorType& alloc = inDocument.GetAllocator();
-    for (rapidjson::SizeType i = 0; i < components.Size(); ++i) {
+    for (auto&& c : components) {
         //各コンポーネントを読み込んでいく
-        loadComponent(gameObject, components[i], alloc);
+        loadComponent(gameObject, *c);
     }
 }
 
-void GameObjectFactory::loadComponent(GameObject& gameObject, rapidjson::Value& component, rapidjson::Document::AllocatorType& alloc) const {
-    //有効なオブジェクトか
-    if (!component.IsObject()) {
-        return;
-    }
+void GameObjectFactory::loadComponent(GameObject& gameObject, JsonObject& component) const {
     //有効な型名か
     std::string type;
     if (!isValidType(type, component)) {
@@ -207,15 +202,15 @@ void GameObjectFactory::loadComponent(GameObject& gameObject, rapidjson::Value& 
         return;
     }
     //プロパティがあるか
-    if (!component.HasMember("properties")) {
+    if (!component.hasObject("properties")) {
         return;
     }
 
     //新規コンポーネントを生成
-    itr->second(gameObject, type, component["properties"], alloc);
+    itr->second(gameObject, type, component.getObject("properties"));
 }
 
-bool GameObjectFactory::isValidType(std::string& outType, const rapidjson::Value& inObj) const {
+bool GameObjectFactory::isValidType(std::string& outType, const JsonObject& inObj) const {
     return (JsonHelper::getString(outType, "type", inObj));
 }
 

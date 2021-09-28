@@ -20,6 +20,12 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager() = default;
 
+void SceneManager::childSaveAndLoad(JsonObject& inObj, FileMode mode) {
+    mEngineManager->writeAndRead(inObj, mode);
+    mMeshManager->saveAndLoad(inObj, mode);
+    mTextDrawer->writeAndRead(inObj, mode);
+}
+
 void SceneManager::initialize() {
     mRenderer->initialize();
     mEngineManager->initialize();
@@ -52,10 +58,4 @@ void SceneManager::draw() const {
     mRenderer->renderToDebug(proj2D);
     mSpriteManager->draw(proj2D);
     mEngineManager->drawDebug2D(proj2D);
-}
-
-void SceneManager::childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mEngineManager->writeAndRead(inObj, alloc, mode);
-    mMeshManager->saveAndLoad(inObj, alloc, mode);
-    mTextDrawer->writeAndRead(inObj, alloc, mode);
 }

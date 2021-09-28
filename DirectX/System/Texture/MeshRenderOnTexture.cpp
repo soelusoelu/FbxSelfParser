@@ -41,18 +41,18 @@ MeshRenderOnTexture::MeshRenderOnTexture(const std::string& filePath, int width,
 //{
 //}
 
-void MeshRenderOnTexture::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mFilePath, "filePath", inObj, alloc, mode);
-    JsonHelper::getSet(mWidth, "width", inObj, alloc, mode);
-    JsonHelper::getSet(mHeight, "height", inObj, alloc, mode);
+MeshRenderOnTexture::~MeshRenderOnTexture() = default;
+
+void MeshRenderOnTexture::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mFilePath, "filePath", inObj, mode);
+    JsonHelper::getSet(mWidth, "width", inObj, mode);
+    JsonHelper::getSet(mHeight, "height", inObj, mode);
 
     mRenderTexture = std::make_unique<RenderTexture>(mWidth, mHeight, Format::FORMAT_D16_UNORM, Format::FORMAT_RGBA8_UNORM);
     mMesh = AssetsManager::instance().createMeshFromFilePath(mFilePath);
     const auto& tex = std::make_shared<Texture>(mRenderTexture->getShaderResourceView(), Vector2(mWidth, mHeight));
     mSprite->setTexture(tex);
 }
-
-MeshRenderOnTexture::~MeshRenderOnTexture() = default;
 
 void MeshRenderOnTexture::drawMeshOnTexture(const Matrix4& viewProj) const {
     //レンダーテクスチャへの書き込み前処理

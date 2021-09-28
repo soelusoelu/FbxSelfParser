@@ -29,6 +29,13 @@ ShadowMap::ShadowMap()
 
 ShadowMap::~ShadowMap() = default;
 
+void ShadowMap::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mShadowTextureSize, "shadowTextureSize", inObj, mode);
+    JsonHelper::getSet(mLightDistance, "lightDistance", inObj, mode);
+    JsonHelper::getSet(mNearClip, "nearClip", inObj, mode);
+    JsonHelper::getSet(mFarClip, "farClip", inObj, mode);
+}
+
 void ShadowMap::initialize() {
     mDepthTextureCreateShaderID = AssetsManager::instance().createShader("ShadowDepthTextureCreater.hlsl");
     mRenderTexture = std::make_unique<RenderTexture>(mShadowTextureSize, mShadowTextureSize, Format::FORMAT_D24_UNORM_S8_UINT, Format::FORMAT_R16_UNORM);
@@ -78,11 +85,4 @@ void ShadowMap::transferShadowTexture(unsigned constantBufferIndex) {
 
 void ShadowMap::drawEndShadowTexture() {
     mRenderTexture->drawEndTexture();
-}
-
-void ShadowMap::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mShadowTextureSize, "shadowTextureSize", inObj, alloc, mode);
-    JsonHelper::getSet(mLightDistance, "lightDistance", inObj, alloc, mode);
-    JsonHelper::getSet(mNearClip, "nearClip", inObj, alloc, mode);
-    JsonHelper::getSet(mFarClip, "farClip", inObj, alloc, mode);
 }

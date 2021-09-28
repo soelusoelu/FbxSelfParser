@@ -23,9 +23,9 @@ MeshShader::MeshShader()
 
 MeshShader::~MeshShader() = default;
 
-void MeshShader::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
+void MeshShader::saveAndLoad(JsonObject& inObj, FileMode mode) {
     if (mode == FileMode::SAVE) {
-        JsonHelper::setString(AssetsManager::instance().getShaderFormID(mShaderID).getShaderName(), "shaderName", inObj, alloc);
+        JsonHelper::setString(AssetsManager::instance().getShaderFormID(mShaderID).getShaderName(), "shaderName", inObj);
     } else {
         //シェーダー名が取得できたら読み込む
         if (std::string shader; JsonHelper::getString(shader, "shaderName", inObj)) {

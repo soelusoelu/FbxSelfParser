@@ -178,11 +178,11 @@ void Transform3D::callbackBeforeComputeWorldMatrix(const std::function<void()>& 
     mCallbackBeforeComputeWorldMatrix += f;
 }
 
-void Transform3D::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mPosition, "position", inObj, alloc, mode);
-    JsonHelper::getSet(mRotation, "rotation", inObj, alloc, mode);
-    JsonHelper::getSet(mScale, "scale", inObj, alloc, mode);
-    JsonHelper::getSet(mPivot, "pivot", inObj, alloc, mode);
+void Transform3D::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mPosition, "position", inObj, mode);
+    JsonHelper::getSet(mRotation, "rotation", inObj, mode);
+    JsonHelper::getSet(mScale, "scale", inObj, mode);
+    JsonHelper::getSet(mPivot, "pivot", inObj, mode);
 
     if (mode == FileMode::LOAD) {
         computeLocalMatrix();

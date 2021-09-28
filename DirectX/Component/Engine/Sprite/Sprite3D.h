@@ -10,7 +10,10 @@ class SpriteManager;
 class Texture;
 class Transform3D;
 
-class Sprite3D : public Component, public std::enable_shared_from_this<Sprite3D> {
+class Sprite3D
+    : public Component
+    , public std::enable_shared_from_this<Sprite3D>
+{
 public:
     Sprite3D();
     ~Sprite3D();
@@ -18,7 +21,7 @@ public:
     virtual void lateUpdate() override;
     virtual void finalize() override;
     virtual void onEnable(bool value) override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //描画

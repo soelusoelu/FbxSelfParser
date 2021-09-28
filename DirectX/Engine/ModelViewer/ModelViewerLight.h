@@ -9,15 +9,14 @@ class ModelViewerLight
 public:
     ModelViewerLight();
     ~ModelViewerLight();
-    void drawGUI();
-    Vector3 getDirection() const;
-    const Vector3& getColor() const;
-
-private:
     ModelViewerLight(const ModelViewerLight&) = delete;
     ModelViewerLight& operator=(const ModelViewerLight&) = delete;
 
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
+    void drawGUI();
+    Vector3 getDirection() const;
+    const Vector3& getColor() const;
 
 private:
     Quaternion mDirection;

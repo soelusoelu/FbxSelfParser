@@ -21,6 +21,14 @@ JoyPad::~JoyPad() {
     safeRelease<IDirectInputDevice8>(mPadDevice);
 }
 
+void JoyPad::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mEnterPadStr, "enterPad", inObj, mode);
+
+    if (mode == FileMode::LOAD) {
+        stringToJoyCode(mEnterPadStr, mEnterPad);
+    }
+}
+
 bool JoyPad::initialize(const HWND& hWnd, IDirectInput8* directInput) {
     //利用可能なゲームコントローラーの列挙関数を実行
     if (FAILED(directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, enumJoysticksCallback, NULL, DIEDFL_ATTACHEDONLY))) {
@@ -141,13 +149,5 @@ void JoyPad::stringToJoyCode(const std::string& src, JoyCode& dst) {
 
     if (joy != JoyCode::None) {
         dst = joy;
-    }
-}
-
-void JoyPad::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mEnterPadStr, "enterPad", inObj, alloc, mode);
-
-    if (mode == FileMode::LOAD) {
-        stringToJoyCode(mEnterPadStr, mEnterPad);
     }
 }

@@ -2,8 +2,8 @@
 
 #include "IThisGetter.h"
 #include "Object.h"
+#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 #include <string>
 
@@ -18,6 +18,8 @@ class GameObject final
 public:
     GameObject();
     ~GameObject();
+    GameObject(const GameObject&) = delete;
+    GameObject& operator=(const GameObject&) = delete;
 
     virtual GameObject& getThis() override;
     virtual const GameObject& getThis() const override;
@@ -28,7 +30,7 @@ public:
     void lateUpdate();
 
     //ロード/セーブ
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
 
     //アクティブ指定
     void setActive(bool value);
@@ -56,10 +58,6 @@ public:
     static void setGameObjectManager(GameObjectManager* manager);
     //ゲームオブジェクトを生成
     static std::shared_ptr<GameObject> create(const std::string& name, const std::string& tag);
-
-private:
-    GameObject(const GameObject&) = delete;
-    GameObject& operator=(const GameObject&) = delete;
 
 private:
     std::unique_ptr<Transform3D> mTransform;

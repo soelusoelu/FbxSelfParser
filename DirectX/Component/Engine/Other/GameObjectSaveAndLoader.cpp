@@ -9,8 +9,8 @@ GameObjectSaveAndLoader::GameObjectSaveAndLoader()
 
 GameObjectSaveAndLoader::~GameObjectSaveAndLoader() = default;
 
-void GameObjectSaveAndLoader::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::setStringArray(mGameObjectNames, "gameObjectNames", inObj, alloc);
+void GameObjectSaveAndLoader::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::setStringArray(mGameObjectNames, "gameObjectNames", inObj);
 
     if (mode == FileMode::LOAD) {
         for (const auto& name : mGameObjectNames) {

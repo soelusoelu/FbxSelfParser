@@ -86,25 +86,18 @@ const std::vector<std::shared_ptr<Component>>& ComponentManager::getAllComponent
     return mComponents;
 }
 
-void ComponentManager::saveComponents(rapidjson::Document::AllocatorType& alloc, rapidjson::Value& inObj) const {
+void ComponentManager::saveComponents(JsonObjectArray& inObj) const {
     for (const auto& c : mComponents) {
-        saveComponent(alloc, inObj, *c);
+        saveComponent(*inObj.emplace_back(), *c);
     }
 }
 
-void ComponentManager::saveComponent(rapidjson::Document::AllocatorType& alloc, rapidjson::Value& outArray, Component& component) const {
-    //Jsonオブジェクトを作成する
-    rapidjson::Value obj(rapidjson::kObjectType);
+void ComponentManager::saveComponent(JsonObject& outArray, Component& component) const {
     //コンポーネント名を保存
-    JsonHelper::setString(component.getComponentName(), "type", obj, alloc);
+    JsonHelper::setString(component.getComponentName(), "type", outArray);
 
     //プロパティ用オブジェクトを作成
-    rapidjson::Value props(rapidjson::kObjectType);
+    auto& props = outArray.children.emplace("properties", std::make_shared<JsonObject>()).first->second;
     //コンポーネントのプロパティを保存する
-    component.saveAndLoad(props, alloc, FileMode::SAVE);
-    //Jsonオブジェクトに追加
-    obj.AddMember("properties", props, alloc);
-
-    //コンポーネント配列に追加
-    outArray.PushBack(obj, alloc);
+    component.saveAndLoad(*props, FileMode::SAVE);
 }

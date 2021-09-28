@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <rapidjson/document.h>
+#include "../System/Json/JsonObject.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,6 +15,9 @@ class ComponentManager {
 public:
     ComponentManager();
     ~ComponentManager();
+    ComponentManager(const ComponentManager&) = delete;
+    ComponentManager& operator=(const ComponentManager&) = delete;
+
     //各コンポーネントのstartを一度だけ実行
     void start();
     //所有するすべてのコンポーネントを更新
@@ -68,14 +71,11 @@ public:
     }
 
     //すべてのコンポーネントを保存する
-    void saveComponents(rapidjson::Document::AllocatorType& alloc, rapidjson::Value& inObj) const;
+    void saveComponents(JsonObjectArray& inObj) const;
 
 private:
-    ComponentManager(const ComponentManager&) = delete;
-    ComponentManager& operator=(const ComponentManager&) = delete;
-
     //各コンポーネントを保存する
-    void saveComponent(rapidjson::Document::AllocatorType& alloc, rapidjson::Value& outArray, Component& component) const;
+    void saveComponent(JsonObject& outArray, Component& component) const;
 
 private:
     ComponentPtrArray mComponents;

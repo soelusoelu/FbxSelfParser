@@ -4,8 +4,8 @@
 #include "../GameObject/IThisGetter.h"
 #include "../GameObject/Object.h"
 #include "../GameObject/GameObject.h"
+#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,7 +38,7 @@ public:
     //衝突しなくなった瞬間のコライダーを取得する
     virtual void onCollisionExit(Collider& other) {};
     //ファイルの読み込みと保存
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {};
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) {};
     //Inspectorに表示する情報
     virtual void drawInspector() {};
 
@@ -81,12 +81,12 @@ public:
 
     //指定されたプロパティでコンポーネントを生成
     template <typename T>
-    static void create(GameObject& gameObject, const std::string& componentName, rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc) {
+    static void create(GameObject& gameObject, const std::string& componentName, JsonObject& inObj) {
         auto t = std::make_shared<T>();
         t->mGameObjectGetter = &gameObject;
         t->mComponentName = componentName;
         t->componentManager().addComponent(t);
-        t->saveAndLoad(inObj, alloc, FileMode::LOAD);
+        t->saveAndLoad(inObj, FileMode::LOAD);
         t->awake();
     }
 

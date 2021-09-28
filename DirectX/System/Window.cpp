@@ -26,6 +26,14 @@ Window::~Window() {
     UnregisterClass(mWndClass.lpszClassName, mWndClass.hInstance);
 }
 
+void Window::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mTitle, "title", inObj, mode);
+    JsonHelper::getSet(mGameWidth, "windowWidth", inObj, mode);
+    JsonHelper::getSet(mGameHeight, "windowHeight", inObj, mode);
+    JsonHelper::getSet(mStandardWidth, "windowStandardWidth", inObj, mode);
+    JsonHelper::getSet(mStandardHeight, "windowStandardHeight", inObj, mode);
+}
+
 void Window::initialize(IMouseWheelScrollValueSetter* setter) {
     mMouseWheelScrollValueSetter = setter;
 }
@@ -127,14 +135,6 @@ Vector2 Window::getWindowCorrect() {
         static_cast<float>(mGameWidth) / static_cast<float>(mStandardWidth),
         static_cast<float>(mGameHeight) / static_cast<float>(mStandardHeight)
     );
-}
-
-void Window::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mTitle, "title", inObj, alloc, mode);
-    JsonHelper::getSet(mGameWidth, "windowWidth", inObj, alloc, mode);
-    JsonHelper::getSet(mGameHeight, "windowHeight", inObj, alloc, mode);
-    JsonHelper::getSet(mStandardWidth, "windowStandardWidth", inObj, alloc, mode);
-    JsonHelper::getSet(mStandardHeight, "windowStandardHeight", inObj, alloc, mode);
 }
 
 void Window::updateWindowToClientSize() {

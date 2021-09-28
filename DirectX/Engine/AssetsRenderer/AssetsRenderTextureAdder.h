@@ -15,17 +15,16 @@ class AssetsRenderTextureAdder
 public:
     AssetsRenderTextureAdder();
     ~AssetsRenderTextureAdder();
+    AssetsRenderTextureAdder(const AssetsRenderTextureAdder&) = delete;
+    AssetsRenderTextureAdder& operator=(const AssetsRenderTextureAdder&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize(IAddAssets* adder);
     void update();
 
 private:
-    AssetsRenderTextureAdder(const AssetsRenderTextureAdder&) = delete;
-    AssetsRenderTextureAdder& operator=(const AssetsRenderTextureAdder&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-
     void onClickButton();
-    void onChangeMode();
 
 private:
     std::unique_ptr<SpriteButton> mButton;

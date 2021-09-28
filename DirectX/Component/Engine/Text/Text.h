@@ -10,7 +10,7 @@ public:
     Text();
     ~Text();
     virtual void lateUpdate() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
     void setText(const std::string& text);
     const std::string& text() const;

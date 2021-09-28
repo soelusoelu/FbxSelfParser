@@ -199,7 +199,6 @@
     <ClCompile Include="Engine\EngineFunctionManager.cpp" />
     <ClCompile Include="Engine\DebugManager\Inspector\ImGuiInspector.cpp" />
     <ClCompile Include="Engine\DebugManager\Inspector\ImGuiWrapper.cpp" />
-    <ClCompile Include="Engine\DebugManager\Inspector\Inspector.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer2D.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer3D.cpp" />
@@ -496,7 +495,6 @@
     <ClInclude Include="GameObject\IGameObjectsGetter.h" />
     <ClInclude Include="Engine\DebugManager\Inspector\ImGuiInspector.h" />
     <ClInclude Include="Engine\DebugManager\Inspector\ImGuiWrapper.h" />
-    <ClInclude Include="Engine\DebugManager\Inspector\Inspector.h" />
     <ClInclude Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer.h" />
     <ClInclude Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer2D.h" />
     <ClInclude Include="Engine\DebugManager\DebugUtility\LineRenderer\LineRenderer3D.h" />

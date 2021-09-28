@@ -14,6 +14,11 @@ class Log
 public:
     Log();
     ~Log();
+    Log(const Log&) = delete;
+    Log& operator=(const Log&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize();
     void log(const std::string& message);
     void logError(const std::string& message);
@@ -22,11 +27,6 @@ public:
     void drawLogs(DrawString& drawString) const;
 
 private:
-    Log(const Log&) = delete;
-    Log& operator=(const Log&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-
     void addLog(const std::string& message, const Vector3& color);
     void adjustCapacity();
 

@@ -18,6 +18,10 @@ DebugUtility::DebugUtility()
 
 DebugUtility::~DebugUtility() = default;
 
+void DebugUtility::childSaveAndLoad(JsonObject & inObj, FileMode mode) {
+    mLog->writeAndRead(inObj, mode);
+}
+
 DebugUtility& DebugUtility::instance() {
     if (!mInstance) {
         mInstance = new DebugUtility();
@@ -74,8 +78,4 @@ LineRenderer2D& DebugUtility::lineRenderer2D() const {
 
 LineInstancingDrawer& DebugUtility::lineRenderer3D() const {
     return *mLineRenderer3D;
-}
-
-void DebugUtility::childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mLog->writeAndRead(inObj, alloc, mode);
 }

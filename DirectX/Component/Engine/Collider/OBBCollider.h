@@ -21,7 +21,7 @@ public:
     virtual void start() override;
     virtual void lateUpdate() override;
     virtual void finalize() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //OBBを取得する

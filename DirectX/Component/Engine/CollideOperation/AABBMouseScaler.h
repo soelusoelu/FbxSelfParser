@@ -13,9 +13,12 @@ class AABBMouseScaler : public Component {
 public:
     AABBMouseScaler();
     ~AABBMouseScaler();
+    AABBMouseScaler(const AABBMouseScaler&) = delete;
+    AABBMouseScaler& operator=(const AABBMouseScaler&) = delete;
+
     virtual void start() override;
     virtual void update() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //AABBをセットする
@@ -24,9 +27,6 @@ public:
     bool editing() const;
 
 private:
-    AABBMouseScaler(const AABBMouseScaler&) = delete;
-    AABBMouseScaler& operator=(const AABBMouseScaler&) = delete;
-
     //AABBのボックスの点を選択する
     void selectBoxPoint();
     //マウスの移動量から当たり判定を拡縮する

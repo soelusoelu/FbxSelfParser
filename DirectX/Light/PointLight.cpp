@@ -16,13 +16,13 @@ PointLight::PointLight()
 
 PointLight::~PointLight() = default;
 
+void PointLight::saveAndLoad(JsonObject & inObj, FileMode mode) {
+    JsonHelper::getSet(mMeshFileName, "pointLightMeshFileName", inObj, mode);
+}
+
 void PointLight::initialize() {
     //mesh = World::instance().assetsManager().createMeshLoader(mMeshFileName);
     //mesh->setInitMaterials(&materials);
     //radius = mesh->getRadius();
     //shader = World::instance().assetsManager().createShader("PointLight.hlsl");
-}
-
-void PointLight::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mMeshFileName, "pointLightMeshFileName", inObj, alloc, mode);
 }

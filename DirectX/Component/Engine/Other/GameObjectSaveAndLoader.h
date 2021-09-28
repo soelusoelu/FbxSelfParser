@@ -11,14 +11,13 @@ class GameObjectSaveAndLoader : public Component {
 public:
     GameObjectSaveAndLoader();
     ~GameObjectSaveAndLoader();
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    GameObjectSaveAndLoader(const GameObjectSaveAndLoader&) = delete;
+    GameObjectSaveAndLoader& operator=(const GameObjectSaveAndLoader&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
 
     //保存するゲームオブジェクトを追加する
     void addSaveGameObject(const std::string& name);
-
-private:
-    GameObjectSaveAndLoader(const GameObjectSaveAndLoader&) = delete;
-    GameObjectSaveAndLoader& operator=(const GameObjectSaveAndLoader&) = delete;
 
 private:
     //保存するゲームオブジェクト名配列

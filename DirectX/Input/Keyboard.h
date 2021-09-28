@@ -13,6 +13,11 @@ class Keyboard
 public:
     Keyboard();
     ~Keyboard();
+    Keyboard(const Keyboard&) = delete;
+    Keyboard& operator=(const Keyboard&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     virtual bool getKeyDown(KeyCode key) const override;
     virtual bool getKey(KeyCode key) const override;
     virtual bool getKeyUp(KeyCode key) const override;
@@ -25,12 +30,6 @@ public:
     void update();
     //文字列をKeyCodeに変換
     static void stringToKeyCode(const std::string& src, KeyCode& dst);
-
-private:
-    Keyboard(const Keyboard&) = delete;
-    Keyboard& operator=(const Keyboard&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 public:
     //無効な数字

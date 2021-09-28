@@ -15,6 +15,10 @@ FPSCounter::FPSCounter()
 
 FPSCounter::~FPSCounter() = default;
 
+void FPSCounter::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mFixedFrame, "fps", inObj, mode);
+}
+
 float FPSCounter::getFps() const {
     return mCurrentFPS;
 }
@@ -44,10 +48,6 @@ void FPSCounter::fixedFrame() {
 
 void FPSCounter::setFixedFrame(float fixedFrame) {
     mFixedFrame = fixedFrame;
-}
-
-void FPSCounter::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mFixedFrame, "fps", inObj, alloc, mode);
 }
 
 void FPSCounter::computeFps(float time) {

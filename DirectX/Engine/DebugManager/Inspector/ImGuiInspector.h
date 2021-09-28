@@ -14,16 +14,16 @@ class ImGuiInspector
 public:
     ImGuiInspector();
     ~ImGuiInspector();
+    ImGuiInspector(const ImGuiInspector&) = delete;
+    ImGuiInspector& operator=(const ImGuiInspector&) = delete;
+
     virtual void setTarget(const std::shared_ptr<GameObject>& target) override;
     virtual float getInspectorPositionX() const override;
 
     void drawInspect() const;
 
 private:
-    ImGuiInspector(const ImGuiInspector&) = delete;
-    ImGuiInspector& operator=(const ImGuiInspector&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
 
     void drawName(const GameObject& target) const;
     void drawTag(const GameObject& target) const;

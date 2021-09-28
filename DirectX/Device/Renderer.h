@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "../Math/Math.h"
-#include <rapidjson/document.h>
 #include <memory>
 
 class Camera;
@@ -12,6 +11,9 @@ class Renderer {
 public:
     Renderer();
     ~Renderer();
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+
     void initialize();
 
     //GBufferのテクスチャに書き込み
@@ -39,10 +41,6 @@ public:
     void renderToDebug(Matrix4& proj) const;
     //ポイントライト処理
     void renderPointLight() const;
-
-private:
-    Renderer(const Renderer&) = delete;
-    Renderer& operator=(const Renderer&) = delete;
 
 private:
     std::unique_ptr<GBuffer> mGBuffer;

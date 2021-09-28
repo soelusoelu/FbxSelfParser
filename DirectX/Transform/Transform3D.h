@@ -2,8 +2,8 @@
 
 #include "../Device/Function.h"
 #include "../Math/Math.h"
+#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <functional>
 #include <memory>
 
@@ -14,6 +14,8 @@ class Transform3D {
 public:
     Transform3D(GameObject* gameObject = nullptr);
     ~Transform3D();
+    Transform3D(const Transform3D&) = delete;
+    Transform3D& operator=(const Transform3D&) = delete;
 
     //行列を計算する
     void computeMatrix();
@@ -80,15 +82,12 @@ public:
     void callbackBeforeComputeWorldMatrix(const std::function<void()>& f);
 
     //ロード/セーブ
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
 
     //インスペクター
     void drawInspector();
 
 private:
-    Transform3D(const Transform3D&) = delete;
-    Transform3D& operator=(const Transform3D&) = delete;
-
     //ローカル行列を計算する
     void computeLocalMatrix();
     //ワールド行列を計算する

@@ -23,9 +23,9 @@ bool AssetsRenderTextureManager::selectedTexture() const {
     return (mCurrentSelectTexture) ? true : false;
 }
 
-void AssetsRenderTextureManager::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mTextureList->writeAndRead(inObj, alloc, mode);
-    mTextureAdder->writeAndRead(inObj, alloc, mode);
+void AssetsRenderTextureManager::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    mTextureList->writeAndRead(inObj, mode);
+    mTextureAdder->writeAndRead(inObj, mode);
 }
 
 void AssetsRenderTextureManager::initialize() {

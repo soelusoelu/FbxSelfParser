@@ -23,6 +23,14 @@ LightManager::~LightManager() {
     PointLightComponent::setLightManager(nullptr);
 }
 
+void LightManager::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mAmbientLight, "ambientLight", inObj, mode);
+}
+
+void LightManager::childSaveAndLoad(JsonObject& inObj, FileMode mode) {
+    mPointLight->writeAndRead(inObj, mode);
+}
+
 void LightManager::initialize() {
     mPointLight->initialize();
 }
@@ -83,12 +91,4 @@ void LightManager::drawPointLights(const Camera& camera) {
     //for (const auto& pointLight : mPointLights) {
     //    pointLight->draw(camera, *mPointLight);
     //}
-}
-
-void LightManager::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mAmbientLight, "ambientLight", inObj, alloc, mode);
-}
-
-void LightManager::childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mPointLight->writeAndRead(inObj, alloc, mode);
 }

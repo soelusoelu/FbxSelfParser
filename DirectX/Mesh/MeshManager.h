@@ -3,8 +3,8 @@
 #include "IMeshAdder.h"
 #include "IMeshesGetter.h"
 #include "../Math/Math.h"
+#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <list>
 #include <memory>
 
@@ -18,10 +18,14 @@ class MeshManager
 public:
     MeshManager();
     ~MeshManager();
+    MeshManager(const MeshManager&) = delete;
+    MeshManager& operator=(const MeshManager&) = delete;
+
     virtual const MeshPtrList& getMeshes() const override;
+
     virtual void add(const MeshPtr& mesh, bool handleShadow) override;
 
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
     void initialize();
     void update();
     //描画
@@ -40,9 +44,6 @@ public:
     void registerThisToMeshRenderer();
 
 private:
-    MeshManager(const MeshManager&) = delete;
-    MeshManager& operator=(const MeshManager&) = delete;
-
     //不要なメッシュを削除する
     void remove();
     //描画するか

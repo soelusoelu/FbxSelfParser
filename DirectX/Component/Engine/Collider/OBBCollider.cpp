@@ -64,14 +64,14 @@ void OBBCollider::finalize() {
     }
 }
 
-void OBBCollider::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mBoneNo, "boneNo", inObj, alloc, mode);
-    JsonHelper::getSet(mBoneStart, "boneStart", inObj, alloc, mode);
-    JsonHelper::getSet(mBoneEnd, "boneEnd", inObj, alloc, mode);
-    JsonHelper::getSet(mOBB.center, "center", inObj, alloc, mode);
-    JsonHelper::getSet(mOBB.rotation, "rotation", inObj, alloc, mode);
-    JsonHelper::getSet(mDefaultExtents, "extents", inObj, alloc, mode);
-    JsonHelper::getSet(mOffsetCenter, "offsetCenter", inObj, alloc, mode);
+void OBBCollider::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mBoneNo, "boneNo", inObj, mode);
+    JsonHelper::getSet(mBoneStart, "boneStart", inObj, mode);
+    JsonHelper::getSet(mBoneEnd, "boneEnd", inObj, mode);
+    JsonHelper::getSet(mOBB.center, "center", inObj, mode);
+    JsonHelper::getSet(mOBB.rotation, "rotation", inObj, mode);
+    JsonHelper::getSet(mDefaultExtents, "extents", inObj, mode);
+    JsonHelper::getSet(mOffsetCenter, "offsetCenter", inObj, mode);
 }
 
 void OBBCollider::drawInspector() {

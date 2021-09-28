@@ -11,7 +11,10 @@ class SpriteManager;
 class Texture;
 class Transform2D;
 
-class SpriteComponent : public Component, public std::enable_shared_from_this<SpriteComponent> {
+class SpriteComponent
+    : public Component
+    , public std::enable_shared_from_this<SpriteComponent>
+{
 public:
     SpriteComponent();
     virtual ~SpriteComponent();
@@ -19,7 +22,7 @@ public:
     virtual void lateUpdate() override;
     virtual void finalize() override;
     virtual void onEnable(bool value) override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //描画

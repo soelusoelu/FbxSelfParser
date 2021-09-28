@@ -12,6 +12,13 @@ DebugManager::~DebugManager() {
     DebugUtility::instance().finalize();
 }
 
+void DebugManager::childSaveAndLoad(JsonObject& inObj, FileMode mode) {
+    if (mode == FileMode::LOAD) {
+        mStringDrawer->writeAndRead(inObj, mode);
+    }
+    DebugUtility::instance().writeAndRead(inObj, mode);
+}
+
 void DebugManager::initialize() {
     mStringDrawer->initialize();
     DebugUtility::instance().initialize();
@@ -37,11 +44,4 @@ void DebugManager::draw3D(
     const Matrix4& viewProj
 ) const {
     DebugUtility::instance().draw3D(renderer, viewProj);
-}
-
-void DebugManager::childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    if (mode == FileMode::LOAD) {
-        mStringDrawer->writeAndRead(inObj, alloc, mode);
-    }
-    DebugUtility::instance().writeAndRead(inObj, alloc, mode);
 }

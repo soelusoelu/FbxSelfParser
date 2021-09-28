@@ -17,6 +17,14 @@ Keyboard::~Keyboard() {
     safeRelease<IDirectInputDevice8>(mKeyDevice);
 }
 
+void Keyboard::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mEnterKeyStr, "enterKey", inObj, mode);
+
+    if (mode == FileMode::LOAD) {
+        stringToKeyCode(mEnterKeyStr, mEnterKey);
+    }
+}
+
 bool Keyboard::getKeyDown(KeyCode key) const {
     return (mCurrentKeys[static_cast<BYTE>(key)] & InputUtility::VERSION && !(mPreviousKeys[static_cast<BYTE>(key)] & InputUtility::VERSION));
 }
@@ -238,13 +246,5 @@ void Keyboard::stringToKeyCode(const std::string& src, KeyCode& dst) {
 
     if (key != KeyCode::None) {
         dst = key;
-    }
-}
-
-void Keyboard::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mEnterKeyStr, "enterKey", inObj, alloc, mode);
-
-    if (mode == FileMode::LOAD) {
-        stringToKeyCode(mEnterKeyStr, mEnterKey);
     }
 }

@@ -14,6 +14,11 @@ class FPSCounter
 public:
     FPSCounter();
     ~FPSCounter();
+    FPSCounter(const FPSCounter&) = delete;
+    FPSCounter& operator=(const FPSCounter&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     virtual float getFps() const override;
 
     //設定したフレームレートに固定する
@@ -22,11 +27,6 @@ public:
     void setFixedFrame(float fixedFrame);
 
 private:
-    FPSCounter(const FPSCounter&) = delete;
-    FPSCounter& operator=(const FPSCounter&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-
     //フレームレートを計算する
     void computeFps(float time);
 

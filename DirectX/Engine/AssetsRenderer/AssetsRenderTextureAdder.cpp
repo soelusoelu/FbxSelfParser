@@ -19,6 +19,11 @@ AssetsRenderTextureAdder::AssetsRenderTextureAdder()
 
 AssetsRenderTextureAdder::~AssetsRenderTextureAdder() = default;
 
+void AssetsRenderTextureAdder::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mRenderPosition, "renderPosition", inObj, mode);
+    JsonHelper::getSet(mSpriteFilePath, "spriteButtonFilePath", inObj, mode);
+}
+
 void AssetsRenderTextureAdder::initialize(IAddAssets* adder) {
     mAssetsAdder = adder;
     mButton = std::make_unique<SpriteButton>([&] { onClickButton(); }, mSpriteFilePath, mRenderPosition);
@@ -26,11 +31,6 @@ void AssetsRenderTextureAdder::initialize(IAddAssets* adder) {
 
 void AssetsRenderTextureAdder::update() {
     mButton->clickButton(Input::mouse().getMousePosition());
-}
-
-void AssetsRenderTextureAdder::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mRenderPosition, "renderPosition", inObj, alloc, mode);
-    JsonHelper::getSet(mSpriteFilePath, "spriteButtonFilePath", inObj, alloc, mode);
 }
 
 void AssetsRenderTextureAdder::onClickButton() {

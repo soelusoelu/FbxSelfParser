@@ -17,6 +17,23 @@ AssetsRenderTextureList::AssetsRenderTextureList()
 
 AssetsRenderTextureList::~AssetsRenderTextureList() = default;
 
+void AssetsRenderTextureList::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mTextureSize, "textureSize", inObj, mode);
+    JsonHelper::getSet(mTextureDisplayInterval, "textureDisplayInterval", inObj, mode);
+
+    if (mode == FileMode::SAVE) {
+        std::vector<std::string> temp(mTexturesFilePath.cbegin(), mTexturesFilePath.cend());
+        JsonHelper::setStringArray(temp, "texturesFilePath", inObj);
+    } else {
+        mColumnDisplayLimit = Window::width() / (mTextureSize + mTextureDisplayInterval);
+
+        std::vector<std::string> temp;
+        if (JsonHelper::getStringArray(temp, "texturesFilePath", inObj)) {
+            mTexturesFilePath.insert(temp.cbegin(), temp.cend());
+        }
+    }
+}
+
 void AssetsRenderTextureList::add(const std::string& filePath) {
     //パスが読み込み済みなら終了
     if (loadedFilePath(filePath)) {
@@ -76,23 +93,6 @@ void AssetsRenderTextureList::drawMeshOnTexture() {
 void AssetsRenderTextureList::drawTexture(const Matrix4& proj) const {
     for (const auto& tex : mTextures) {
         tex->getTexture().draw(proj);
-    }
-}
-
-void AssetsRenderTextureList::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mTextureSize, "textureSize", inObj, alloc, mode);
-    JsonHelper::getSet(mTextureDisplayInterval, "textureDisplayInterval", inObj, alloc, mode);
-
-    if (mode == FileMode::SAVE) {
-        std::vector<std::string> temp(mTexturesFilePath.cbegin(), mTexturesFilePath.cend());
-        JsonHelper::setStringArray(temp, "texturesFilePath", inObj, alloc);
-    } else {
-        mColumnDisplayLimit = Window::width() / (mTextureSize + mTextureDisplayInterval);
-
-        std::vector<std::string> temp;
-        if (JsonHelper::getStringArray(temp, "texturesFilePath", inObj)) {
-            mTexturesFilePath.insert(temp.cbegin(), temp.cend());
-        }
     }
 }
 

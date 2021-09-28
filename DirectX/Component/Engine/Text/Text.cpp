@@ -28,10 +28,10 @@ void Text::lateUpdate() {
     }
 }
 
-void Text::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    TextBase::saveAndLoad(inObj, alloc, mode);
+void Text::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    TextBase::saveAndLoad(inObj, mode);
 
-    JsonHelper::getSet(mText, "text", inObj, alloc, mode);
+    JsonHelper::getSet(mText, "text", inObj, mode);
 }
 
 void Text::drawInspector() {

@@ -27,6 +27,11 @@ class JoyPad
 public:
     JoyPad();
     ~JoyPad();
+    JoyPad(const JoyPad&) = delete;
+    JoyPad& operator=(const JoyPad&) = delete;
+
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     bool initialize(const HWND& hWnd, IDirectInput8* directInput);
     void update();
     //キーが押された瞬間
@@ -42,12 +47,6 @@ public:
     bool getEnter() const;
     //文字列をJoyCodeに変換
     static void stringToJoyCode(const std::string& src, JoyCode& dst);
-
-private:
-    JoyPad(const JoyPad&) = delete;
-    JoyPad& operator=(const JoyPad&) = delete;
-
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 public:
     static inline IDirectInputDevice8* mPadDevice = nullptr;

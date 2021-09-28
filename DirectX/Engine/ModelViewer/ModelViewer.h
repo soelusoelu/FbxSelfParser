@@ -7,8 +7,8 @@
 #include "../AssetsRenderer/ICurrentSelectTextureGetter.h"
 #include "../../Device/Function.h"
 #include "../../Math/Math.h"
+#include "../../System/Json/JsonObject.h"
 #include "../../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 #include <utility>
 
@@ -33,11 +33,13 @@ class ModelViewer
 public:
     ModelViewer();
     ~ModelViewer();
+    ModelViewer(const ModelViewer&) = delete;
+    ModelViewer& operator=(const ModelViewer&) = delete;
 
     virtual void callbackModeChange(const std::function<void(ModelViewerMode)>& f) override;
     virtual void callbackModelChange(const std::function<void(GameObject&)>& f) override;
 
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
 
     //初期化
     void initialize(
@@ -59,9 +61,6 @@ public:
     void draw(const Renderer& renderer) const;
 
 private:
-    ModelViewer(const ModelViewer&) = delete;
-    ModelViewer& operator=(const ModelViewer&) = delete;
-
     //モデルビューア独自のGUIを描画する
     void drawGUI() const;
     //モードを変更する

@@ -20,17 +20,17 @@ void TextBase::onEnable(bool value) {
     setActive(value);
 }
 
-void TextBase::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mPosition, "position", inObj, alloc, mode);
-    JsonHelper::getSet(mScale, "scale", inObj, alloc, mode);
-    JsonHelper::getSet(mColor, "color", inObj, alloc, mode);
-    JsonHelper::getSet(mAlpha, "alpha", inObj, alloc, mode);
-    JsonHelper::getSet(mIsActive, "isActive", inObj, alloc, mode);
+void TextBase::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mPosition, "position", inObj, mode);
+    JsonHelper::getSet(mScale, "scale", inObj, mode);
+    JsonHelper::getSet(mColor, "color", inObj, mode);
+    JsonHelper::getSet(mAlpha, "alpha", inObj, mode);
+    JsonHelper::getSet(mIsActive, "isActive", inObj, mode);
 
     std::string str;
     if (mode == FileMode::SAVE) {
         PivotFunc::pivotToString(mPivot, str);
-        JsonHelper::setString(str, "pivot", inObj, alloc);
+        JsonHelper::setString(str, "pivot", inObj);
     } else {
         if (JsonHelper::getString(str, "pivot", inObj)) {
             PivotFunc::stringToPivot(str, mPivot);

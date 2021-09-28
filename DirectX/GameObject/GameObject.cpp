@@ -41,8 +41,8 @@ void GameObject::lateUpdate() {
     }
 }
 
-void GameObject::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mTransform->saveAndLoad(inObj, alloc, mode);
+void GameObject::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    mTransform->saveAndLoad(inObj, mode);
 }
 
 void GameObject::setActive(bool value) {

@@ -14,11 +14,14 @@ void JsonReader::parse(JsonStream& in, JsonObject& value) const {
     if (in.peek() == '\0') {
         assert(false);
     } else {
-        //全ての要素を解析していく
-        while (in.peek() != '\0') {
-            parseValue(in, value, "");
+        //要素を解析していく
+        parseObject(in, value, "");
 
-            skipSpaceAndComments(in);
+        skipSpaceAndComments(in);
+
+        //解析後ヌル文字で終わっていなければエラー
+        if (in.peek() != '\0') {
+            assert(false);
         }
     }
 }
@@ -26,25 +29,22 @@ void JsonReader::parse(JsonStream& in, JsonObject& value) const {
 void JsonReader::parseValue(JsonStream& in, JsonObject& value, const std::string& key) const {
     char c = in.peek();
     if (c == '{') {
-        parseObject(in, value, key);
+        auto out = std::make_shared<JsonObject>();
+        parseObject(in, *out, key);
+        value.children.emplace(key, out);
     } else if (c == '"') {
-        parseString(in, value.values.emplace(key, "").first->second);
+        parseString(in, value.values.emplace(key, std::string()).first->second);
     } else if (c == '[') {
         parseArray(in, value, key);
     } else {
-        parseNumber(in, value.values.emplace(key, "").first->second);
+        parseNumber(in, value.values.emplace(key, std::string()).first->second);
     }
-
-    skipSpaceAndComments(in);
 }
 
 void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::string& key) const {
     assert(in.peek() == '{');
     in.take(); //skip {
     skipSpaceAndComments(in);
-
-    //子オブジェクトを作成する(.first->secondで新しく生成したJsonObjectを取得している)
-    auto& child = value.children.emplace(key, std::make_unique<JsonObject>()).first->second;
 
     //空オブジェクトかチェック
     if (consume(in, '}')) {
@@ -62,7 +62,7 @@ void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::strin
 
         skipSpaceAndComments(in);
 
-        parseValue(in, *child, name);
+        parseValue(in, value, name);
 
         skipSpaceAndComments(in);
 
@@ -125,13 +125,40 @@ void JsonReader::parseArray(JsonStream& in, JsonObject& out, const std::string& 
         return;
     }
 
-    JsonValueArray values;
+    auto c = in.peek();
+    if (c == '"') {
+        auto& target = out.valueArray.emplace(key, JsonValueArray{}).first->second;
+        parseString(in, target.emplace_back());
+    } else if (c == '{') {
+        auto target = std::make_shared<JsonObject>();
+        parseObject(in, *target, std::string());
+        JsonObjectArray targetArray(1, target);
+        out.arrayChildren.emplace(key, targetArray);
+    } else {
+        auto& target = out.valueArray.emplace(key, JsonValueArray{}).first->second;
+        parseNumber(in, target.emplace_back());
+    }
+
+    skipSpaceAndComments(in);
+
+    if (consume(in, ',')) {
+        skipSpaceAndComments(in);
+    } else if (consume(in, ']')) {
+        return;
+    } else {
+        assert(false);
+    }
 
     while (true) {
-        if (in.peek() == '"') {
-            parseString(in, values.emplace_back());
+        c = in.peek();
+        if (c == '"') {
+            parseString(in, out.valueArray[key].emplace_back());
+        } else if (c == '{') {
+            auto target = std::make_shared<JsonObject>();
+            parseObject(in, *target, std::string());
+            out.arrayChildren[key].emplace_back(target);
         } else {
-            parseNumber(in, values.emplace_back());
+            parseNumber(in, out.valueArray[key].emplace_back());
         }
 
         skipSpaceAndComments(in);
@@ -144,8 +171,6 @@ void JsonReader::parseArray(JsonStream& in, JsonObject& out, const std::string& 
             assert(false);
         }
     }
-
-    out.valueArray.emplace(key, values);
 }
 
 void JsonReader::skipSpaceAndComments(JsonStream& in) const {

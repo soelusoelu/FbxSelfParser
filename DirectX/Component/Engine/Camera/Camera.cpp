@@ -26,10 +26,10 @@ void Camera::lateUpdate() {
     calcView();
 }
 
-void Camera::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mFOV, "fov", inObj, alloc, mode);
-    JsonHelper::getSet(mNearClip, "nearClip", inObj, alloc, mode);
-    JsonHelper::getSet(mFarClip, "farClip", inObj, alloc, mode);
+void Camera::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mFOV, "fov", inObj, mode);
+    JsonHelper::getSet(mNearClip, "nearClip", inObj, mode);
+    JsonHelper::getSet(mFarClip, "farClip", inObj, mode);
 }
 
 void Camera::drawInspector() {

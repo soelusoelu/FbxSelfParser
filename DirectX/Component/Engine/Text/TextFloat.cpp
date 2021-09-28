@@ -19,11 +19,11 @@ void TextFloat::lateUpdate() {
     mDrawString->drawNumber(mNumber, mPosition, mScale, mDecimalDigits, mColor, mAlpha, mPivot);
 }
 
-void TextFloat::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    TextBase::saveAndLoad(inObj, alloc, mode);
+void TextFloat::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    TextBase::saveAndLoad(inObj, mode);
 
-    JsonHelper::getSet(mNumber, "number", inObj, alloc, mode);
-    JsonHelper::getSet(mDecimalDigits, "decimalDigits", inObj, alloc, mode);
+    JsonHelper::getSet(mNumber, "number", inObj, mode);
+    JsonHelper::getSet(mDecimalDigits, "decimalDigits", inObj, mode);
 }
 
 void TextFloat::drawInspector() {

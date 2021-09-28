@@ -49,9 +49,9 @@ void CameraMove::update() {
     mCamera->lookAt({ transform().getPosition() + transform().forward() * 10.f });
 }
 
-void CameraMove::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mCameraSpeed, "cameraSpeed", inObj, alloc, mode);
-    JsonHelper::getSet(mRotateSpeed, "rotateSpeed", inObj, alloc, mode);
+void CameraMove::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mCameraSpeed, "cameraSpeed", inObj, mode);
+    JsonHelper::getSet(mRotateSpeed, "rotateSpeed", inObj, mode);
 }
 
 void CameraMove::drawInspector() {

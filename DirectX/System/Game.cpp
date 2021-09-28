@@ -17,21 +17,19 @@
 #include "../Sound/XAudio2/SoundEngine.h"
 #include "../Utility/LevelLoader.h"
 #include "../Utility/Random.h"
-#include "Json/JsonStream.h"
-#include "Json/JsonObject.h"
-#include "Json/JsonReader.h"
-#include "../Device/TimeMeasurement.h"
 
 Game::Game()
     : mWindow(nullptr)
     , mFPSCounter(nullptr)
+    , mGlobalObject(nullptr)
     , mSceneManager(nullptr)
     , mInstance(nullptr)
 {
 }
 
 Game::~Game() {
-    LevelLoader::saveGlobal(this, GLOBAL_DATA_FILE_NAME);
+    //LevelLoader::saveGlobal(this, GLOBAL_DATA_FILE_NAME);
+    //saveGlobalFile();
 
     safeDelete(mSceneManager);
 
@@ -66,13 +64,6 @@ void Game::run(HINSTANCE hInstance) {
     }
 }
 
-void Game::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    mWindow->writeAndRead(inObj, alloc, mode);
-    mFPSCounter->writeAndRead(inObj, alloc, mode);
-    InputManager::saveAndLoad(inObj, alloc, mode);
-    mSceneManager->writeAndRead(inObj, alloc, mode);
-}
-
 void Game::quit() {
     PostQuitMessage(0);
 }
@@ -85,18 +76,10 @@ void Game::initialize() {
     mSceneManager = new SceneManager();
 
     //ファイルから値を読み込む
-    //TimeMeasurement timer1;
-    //timer1.start();
-    //LevelLoader::loadGlobal(this, GLOBAL_DATA_FILE_NAME);
-    //auto dur1 = timer1.end();
-
-    TimeMeasurement timer2;
-    timer2.start();
-    JsonReader reader;
-    JsonStream stream("Assets\\Data\\Global.json");
-    auto rootObject = std::make_unique<JsonObject>();
-    reader.parse(stream, *rootObject);
-    auto dur2 = timer2.end();
+    JsonObject rootObject;
+    LevelLoader::loadJson(rootObject, GLOBAL_DATA_FILE_NAME);
+    mGlobalObject = rootObject.getObjectPtr("globalProperties");
+    loadGlobalFile();
 
     mWindow->initialize(&InputManager::mouse());
     mWindow->createWindow(mInstance);
@@ -141,4 +124,18 @@ void Game::mainLoop() {
     dx.present();
 
     SoundEngine::instance().update();
+}
+
+void Game::loadGlobalFile() {
+    mWindow->writeAndRead(*mGlobalObject, FileMode::LOAD);
+    mFPSCounter->writeAndRead(*mGlobalObject, FileMode::LOAD);
+    InputManager::saveAndLoad(*mGlobalObject, FileMode::LOAD);
+    mSceneManager->writeAndRead(*mGlobalObject, FileMode::LOAD);
+}
+
+void Game::saveGlobalFile() {
+    mWindow->writeAndRead(*mGlobalObject, FileMode::SAVE);
+    mFPSCounter->writeAndRead(*mGlobalObject, FileMode::SAVE);
+    InputManager::saveAndLoad(*mGlobalObject, FileMode::SAVE);
+    mSceneManager->writeAndRead(*mGlobalObject, FileMode::SAVE);
 }

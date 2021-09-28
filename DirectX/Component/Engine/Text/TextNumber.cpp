@@ -18,10 +18,10 @@ void TextNumber::lateUpdate() {
     mDrawString->drawNumber(mNumber, mPosition, mScale, mColor, mAlpha, mPivot);
 }
 
-void TextNumber::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    TextBase::saveAndLoad(inObj, alloc, mode);
+void TextNumber::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    TextBase::saveAndLoad(inObj, mode);
 
-    JsonHelper::getSet(mNumber, "number", inObj, alloc, mode);
+    JsonHelper::getSet(mNumber, "number", inObj, mode);
 }
 
 void TextNumber::drawInspector() {

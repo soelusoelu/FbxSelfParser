@@ -10,8 +10,8 @@ Time::Time()
 
 Time::~Time() = default;
 
-void Time::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mLimitTime, "limitTime", inObj, alloc, mode);
+void Time::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mLimitTime, "limitTime", inObj, mode);
 }
 
 void Time::update() {

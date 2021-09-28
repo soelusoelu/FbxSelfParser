@@ -12,14 +12,13 @@ class CameraMove
 public:
     CameraMove();
     ~CameraMove();
-    virtual void start() override;
-    virtual void update() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
-    virtual void drawInspector() override;
-
-private:
     CameraMove(const CameraMove&) = delete;
     CameraMove& operator=(const CameraMove&) = delete;
+
+    virtual void start() override;
+    virtual void update() override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
+    virtual void drawInspector() override;
 
 private:
     std::shared_ptr<Camera> mCamera;

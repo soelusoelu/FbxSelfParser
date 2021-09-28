@@ -3,8 +3,8 @@
 #include "ICallbackSelectAssetsTexture.h"
 #include "ICurrentSelectTextureGetter.h"
 #include "../../Math/Math.h"
+#include "../../System/Json/JsonObject.h"
 #include "../../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 
 class AssetsRenderTextureList;
@@ -20,10 +20,13 @@ class AssetsRenderTextureManager
 public:
     AssetsRenderTextureManager();
     ~AssetsRenderTextureManager();
+    AssetsRenderTextureManager(const AssetsRenderTextureManager&) = delete;
+    AssetsRenderTextureManager& operator=(const AssetsRenderTextureManager&) = delete;
+
     virtual const AssetsRenderTexture& getCurrentSelectTexture() const override;
     virtual bool selectedTexture() const override;
 
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
     //初期化
     void initialize();
     //毎フレーム更新
@@ -34,10 +37,6 @@ public:
     void drawTextures(const Matrix4& proj) const;
     //アセットテクスチャ選択コールバックを取得する
     ICallbackSelectAssetsTexture* getCallbackSelectAssetsTexture() const;
-
-private:
-    AssetsRenderTextureManager(const AssetsRenderTextureManager&) = delete;
-    AssetsRenderTextureManager& operator=(const AssetsRenderTextureManager&) = delete;
 
 private:
     std::unique_ptr<AssetsRenderTextureList> mTextureList;

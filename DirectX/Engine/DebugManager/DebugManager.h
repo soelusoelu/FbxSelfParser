@@ -15,6 +15,10 @@ class DebugManager
 public:
     DebugManager();
     ~DebugManager();
+    DebugManager(const DebugManager&) = delete;
+    DebugManager& operator=(const DebugManager&) = delete;
+
+    virtual void childSaveAndLoad(JsonObject& inObj, FileMode mode) override;
 
     //初期化
     void initialize();
@@ -31,12 +35,6 @@ public:
         const Renderer& renderer,
         const Matrix4& viewProj
     ) const;
-
-private:
-    DebugManager(const DebugManager&) = delete;
-    DebugManager& operator=(const DebugManager&) = delete;
-
-    virtual void childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     std::unique_ptr<DrawString> mStringDrawer;

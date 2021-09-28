@@ -2,7 +2,7 @@
 
 #include "FileMode.h"
 #include "../Math/Math.h"
-#include <rapidjson/document.h>
+#include "../System/Json/JsonObject.h"
 #include <string>
 #include <vector>
 
@@ -13,78 +13,67 @@ public:
     static void getSet(
         int& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         float& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         std::string& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         bool& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         Vector2& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         Vector3& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         Vector4& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         Quaternion& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         std::vector<int>& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         std::vector<std::string>& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
     static void getSet(
         std::vector<Vector3>& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc,
+        JsonObject& inObject,
         FileMode mode
     );
 
@@ -94,124 +83,113 @@ public:
     static bool getInt(
         int& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getFloat(
         float& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getString(
         std::string& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getBool(
         bool& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getVector2(
         Vector2& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getVector3(
         Vector3& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getVector4(
         Vector4& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getQuaternion(
         Quaternion& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getIntArray(
         std::vector<int>& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getStringArray(
         std::vector<std::string>& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
     static bool getVector3Array(
         std::vector<Vector3>& out,
         const char* name,
-        const rapidjson::Value& inObject
+        const JsonObject& inObject
     );
 
     //setter
     static void setInt(
         int value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setFloat(
         float value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setString(
         const std::string& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setBool(
         bool value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setVector2(
         const Vector2& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setVector3(
         const Vector3& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setVector4(
         const Vector4& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setQuaternion(
         const Quaternion& value,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setIntArray(
         const std::vector<int>& values,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setStringArray(
         const std::vector<std::string>& values,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
     static void setVector3Array(
         const std::vector<Vector3>& values,
         const char* name,
-        rapidjson::Value& inObject,
-        rapidjson::Document::AllocatorType& alloc
+        JsonObject& inObject
     );
 };

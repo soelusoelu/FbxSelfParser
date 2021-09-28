@@ -14,6 +14,13 @@ ModelViewerLight::ModelViewerLight()
 
 ModelViewerLight::~ModelViewerLight() = default;
 
+void ModelViewerLight::saveAndLoad(JsonObject& inObj, FileMode mode) {
+    JsonHelper::getSet(mDirection, "direction", inObj, mode);
+    JsonHelper::getSet(mColor, "color", inObj, mode);
+    JsonHelper::getSet(mDirectionDrawPosition, "directionDrawPosition", inObj, mode);
+    JsonHelper::getSet(mLengthDirection, "lengthDirection", inObj, mode);
+}
+
 void ModelViewerLight::drawGUI() {
     ImGui::Text("DirectionalLight");
 
@@ -30,11 +37,4 @@ Vector3 ModelViewerLight::getDirection() const {
 
 const Vector3& ModelViewerLight::getColor() const {
     return mColor;
-}
-
-void ModelViewerLight::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
-    JsonHelper::getSet(mDirection, "direction", inObj, alloc, mode);
-    JsonHelper::getSet(mColor, "color", inObj, alloc, mode);
-    JsonHelper::getSet(mDirectionDrawPosition, "directionDrawPosition", inObj, alloc, mode);
-    JsonHelper::getSet(mLengthDirection, "lengthDirection", inObj, alloc, mode);
 }

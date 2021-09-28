@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "SystemInclude.h"
+#include "Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 
 class Window;
@@ -16,7 +16,7 @@ public:
     //アプリケーションの実行
     void run(HINSTANCE hInstance);
     //グローバルファイルを読み書きする
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
 
     //アプリケーションの終了
     static void quit();
@@ -26,10 +26,15 @@ private:
     void initialize();
     //メインループ
     void mainLoop();
+    //グローバルファイルを読み込む
+    void loadGlobalFile();
+    //グローバルファイルを書き込む
+    void saveGlobalFile();
 
 private:
     std::unique_ptr<Window> mWindow;
     std::unique_ptr<FPSCounter> mFPSCounter;
+    std::shared_ptr<JsonObject> mGlobalObject;
     SceneManager* mSceneManager;
     HINSTANCE mInstance;
 

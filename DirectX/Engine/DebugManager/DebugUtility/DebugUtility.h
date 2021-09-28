@@ -16,10 +16,16 @@ class DebugUtility
 {
 private:
     DebugUtility();
+    DebugUtility(const DebugUtility&) = delete;
+    DebugUtility& operator=(const DebugUtility&) = delete;
 
 public:
     ~DebugUtility();
+
+    virtual void childSaveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     static DebugUtility& instance();
+
     void initialize();
     void finalize();
     void preUpdateProcess();
@@ -30,12 +36,6 @@ public:
     PointRenderer& pointRenderer() const;
     LineRenderer2D& lineRenderer2D() const;
     LineInstancingDrawer& lineRenderer3D() const;
-
-private:
-    DebugUtility(const DebugUtility&) = delete;
-    DebugUtility& operator=(const DebugUtility&) = delete;
-
-    virtual void childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     static inline DebugUtility* mInstance = nullptr;

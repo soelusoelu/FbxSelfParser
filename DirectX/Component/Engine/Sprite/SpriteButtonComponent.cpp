@@ -56,7 +56,7 @@ void SpriteButtonComponent::lateUpdate() {
     }
 }
 
-void SpriteButtonComponent::saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) {
+void SpriteButtonComponent::saveAndLoad(JsonObject& inObj, FileMode mode) {
     if (mode == FileMode::SAVE) {
         if (std::string filename;  JsonHelper::getString(filename, "selectingSpriteFilename", inObj)) {
             mSelectingSprite = addComponent<SpriteComponent>("SpriteComponent");
@@ -64,7 +64,7 @@ void SpriteButtonComponent::saveAndLoad(rapidjson::Value& inObj, rapidjson::Docu
         }
     } else {
         if (mSelectingSprite) {
-            JsonHelper::setString(mSelectingSprite->fileName(), "selectingSpriteFilename", inObj, alloc);
+            JsonHelper::setString(mSelectingSprite->fileName(), "selectingSpriteFilename", inObj);
         }
     }
 }

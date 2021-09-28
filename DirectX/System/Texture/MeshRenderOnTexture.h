@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "../AssetsDirectoryPath.h"
+#include "../Json/JsonObject.h"
 #include "../../Math/Math.h"
 #include "../../Mesh/IMesh.h"
 #include "../../Utility/FileMode.h"
-#include <rapidjson/document.h>
 #include <memory>
 #include <string>
 
@@ -20,8 +20,11 @@ public:
     MeshRenderOnTexture(const std::string& filePath, int width, int height);
     //MeshRenderOnTexture(const std::string& fileName, const std::string& directoryPath, int width, int height);
     ~MeshRenderOnTexture();
+    MeshRenderOnTexture(const MeshRenderOnTexture&) = delete;
+    MeshRenderOnTexture& operator=(const MeshRenderOnTexture&) = delete;
+
     //保存と読み込み
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
     //メッシュをテクスチャ上に描画する
     void drawMeshOnTexture(const Matrix4& viewProj) const;
     //メッシュ描画済みテクスチャを描画する
@@ -43,10 +46,6 @@ public:
     int getWidth() const;
     //テクスチャの縦幅を取得する
     int getHeight() const;
-
-private:
-    MeshRenderOnTexture(const MeshRenderOnTexture&) = delete;
-    MeshRenderOnTexture& operator=(const MeshRenderOnTexture&) = delete;
 
 private:
     std::unique_ptr<RenderTexture> mRenderTexture;

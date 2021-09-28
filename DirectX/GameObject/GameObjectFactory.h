@@ -2,7 +2,7 @@
 
 #include "../Math/Math.h"
 #include "../System/AssetsDirectoryPath.h"
-#include <rapidjson/document.h>
+#include "../System/Json/JsonObject.h"
 #include <functional>
 #include <memory>
 #include <string>
@@ -11,33 +11,33 @@
 class GameObject;
 
 class GameObjectFactory {
-    using ComponentFunc = std::function<void(GameObject&, const std::string&, rapidjson::Value&, rapidjson::Document::AllocatorType&)>;
+    using ComponentFunc = std::function<void(GameObject&, const std::string&, JsonObject&)>;
 
 public:
     GameObjectFactory();
     ~GameObjectFactory();
+    GameObjectFactory(const GameObjectFactory&) = delete;
+    GameObjectFactory& operator=(const GameObjectFactory&) = delete;
+
     //ファイルからゲームオブジェクト生成
     std::shared_ptr<GameObject> createGameObjectFromFile(const std::string& type, const std::string& directoryPath = AssetsDirectoryPath::DATA_PATH);
 
 private:
-    GameObjectFactory(const GameObjectFactory&) = delete;
-    GameObjectFactory& operator=(const GameObjectFactory&) = delete;
-
     //ゲームオブジェクトを生成する
-    std::shared_ptr<GameObject> createGameObject(rapidjson::Document& inDocument, const std::string& type, const std::string& directoryPath);
+    std::shared_ptr<GameObject> createGameObject(JsonObject& inObj, const std::string& type, const std::string& directoryPath);
     //ゲームオブジェクトのタグを取得する
-    std::string loadTag(const rapidjson::Document& inDocument);
+    std::string loadTag(const JsonObject& inObj);
     //ゲームオブジェクトプロパティの読み込み
-    void loadGameObjectProperties(GameObject& gameObject, rapidjson::Document& inDocument);
+    void loadGameObjectProperties(GameObject& gameObject, JsonObject& inObj);
     //継承コンポーネントの読み込み
-    void loadPrototypeComponents(GameObject& gameObject, const rapidjson::Document& inDocument, const std::string& directoryPath) const;
+    void loadPrototypeComponents(GameObject& gameObject, const JsonObject& inObj, const std::string& directoryPath) const;
     //コンポーネントの読み込み
-    void loadComponents(GameObject& gameObject, rapidjson::Document& inDocument) const;
+    void loadComponents(GameObject& gameObject, JsonObject& inObj) const;
     //各コンポーネントの読み込み
-    void loadComponent(GameObject& gameObject, rapidjson::Value& component, rapidjson::Document::AllocatorType& alloc) const;
+    void loadComponent(GameObject& gameObject, JsonObject& component) const;
 
     //有効な型か
-    bool isValidType(std::string& outType, const rapidjson::Value& inObj) const;
+    bool isValidType(std::string& outType, const JsonObject& inObj) const;
 
 private:
     std::unordered_map<std::string, ComponentFunc> mComponents;

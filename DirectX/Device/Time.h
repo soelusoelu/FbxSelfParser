@@ -1,14 +1,17 @@
 ﻿#pragma once
 
+#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
-#include <rapidjson/document.h>
 
 class Time {
 public:
     Time();
     ~Time();
+    Time(const Time&) = delete;
+    Time& operator=(const Time&) = delete;
+
     //保存と読み込み
-    void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode);
+    void saveAndLoad(JsonObject& inObj, FileMode mode);
     //内部時間を進める
     void update();
     //設定を最初の状態に戻す

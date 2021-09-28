@@ -8,9 +8,12 @@ class Camera : public Component {
 public:
     Camera();
     ~Camera();
+    Camera(const Camera&) = delete;
+    Camera& operator=(const Camera&) = delete;
+
     virtual void awake() override;
     virtual void lateUpdate() override;
-    virtual void saveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
+    virtual void saveAndLoad(JsonObject& inObj, FileMode mode) override;
     virtual void drawInspector() override;
 
     //ビュー行列を取得する
@@ -52,9 +55,6 @@ public:
     bool viewFrustumCulling(const Vector3& pos, float radius) const;
 
 private:
-    Camera(const Camera&) = delete;
-    Camera& operator=(const Camera&) = delete;
-
     void calcView();
     void calcProj();
 

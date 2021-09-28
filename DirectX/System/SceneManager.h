@@ -16,12 +16,12 @@ class SceneManager
 public:
     SceneManager();
     ~SceneManager();
+
+    virtual void childSaveAndLoad(JsonObject& inObj, FileMode mode) override;
+
     void initialize();
     void update();
     void draw() const;
-
-private:
-    virtual void childSaveAndLoad(rapidjson::Value& inObj, rapidjson::Document::AllocatorType& alloc, FileMode mode) override;
 
 private:
     std::unique_ptr<Renderer> mRenderer;
