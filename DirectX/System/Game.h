@@ -34,7 +34,7 @@ private:
 private:
     std::unique_ptr<Window> mWindow;
     std::unique_ptr<FPSCounter> mFPSCounter;
-    std::shared_ptr<JsonObject> mGlobalObject;
+    std::shared_ptr<JsonObject> mRootObject;
     SceneManager* mSceneManager;
     HINSTANCE mInstance;
 

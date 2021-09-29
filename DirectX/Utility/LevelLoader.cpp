@@ -6,9 +6,9 @@
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../GameObject/GameObject.h"
 #include "../System/Game.h"
-#include "../System/Json/JsonObject.h"
 #include "../System/Json/JsonReader.h"
 #include "../System/Json/JsonStream.h"
+#include "../System/Json/JsonWriter.h"
 #include <memory>
 
 bool LevelLoader::loadJson(
@@ -79,16 +79,6 @@ void LevelLoader::writeBuffer(
     const JsonObject& inObj,
     const std::string& filePath
 ) {
-    ////jsonを文字列バッファに保存
-    //rapidjson::StringBuffer buffer;
-    ////整形出力用にPrettyWriterを使う(もしくはWriter)
-    //rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-    //inDoc.Accept(writer);
-    //const char* output = buffer.GetString();
-
-    ////文字列をファイルに書き込む
-    //std::ofstream outFile(filePath);
-    //if (outFile.is_open()) {
-    //    outFile << output;
-    //}
+    JsonWriter writer;
+    writer.write(("test" + filePath).c_str(), inObj);
 }
