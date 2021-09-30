@@ -1,71 +1,73 @@
 {
-    "globalProperties": {
-        "Window": {
-            "title": "ModelViewer",
-            "windowWidth": 1280,
-            "windowHeight": 720,
-            "windowStandardWidth": 1920,
-            "windowStandardHeight": 1080
-        },
-        "FPSCounter": {
-            "fps": 60.0
-        },
-        "Keyboard": {
-            "enterKey": "Space"
-        },
-        "JoyPad": {
-            "enterPad": "A"
-        },
-        "SceneManager": {},
-        "EngineFunctionManager": {},
-        "DebugManager": {},
-        "DebugUtility": {},
-        "Log": {
-            "scale": [
-                0.3125,
-                0.3125
-            ]
-        },
-        "AssetsRenderTextureList": {
-            "textureSize": 64,
-            "textureDisplayInterval": 32,
-            "texturesFilePath": []
-        },
-        "AssetsRenderTextureAdder": {
-            "renderPosition": [
-                0.0,
-                1016.0
-            ],
-            "spriteButtonFilePath": "System/add_mesh.png"
-        },
-        "ModelViewerLight": {
-            "direction": [
-                0.9659258127212524,
-                -6.434408987843199e-7,
-                -6.434408987843199e-7,
-                0.258819043636322
-            ],
-            "color": [
-                1.0,
-                0.9999899864196777,
-                0.9999899864196777
-            ],
-            "directionDrawPosition": [
-                30.0,
-                20.0,
-                0.0
-            ],
-            "lengthDirection": 5.0
-        },
-        "ShadowMap": {
-            "shadowTextureSize": 8192,
-            "lightDistance": 290.0,
-            "nearClip": 10.0,
-            "farClip": 300.0
-        },
-        "DrawString": {
-            "number": "System/number2.png",
-            "font": "System/font2.png"
-        }
-    }
+	"globalProperties": {
+		"ShadowMap": {
+			"nearClip": 10.000000,
+			"shadowTextureSize": 8192,
+			"farClip": 300.000000,
+			"lightDistance": 290.000000
+		},
+		"Window": {
+			"title": "ModelViewer",
+			"windowWidth": 1280,
+			"windowHeight": 720,
+			"windowStandardWidth": 1920,
+			"windowStandardHeight": 1080
+		},
+		"Keyboard": {
+			"enterKey": "Space"
+		},
+		"FPSCounter": {
+			"fps": 60.000000
+		},
+		"EngineFunctionManager": {},
+		"SceneManager": {},
+		"JoyPad": {
+			"enterPad": "A"
+		},
+		"DebugManager": {},
+		"DebugUtility": {},
+		"Log": {
+			"scale": [
+				0.312500,
+				0.312500
+			]
+		},
+		"AssetsRenderTextureList": {
+			"textureSize": 64,
+			"textureDisplayInterval": 32,
+			"texturesFilePath": [
+				"Assets\\Model\\cone_ascii.fbx"
+			]
+		},
+		"AssetsRenderTextureAdder": {
+			"renderPosition": [
+				0.000000,
+				1016.000000
+			],
+			"spriteButtonFilePath": "System/add_mesh.png"
+		},
+		"ModelViewerLight": {
+			"lengthDirection": 5.000000,
+			"direction": [
+				0.965926,
+				-0.000001,
+				-0.000001,
+				0.258819
+			],
+			"color": [
+				1.000000,
+				0.999990,
+				0.999990
+			],
+			"directionDrawPosition": [
+				30.000000,
+				20.000000,
+				0.000000
+			]
+		},
+		"DrawString": {
+			"font": "System/font2.png",
+			"number": "System/number2.png"
+		}
+	}
 }

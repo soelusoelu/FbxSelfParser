@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "SystemInclude.h"
-#include "Json/JsonObject.h"
 #include "../Utility/FileMode.h"
 #include <memory>
 
+struct JsonObject;
 class Window;
 class FPSCounter;
 class SceneManager;
@@ -15,8 +15,6 @@ public:
     ~Game();
     //アプリケーションの実行
     void run(HINSTANCE hInstance);
-    //グローバルファイルを読み書きする
-    void saveAndLoad(JsonObject& inObj, FileMode mode);
 
     //アプリケーションの終了
     static void quit();

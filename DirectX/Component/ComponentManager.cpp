@@ -1,5 +1,7 @@
 ﻿#include "ComponentManager.h"
 #include "Component.h"
+#include "../System/Json/JsonObject.h"
+#include "../System/Json/JsonValue.h"
 #include "../Utility/JsonHelper.h"
 
 ComponentManager::ComponentManager() = default;
@@ -86,18 +88,26 @@ const std::vector<std::shared_ptr<Component>>& ComponentManager::getAllComponent
     return mComponents;
 }
 
-void ComponentManager::saveComponents(JsonObjectArray& inObj) const {
-    for (const auto& c : mComponents) {
-        saveComponent(*inObj.emplace_back(), *c);
+void ComponentManager::saveComponents(JsonValue& out) const {
+    if (!out.isArray()) {
+        out.setArray();
+    }
+    auto& a = out.a;
+    auto size = mComponents.size();
+    a.resize(size);
+    for (size_t i = 0; i < size; ++i) {
+        a[i].setObject();
+        saveComponent(a[i].getObject(), *mComponents[i]);
     }
 }
 
-void ComponentManager::saveComponent(JsonObject& outArray, Component& component) const {
+void ComponentManager::saveComponent(JsonObject& out, Component& component) const {
     //コンポーネント名を保存
-    JsonHelper::setString(component.getComponentName(), "type", outArray);
+    JsonHelper::setString(component.getComponentName(), "type", out);
 
     //プロパティ用オブジェクトを作成
-    auto& props = outArray.children.emplace("properties", std::make_shared<JsonObject>()).first->second;
+    auto props = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
     //コンポーネントのプロパティを保存する
-    component.saveAndLoad(*props, FileMode::SAVE);
+    component.saveAndLoad(props->getObject(), FileMode::SAVE);
+    out.setValue("properties", props);
 }

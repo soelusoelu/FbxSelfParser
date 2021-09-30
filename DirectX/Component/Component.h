@@ -4,12 +4,12 @@
 #include "../GameObject/IThisGetter.h"
 #include "../GameObject/Object.h"
 #include "../GameObject/GameObject.h"
-#include "../System/Json/JsonObject.h"
 #include "../Utility/FileMode.h"
 #include <memory>
 #include <string>
 #include <vector>
 
+struct JsonObject;
 class Collider;
 class Transform3D;
 

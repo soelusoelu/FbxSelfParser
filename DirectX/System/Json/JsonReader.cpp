@@ -1,5 +1,7 @@
 ﻿#include "JsonReader.h"
+#include "JsonObject.h"
 #include "JsonStream.h"
+#include "JsonValue.h"
 #include <cassert>
 
 JsonReader::JsonReader() = default;
@@ -15,7 +17,7 @@ void JsonReader::parse(JsonStream& in, JsonObject& value) const {
         assert(false);
     } else {
         //要素を解析していく
-        parseObject(in, value, "");
+        parseObject(in, value);
 
         skipSpaceAndComments(in);
 
@@ -26,22 +28,25 @@ void JsonReader::parse(JsonStream& in, JsonObject& value) const {
     }
 }
 
-void JsonReader::parseValue(JsonStream& in, JsonObject& value, const std::string& key) const {
+void JsonReader::parseValue(JsonStream& in, JsonValue& value) const {
     char c = in.peek();
-    if (c == '{') {
-        auto out = std::make_shared<JsonObject>();
-        parseObject(in, *out, key);
-        value.children.emplace(key, out);
+    if (c == 't') {
+        parseTrue(in, value);
+    } else if (c == 'f') {
+        parseFalse(in, value);
+    } else if (c == '{') {
+        value.setObject();
+        parseObject(in, *value.o);
     } else if (c == '"') {
-        parseString(in, value.values.emplace(key, std::string()).first->second);
+        parseString(in, value);
     } else if (c == '[') {
-        parseArray(in, value, key);
+        parseArray(in, value);
     } else {
-        parseNumber(in, value.values.emplace(key, std::string()).first->second);
+        parseNumber(in, value);
     }
 }
 
-void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::string& key) const {
+void JsonReader::parseObject(JsonStream& in, JsonObject& value) const {
     assert(in.peek() == '{');
     in.take(); //skip {
     skipSpaceAndComments(in);
@@ -52,8 +57,10 @@ void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::strin
     }
 
     while (true) {
-        std::string name;
-        parseString(in, name);
+        auto name = parseString(in);
+
+        auto v = std::make_shared<JsonValue>();
+        value.values.emplace(name, v);
 
         skipSpaceAndComments(in);
 
@@ -62,7 +69,7 @@ void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::strin
 
         skipSpaceAndComments(in);
 
-        parseValue(in, value, name);
+        parseValue(in, *v);
 
         skipSpaceAndComments(in);
 
@@ -74,92 +81,116 @@ void JsonReader::parseObject(JsonStream& in, JsonObject& value, const std::strin
     }
 }
 
-void JsonReader::parseNumber(JsonStream& in, std::string& out) const {
+void JsonReader::parseNumber(JsonStream& in, JsonValue& value) const {
+    //文字列で取得してから数値に変換するための一時変数
+    std::string num;
+
+    //マイナスか
     if (consume(in, '-')) {
-        out += '-';
+        num += '-';
     }
 
+    //整数部分を取得する
     char c = in.peek();
-    while ((c >= '0' && c <= '9') || c == '.') {
-        out += c;
+    while (c >= '0' && c <= '9') {
+        num += c;
+        c = in.take();
+    }
+
+    //整数部分の次がドットじゃなければintで確定
+    if (c != '.') {
+        //intで登録
+        value.setInt(std::stoi(num));
+        return;
+    }
+
+    //以下小数部分を取得する
+    num += '.';
+    c = in.take(); //skip .
+    while (c >= '0' && c <= '9') {
+        num += c;
         c = in.take();
     }
 
     if (c == 'e') {
-        out += 'e';
+        num += 'e';
         in.take(); //skip e
 
-        if (consume(in, '+')) {
-            out += '+';
-        } else if (consume(in, '-')) {
-            out += '-';
+        if (consume(in, '-')) {
+            num += '-';
+        } else if (consume(in, '+')) {
+            num += '+';
         }
 
         c = in.peek();
-        while ((c >= '0' && c <= '9') || c == '.') {
-            out += c;
+        while (c >= '0' && c <= '9') {
+            num += c;
             c = in.take();
         }
     }
+
+    //floatで登録
+    value.setFloat(std::stof(num));
 }
 
-void JsonReader::parseString(JsonStream& in, std::string& out) const {
+void JsonReader::parseString(JsonStream& in, JsonValue& value) const {
+    value.setString(parseString(in));
+}
+
+std::string JsonReader::parseString(JsonStream& in) const {
     assert(in.peek() == '"');
 
+    std::string result;
     char c = in.take();
     while (c != '"') {
-        out += c;
+        result += c;
         c = in.take();
     }
 
     in.take(); //skip "
+
+    return result;
 }
 
-void JsonReader::parseArray(JsonStream& in, JsonObject& out, const std::string& key) const {
+void JsonReader::parseTrue(JsonStream& in, JsonValue& value) const {
+    assert(in.peek() == 't');
+    in.take(); //skip t
+
+    if (consume(in, 'r') && consume(in, 'u') && consume(in, 'e')) {
+        value.setBool(true);
+    } else {
+        assert(false);
+    }
+}
+
+void JsonReader::parseFalse(JsonStream& in, JsonValue& value) const {
+    assert(in.peek() == 'f');
+    in.take(); //skip f
+
+    if (consume(in, 'a') && consume(in, 'l') && consume(in, 's') && consume(in, 'e')) {
+        value.setBool(false);
+    } else {
+        assert(false);
+    }
+}
+
+void JsonReader::parseArray(JsonStream& in, JsonValue& value) const {
     assert(in.peek() == '[');
     in.take(); //skip [
     skipSpaceAndComments(in);
+
+    //valueを配列に設定する
+    value.setArray();
+    auto& a = value.a;
 
     //空配列かチェック
     if (consume(in, ']')) {
         return;
     }
 
-    auto c = in.peek();
-    if (c == '"') {
-        auto& target = out.valueArray.emplace(key, JsonValueArray{}).first->second;
-        parseString(in, target.emplace_back());
-    } else if (c == '{') {
-        auto target = std::make_shared<JsonObject>();
-        parseObject(in, *target, std::string());
-        JsonObjectArray targetArray(1, target);
-        out.arrayChildren.emplace(key, targetArray);
-    } else {
-        auto& target = out.valueArray.emplace(key, JsonValueArray{}).first->second;
-        parseNumber(in, target.emplace_back());
-    }
-
-    skipSpaceAndComments(in);
-
-    if (consume(in, ',')) {
-        skipSpaceAndComments(in);
-    } else if (consume(in, ']')) {
-        return;
-    } else {
-        assert(false);
-    }
-
     while (true) {
-        c = in.peek();
-        if (c == '"') {
-            parseString(in, out.valueArray[key].emplace_back());
-        } else if (c == '{') {
-            auto target = std::make_shared<JsonObject>();
-            parseObject(in, *target, std::string());
-            out.arrayChildren[key].emplace_back(target);
-        } else {
-            parseNumber(in, out.valueArray[key].emplace_back());
-        }
+        //配列の末尾に要素を追加していく
+        parseValue(in, a.emplace_back());
 
         skipSpaceAndComments(in);
 

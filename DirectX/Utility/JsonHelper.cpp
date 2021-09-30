@@ -1,8 +1,10 @@
 ﻿#include "JsonHelper.h"
+#include "../System/Json/JsonValue.h"
+#include <cassert>
 
 void JsonHelper::getSet(
     int& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -15,7 +17,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     float& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -28,7 +30,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     std::string& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -41,7 +43,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     bool& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 )
@@ -55,7 +57,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     Vector2& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -68,7 +70,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     Vector3& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -81,7 +83,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     Vector4& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -94,7 +96,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     Quaternion& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -107,7 +109,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     std::vector<int>& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -120,7 +122,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     std::vector<std::string>& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -133,7 +135,7 @@ void JsonHelper::getSet(
 
 void JsonHelper::getSet(
     std::vector<Vector3>& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject,
     FileMode mode
 ) {
@@ -146,154 +148,160 @@ void JsonHelper::getSet(
 
 bool JsonHelper::getInt(
     int& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
     //プロパティが存在するか
     if (!inObject.hasValue(name)) {
         return false;
     }
-#endif // _DEBUG
 
     //値を取得する
     const auto& value = inObject.getValue(name);
 
+    assert(value.isInt());
+
     //プロパティの取得に成功
-    out = std::stoi(value);
+    out = value.getInt();
+
     return true;
 }
 
 bool JsonHelper::getFloat(
     float& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
     if (!inObject.hasValue(name)) {
         return false;
     }
-#endif // _DEBUG
 
     const auto& value = inObject.getValue(name);
 
-    out = std::stof(value);
+    assert(value.isFloat());
+
+    out = value.getFloat();
+
     return true;
 }
 
 bool JsonHelper::getString(
     std::string& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
     if (!inObject.hasValue(name)) {
         return false;
     }
-#endif // _DEBUG
 
-    out = inObject.getValue(name);
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isString());
+
+    out = value.getString();
+
     return true;
 }
 
 bool JsonHelper::getBool(
     bool& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
     if (!inObject.hasValue(name)) {
         return false;
     }
-#endif // _DEBUG
 
     const auto& value = inObject.getValue(name);
 
-    out = (value == "true");
+    assert(value.isBool());
+
+    out = value.getBool();
+
     return true;
 }
 
 bool JsonHelper::getVector2(
     Vector2& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
     constexpr int VECTOR2_VALUE_COUNT = 2;
 
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
-        return false;
-    }
-#endif // _DEBUG
-
-    const auto& value = inObject.getArray(name);
-
-    if (value.size() != VECTOR2_VALUE_COUNT) {
+    if (!inObject.hasValue(name)) {
         return false;
     }
 
-    out.x = std::stof(value[0]);
-    out.y = std::stof(value[1]);
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    assert(a.size() == VECTOR2_VALUE_COUNT);
+    assert(a[0].isFloat() && a[1].isFloat());
+
+    out.x = a[0].getFloat();
+    out.y = a[1].getFloat();
 
     return true;
 }
 
 bool JsonHelper::getVector3(
     Vector3& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
     constexpr int VECTOR3_VALUE_COUNT = 3;
 
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
-        return false;
-    }
-#endif // _DEBUG
-
-    const auto& value = inObject.getArray(name);
-
-    if (value.size() != VECTOR3_VALUE_COUNT) {
+    if (!inObject.hasValue(name)) {
         return false;
     }
 
-    out.x = std::stof(value[0]);
-    out.y = std::stof(value[1]);
-    out.z = std::stof(value[2]);
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    assert(a.size() == VECTOR3_VALUE_COUNT);
+    assert(a[0].isFloat() && a[1].isFloat() && a[2].isFloat());
+
+    out.x = a[0].getFloat();
+    out.y = a[1].getFloat();
+    out.z = a[2].getFloat();
 
     return true;
 }
 
 bool JsonHelper::getVector4(
     Vector4& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
     constexpr int VECTOR4_VALUE_COUNT = 4;
 
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
-        return false;
-    }
-#endif // _DEBUG
-
-    const auto& value = inObject.getArray(name);
-
-    if (value.size() != VECTOR4_VALUE_COUNT) {
+    if (!inObject.hasValue(name)) {
         return false;
     }
 
-    out.x = std::stof(value[0]);
-    out.y = std::stof(value[1]);
-    out.z = std::stof(value[2]);
-    out.w = std::stof(value[3]);
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    assert(a.size() == VECTOR4_VALUE_COUNT);
+    assert(a[0].isFloat() && a[1].isFloat() && a[2].isFloat() && a[3].isFloat());
+
+    out.x = a[0].getFloat();
+    out.y = a[1].getFloat();
+    out.z = a[2].getFloat();
+    out.w = a[3].getFloat();
 
     return true;
 }
 
 bool JsonHelper::getQuaternion(
     Quaternion& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
     Vector4 temp;
@@ -309,25 +317,32 @@ bool JsonHelper::getQuaternion(
 
 bool JsonHelper::getIntArray(
     std::vector<int>& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
+    if (!inObject.hasValue(name)) {
         return false;
+    }
+
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    if (a.empty()) {
+        return false;
+    }
+
+#ifdef _DEBUG
+    for (const auto& v : a) {
+        assert(v.isInt());
     }
 #endif // _DEBUG
 
-    const auto& value = inObject.getArray(name);
-
-    if (value.empty()) {
-        return false;
-    }
-
-    auto size = value.size();
+    auto size = a.size();
     out.resize(size);
     for (size_t i = 0; i < size; ++i) {
-        out[i] = std::stoi(value[i]);
+        out[i] = a[i].getInt();
     }
 
     return true;
@@ -335,54 +350,73 @@ bool JsonHelper::getIntArray(
 
 bool JsonHelper::getStringArray(
     std::vector<std::string>& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
+    if (!inObject.hasValue(name)) {
         return false;
+    }
+
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    if (a.empty()) {
+        return false;
+    }
+
+#ifdef _DEBUG
+    for (const auto& v : a) {
+        assert(v.isString());
     }
 #endif // _DEBUG
 
-    const auto& value = inObject.getArray(name);
-
-    if (value.empty()) {
-        return false;
+    auto size = a.size();
+    out.resize(size);
+    for (size_t i = 0; i < size; ++i) {
+        out[i] = a[i].getString();
     }
-
-    out = value;
 
     return true;
 }
 
 bool JsonHelper::getVector3Array(
     std::vector<Vector3>& out,
-    const char* name,
+    const std::string& name,
     const JsonObject& inObject
 ) {
     constexpr int VECTOR3_VALUE_COUNT = 3;
 
-#ifdef _DEBUG
-    if (!inObject.hasArray(name)) {
+    if (!inObject.hasValue(name)) {
         return false;
+    }
+
+    const auto& value = inObject.getValue(name);
+
+    assert(value.isArray());
+    const auto& a = value.getArray();
+
+    if (a.empty()) {
+        return false;
+    }
+
+#ifdef _DEBUG
+    for (const auto& v : a) {
+        assert(v.isFloat());
     }
 #endif // _DEBUG
 
-    const auto& value = inObject.getArray(name);
-
-    auto size = value.size();
-    if (value.empty() || size % VECTOR3_VALUE_COUNT != 0) {
-        return false;
-    }
-
+    auto size = a.size();
+    assert(size % VECTOR3_VALUE_COUNT == 0);
     auto sizeDiv3 = size / VECTOR3_VALUE_COUNT;
     out.resize(sizeDiv3);
+
     for (size_t i = 0; i < sizeDiv3; ++i) {
-        out[i] = Vector3(
-            std::stof(value[i * VECTOR3_VALUE_COUNT]),
-            std::stof(value[i * VECTOR3_VALUE_COUNT + 1]),
-            std::stof(value[i * VECTOR3_VALUE_COUNT + 2])
-        );
+        auto idx = i * VECTOR3_VALUE_COUNT;
+        out[i].x = a[idx].getFloat();
+        out[i].y = a[idx + 1].getFloat();
+        out[i].z = a[idx + 2].getFloat();
     }
 
     return true;
@@ -390,98 +424,133 @@ bool JsonHelper::getVector3Array(
 
 void JsonHelper::setInt(
     int value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
     //すでに値を保持しているなら上書き、ないなら追加
-    auto str = std::to_string(value);
     if (inObject.hasValue(name)) {
-        inObject.values.find(name)->second = str;
+        auto& v = inObject.getValue(name);
+        assert(v.isInt());
+        v.n.i = value;
     } else {
-        inObject.values.emplace(name, str);
+        inObject.setValue(name, value);
     }
 }
 
 void JsonHelper::setFloat(
     float value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto str = std::to_string(value);
     if (inObject.hasValue(name)) {
-        inObject.values.find(name)->second = str;
+        auto& v = inObject.getValue(name);
+        assert(v.isFloat());
+        v.n.f = value;
     } else {
-        inObject.values.emplace(name, str);
+        inObject.setValue(name, value);
     }
 }
 
 void JsonHelper::setString(
     const std::string& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
     if (inObject.hasValue(name)) {
-        inObject.values.find(name)->second = value;
+        auto& v = inObject.getValue(name);
+        assert(v.isString());
+        v.s = value;
     } else {
-        inObject.values.emplace(name, value);
+        inObject.setValue(name, value);
     }
 }
 
 void JsonHelper::setBool(
     bool value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto str = (value) ? "true" : "false";
     if (inObject.hasValue(name)) {
-        inObject.values.find(name)->second = str;
+        auto& v = inObject.getValue(name);
+        assert(v.isBool());
+        v.b = value;
     } else {
-        inObject.values.emplace(name, str);
+        inObject.setValue(name, value);
     }
 }
 
 void JsonHelper::setVector2(
     const Vector2& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto str = { std::to_string(value.x), std::to_string(value.y) };
-    if (inObject.hasArray(name)) {
-        inObject.valueArray.find(name)->second = str;
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        assert(a.size() == 2);
+        assert(a[0].isFloat() && a[1].isFloat());
+        a[0].n.f = value.x;
+        a[1].n.f = value.y;
     } else {
-        inObject.valueArray.emplace(name, str);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        v->pushBack(value.x);
+        v->pushBack(value.y);
+        inObject.setValue(name, v);
     }
 }
 
 void JsonHelper::setVector3(
     const Vector3& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto str = { std::to_string(value.x), std::to_string(value.y), std::to_string(value.z) };
-    if (inObject.hasArray(name)) {
-        inObject.valueArray.find(name)->second = str;
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        assert(a.size() == 3);
+        assert(a[0].isFloat() && a[1].isFloat() && a[2].isFloat());
+        a[0].n.f = value.x;
+        a[1].n.f = value.y;
+        a[2].n.f = value.z;
     } else {
-        inObject.valueArray.emplace(name, str);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        v->pushBack(value.x);
+        v->pushBack(value.y);
+        v->pushBack(value.z);
+        inObject.setValue(name, v);
     }
 }
 
 void JsonHelper::setVector4(
     const Vector4& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto str = { std::to_string(value.x), std::to_string(value.y), std::to_string(value.z), std::to_string(value.w) };
-    if (inObject.hasArray(name)) {
-        inObject.valueArray.find(name)->second = str;
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        assert(a.size() == 4);
+        assert(a[0].isFloat() && a[1].isFloat() && a[2].isFloat() && a[3].isFloat());
+        a[0].n.f = value.x;
+        a[1].n.f = value.y;
+        a[2].n.f = value.z;
+        a[3].n.f = value.w;
     } else {
-        inObject.valueArray.emplace(name, str);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        v->pushBack(value.x);
+        v->pushBack(value.y);
+        v->pushBack(value.z);
+        v->pushBack(value.w);
+        inObject.setValue(name, v);
     }
 }
 
 void JsonHelper::setQuaternion(
     const Quaternion& value,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
     Vector4 tmp(value.x, value.y, value.z, value.w);
@@ -490,63 +559,75 @@ void JsonHelper::setQuaternion(
 
 void JsonHelper::setIntArray(
     const std::vector<int>& values,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto size = values.size();
-    if (inObject.hasArray(name)) {
-        auto& target = inObject.valueArray.find(name)->second;
-        target.resize(size);
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        auto size = values.size();
+        a.resize(size);
         for (size_t i = 0; i < size; ++i) {
-            target[i] = std::to_string(values[i]);
+            a[i].setInt(values[i]);
         }
     } else {
-        auto& target = inObject.valueArray.emplace(name, JsonValueArray{}).first->second;
-        target.resize(size);
-        for (size_t i = 0; i < size; ++i) {
-            target[i] = std::to_string(values[i]);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        for (const auto& x : values) {
+            v->pushBack(x);
         }
+        inObject.setValue(name, v);
     }
 }
 
 void JsonHelper::setStringArray(
     const std::vector<std::string>& values,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto size = values.size();
-    if (inObject.hasArray(name)) {
-        inObject.valueArray.find(name)->second = values;
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        auto size = values.size();
+        a.resize(size);
+        for (size_t i = 0; i < size; ++i) {
+            a[i].setString(values[i]);
+        }
     } else {
-        inObject.valueArray.emplace(name, values);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        for (const auto& x : values) {
+            v->pushBack(x);
+        }
+        inObject.setValue(name, v);
     }
 }
 
 void JsonHelper::setVector3Array(
     const std::vector<Vector3>& values,
-    const char* name,
+    const std::string& name,
     JsonObject& inObject
 ) {
-    auto size = values.size();
-    if (inObject.hasArray(name)) {
-        auto& target = inObject.valueArray.find(name)->second;
-        target.resize(size * 3);
+    if (inObject.hasValue(name)) {
+        auto& v = inObject.getValue(name);
+        assert(v.isArray());
+        auto& a = v.a;
+        auto size = values.size();
+        a.resize(size * 3);
         for (size_t i = 0; i < size; ++i) {
-            const auto& v = values[i];
+            const auto& vec3 = values[i];
             auto idx = i * 3;
-            target[idx] = std::to_string(v.x);
-            target[idx + 1] = std::to_string(v.y);
-            target[idx + 2] = std::to_string(v.z);
+            a[idx].setFloat(vec3.x);
+            a[idx + 1].setFloat(vec3.y);
+            a[idx + 2].setFloat(vec3.z);
         }
     } else {
-        auto& target = inObject.valueArray.emplace(name, JsonValueArray{}).first->second;
-        target.resize(size * 3);
-        for (size_t i = 0; i < size; ++i) {
-            const auto& v = values[i];
-            auto idx = i * 3;
-            target[idx] = std::to_string(v.x);
-            target[idx + 1] = std::to_string(v.y);
-            target[idx + 2] = std::to_string(v.z);
+        auto v = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+        for (const auto& x : values) {
+            v->pushBack(x.x);
+            v->pushBack(x.y);
+            v->pushBack(x.z);
         }
+        inObject.setValue(name, v);
     }
 }

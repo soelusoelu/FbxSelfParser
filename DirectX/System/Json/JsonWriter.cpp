@@ -1,7 +1,9 @@
 ﻿#include "JsonWriter.h"
+#include "JsonObject.h"
+#include "JsonValue.h"
+#include <cassert>
 
-JsonWriter::JsonWriter() {
-}
+JsonWriter::JsonWriter() = default;
 
 JsonWriter::~JsonWriter() = default;
 
@@ -12,207 +14,112 @@ void JsonWriter::write(const char* filePath, const JsonObject& inObject) const {
         return;
     }
 
-    outFile << "{";
+    outFile << '{';
     writeNewLine(outFile);
 
     int tabCount = 0;
-    int valuesSize = inObject.values.size();
-    int valueArraySize = inObject.valueArray.size();
-    int childrenSize = inObject.children.size();
-    int arrayChildrenSize = inObject.arrayChildren.size();
-    int numAllValuesCount = (valuesSize + valueArraySize + childrenSize + arrayChildrenSize);
-    if (valuesSize > 0) {
-        writeValues(outFile, inObject, numAllValuesCount, tabCount);
-    }
-    if (valueArraySize > 0) {
-        writeValueArray(outFile, inObject, numAllValuesCount, tabCount);
-    }
-    if (childrenSize > 0) {
-        writeObject(outFile, inObject, numAllValuesCount, tabCount);
-    }
-    if (arrayChildrenSize > 0) {
-        writeObjectsArray(outFile, inObject, numAllValuesCount, tabCount);
-    }
+    writeValues(outFile, inObject, tabCount);
 
-    outFile << "}";
+    outFile << '}';
 }
 
-void JsonWriter::writeObject(std::ofstream& out, const JsonObject& inObject, int& remainValuesCount, int& tabCount) const {
+void JsonWriter::writeValues(std::ofstream& out, const JsonObject& inObject, int& tabCount) const {
     ++tabCount;
 
-    const auto& children = inObject.children;
-    for (const auto& c : children) {
+    const auto& values = inObject.values;
+    int num = values.size();
+    //オブジェクトが保有している全要素を出力していく
+    for (const auto& value : values) {
         writeTab(out, tabCount);
 
-        if (c.first.size() > 0) {
-            writeString(out, c.first);
+        //名前がない要素もある(オブジェクト配列など)ため、名前がある場合のみ出力
+        if (value.first.size() > 0) {
+            writeString(out, value.first);
 
             writeColon(out);
         }
 
-        out << "{";
-        writeNewLine(out);
+        //要素を出力する
+        const auto& v = *value.second;
+        writeValue(out, v, tabCount);
 
-        const auto& obj = c.second;
-        int valuesSize = obj->values.size();
-        int valueArraySize = obj->valueArray.size();
-        int childrenSize = obj->children.size();
-        int arrayChildrenSize = obj->arrayChildren.size();
-        int numAllValuesCount = (valuesSize + valueArraySize + childrenSize + arrayChildrenSize);
-        if (valuesSize > 0) {
-            writeValues(out, *obj, numAllValuesCount, tabCount);
-        }
-        if (valueArraySize > 0) {
-            writeValueArray(out, *obj, numAllValuesCount, tabCount);
-        }
-        if (childrenSize > 0) {
-            writeObject(out, *obj, numAllValuesCount, tabCount);
-        }
-        if (arrayChildrenSize > 0) {
-            writeObjectsArray(out, *obj, numAllValuesCount, tabCount);
+        --num;
+        if (num > 0) {
+            out << ',';
         }
 
-        writeTab(out, tabCount);
-
-        --remainValuesCount;
-        out << ((remainValuesCount == 0) ? "}" : "},");
         writeNewLine(out);
     }
 
     --tabCount;
 }
 
-void JsonWriter::writeValues(std::ofstream& out, const JsonObject& inObject, int& remainValuesCount, int& tabCount) const {
-    ++tabCount;
-
-    const auto& values = inObject.values;
-    for (const auto& v : values) {
-        writeTab(out, tabCount);
-
-        writeString(out, v.first);
-
-        writeColon(out);
-
-        writeString(out, v.second);
-
-        --remainValuesCount;
-        if (remainValuesCount != 0) {
-            out << ",";
-        }
-        writeNewLine(out);
+void JsonWriter::writeValue(std::ofstream& out, const JsonValue& inValue, int& tabCount) const {
+    if (inValue.isBool()) {
+        out << (inValue.getBool() ? true : false);
+    } else if (inValue.isInt()) {
+        out << inValue.getInt();
+    } else if (inValue.isFloat()) {
+        out << std::to_string(inValue.getFloat());
+    } else if (inValue.isString()) {
+        writeString(out, inValue.getString());
+    } else if (inValue.isArray()) {
+        writeArray(out, inValue.getArray(), tabCount);
+    } else if (inValue.isObject()) {
+        writeObject(out, inValue.getObject(), tabCount);
+    } else {
+        assert(false);
     }
-
-    --tabCount;
 }
 
-void JsonWriter::writeValueArray(std::ofstream& out, const JsonObject& inObject, int& remainValuesCount, int& tabCount) const {
-    ++tabCount;
-
-    const auto& valueArray = inObject.valueArray;
-    for (const auto& va : valueArray) {
-        writeTab(out, tabCount);
-
-        writeString(out, va.first);
-
-        writeColon(out);
-
-        out << "[";
-        writeNewLine(out);
-
-        const auto& values = va.second;
-        if (values.size() > 0) {
-            ++tabCount;
-
-            auto itr = values.begin();
-            while (true) {
-                writeTab(out, tabCount);
-                writeString(out, *itr);
-
-                ++itr;
-                if (itr == values.end()) {
-                    writeNewLine(out);
-                    break;
-                } else {
-                    out << ",";
-                    writeNewLine(out);
-                }
-            }
-
-            --tabCount;
-        }
-
-        writeTab(out, tabCount);
-
-        --remainValuesCount;
-        out << ((remainValuesCount == 0) ? "]" : "],");
-        writeNewLine(out);
+void JsonWriter::writeObject(std::ofstream& out, const JsonObject& inObject, int& tabCount) const {
+    out << '{';
+    //空オブジェクトなら早期リターン
+    if (inObject.values.empty()) {
+        out << '}';
+        return;
     }
 
-    --tabCount;
+    writeNewLine(out);
+
+    //オブジェクトの中身の出力はwriteValuesにまかせる
+    writeValues(out, inObject, tabCount);
+
+    writeTab(out, tabCount);
+    out << '}';
 }
 
-void JsonWriter::writeObjectsArray(std::ofstream& out, const JsonObject& inObject, int& remainValuesCount, int& tabCount) const {
+void JsonWriter::writeArray(std::ofstream& out, const std::vector<JsonValue>& inValues, int& tabCount) const {
+    out << '[';
+    //空配列なら早期リターン
+    if (inValues.empty()) {
+        out << ']';
+        return;
+    }
+
+    writeNewLine(out);
+
     ++tabCount;
 
-    const auto& children = inObject.arrayChildren;
-    for (const auto& c : children) {
+    int num = inValues.size();
+    //配列の全要素を出力していく
+    for (const auto& v : inValues) {
         writeTab(out, tabCount);
 
-        writeString(out, c.first);
+        writeValue(out, v, tabCount);
 
-        writeColon(out);
-
-        out << "[";
-        writeNewLine(out);
-
-        const auto& values = c.second;
-        if (values.size() > 0) {
-            ++tabCount;
-
-            int tmp = values.size();
-            for (const auto& v : values) {
-                //writeObject(out, *v, tmp, tabCount);
-                writeTab(out, tabCount);
-
-                out << "{";
-                writeNewLine(out);
-
-                int valuesSize = v->values.size();
-                int valueArraySize = v->valueArray.size();
-                int childrenSize = v->children.size();
-                int arrayChildrenSize = v->arrayChildren.size();
-                int numAllValuesCount = (valuesSize + valueArraySize + childrenSize + arrayChildrenSize);
-                if (valuesSize > 0) {
-                    writeValues(out, *v, numAllValuesCount, tabCount);
-                }
-                if (valueArraySize > 0) {
-                    writeValueArray(out, *v, numAllValuesCount, tabCount);
-                }
-                if (childrenSize > 0) {
-                    writeObject(out, *v, numAllValuesCount, tabCount);
-                }
-                if (arrayChildrenSize > 0) {
-                    writeObjectsArray(out, *v, numAllValuesCount, tabCount);
-                }
-
-                writeTab(out, tabCount);
-
-                --tmp;
-                out << ((tmp == 0) ? "}" : "},");
-                writeNewLine(out);
-            }
-
-            --tabCount;
+        --num;
+        if (num > 0) {
+            out << ',';
         }
 
-        writeTab(out, tabCount);
-
-        --remainValuesCount;
-        out << ((remainValuesCount == 0) ? "]" : "],");
         writeNewLine(out);
     }
 
     --tabCount;
+
+    writeTab(out, tabCount);
+    out << ']';
 }
 
 void JsonWriter::writeTab(std::ofstream& out, int count) const {
@@ -230,11 +137,5 @@ void JsonWriter::writeColon(std::ofstream& out) const {
 }
 
 void JsonWriter::writeString(std::ofstream& out, const std::string& in) const {
-    out << "\"";
-    out << in;
-    out << "\"";
-}
-
-void JsonWriter::writeNumber(std::ofstream& out, const std::string& in) const {
-    out << in;
+    out << '"' + in + '"';
 }

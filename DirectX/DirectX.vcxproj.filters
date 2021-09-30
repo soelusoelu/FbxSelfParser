@@ -257,6 +257,8 @@
     <ClCompile Include="System\Json\JsonReader.cpp" />
     <ClCompile Include="System\Json\JsonStream.cpp" />
     <ClCompile Include="System\Json\JsonWriter.cpp" />
+    <ClCompile Include="System\Json\JsonValue.cpp" />
+    <ClCompile Include="System\Json\JsonObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -572,8 +574,9 @@
     <ClInclude Include="Mesh\Fbx\FbxWeight.h" />
     <ClInclude Include="System\Json\JsonReader.h" />
     <ClInclude Include="System\Json\JsonStream.h" />
-    <ClInclude Include="System\Json\JsonObject.h" />
     <ClInclude Include="System\Json\JsonWriter.h" />
+    <ClInclude Include="System\Json\JsonValue.h" />
+    <ClInclude Include="System\Json\JsonObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

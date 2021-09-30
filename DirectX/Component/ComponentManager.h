@@ -1,10 +1,11 @@
 ﻿#pragma once
 
-#include "../System/Json/JsonObject.h"
 #include <memory>
 #include <string>
 #include <vector>
 
+struct JsonObject;
+struct JsonValue;
 class Component;
 class Collider;
 
@@ -71,11 +72,11 @@ public:
     }
 
     //すべてのコンポーネントを保存する
-    void saveComponents(JsonObjectArray& inObj) const;
+    void saveComponents(JsonValue& out) const;
 
 private:
     //各コンポーネントを保存する
-    void saveComponent(JsonObject& outArray, Component& component) const;
+    void saveComponent(JsonObject& out, Component& component) const;
 
 private:
     ComponentPtrArray mComponents;

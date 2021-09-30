@@ -2,9 +2,9 @@
 
 #include "../Math/Math.h"
 #include "../System/AssetsDirectoryPath.h"
-#include "../System/Json/JsonObject.h"
 #include <string>
 
+struct JsonObject;
 class Game;
 class GameObject;
 
@@ -19,6 +19,12 @@ public:
     //jsonファイルの読み込み
     static bool loadJson(
         JsonObject& rootObject,
+        const std::string& filename,
+        const std::string& directoryPath = AssetsDirectoryPath::DATA_PATH
+    );
+    //jsonファイルの書き込み
+    static void saveJson(
+        const JsonObject& rootObject,
         const std::string& filename,
         const std::string& directoryPath = AssetsDirectoryPath::DATA_PATH
     );

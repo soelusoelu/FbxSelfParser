@@ -40,6 +40,7 @@
 #include "../Component/Engine/Text/TextNumber.h"
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../System/GlobalFunction.h"
+#include "../System/Json/JsonValue.h"
 #include "../Utility/JsonHelper.h"
 #include "../Utility/LevelLoader.h"
 #include <cassert>
@@ -145,9 +146,9 @@ std::string GameObjectFactory::loadTag(const JsonObject& inObj) {
 }
 
 void GameObjectFactory::loadGameObjectProperties(GameObject& gameObject,  JsonObject& inObj) {
-    if (inObj.hasObject("transform")) {
-        gameObject.saveAndLoad(inObj.getObject("transform"), FileMode::LOAD);
-    }
+    //if (inObj.hasObject("transform")) {
+    //    gameObject.saveAndLoad(inObj.getObject("transform"), FileMode::LOAD);
+    //}
 }
 
 void GameObjectFactory::loadPrototypeComponents(GameObject& gameObject, const JsonObject& inObj, const std::string& directoryPath) const {
@@ -173,19 +174,24 @@ void GameObjectFactory::loadPrototypeComponents(GameObject& gameObject, const Js
 
 void GameObjectFactory::loadComponents(GameObject& gameObject, JsonObject& inObj) const {
     //ファイルにcomponentsメンバがなければ終了
-    if (!inObj.hasObjects("components")) {
+    if (!inObj.hasValue("components")) {
         return;
     }
 
-    const auto& components = inObj.getObjects("components");
+    const auto& components = inObj.getValue("components");
+    assert(components.isArray());
+
+    auto& a = components.getArray();
+
     //componentsが空なら終了
-    if (components.empty()) {
+    if (a.empty()) {
         return;
     }
 
-    for (auto&& c : components) {
+    for (auto&& c : a) {
+        assert(c.isObject());
         //各コンポーネントを読み込んでいく
-        loadComponent(gameObject, *c);
+        loadComponent(gameObject, c.getObject());
     }
 }
 
@@ -202,12 +208,14 @@ void GameObjectFactory::loadComponent(GameObject& gameObject, JsonObject& compon
         return;
     }
     //プロパティがあるか
-    if (!component.hasObject("properties")) {
+    if (!component.hasValue("properties")) {
         return;
     }
 
     //新規コンポーネントを生成
-    itr->second(gameObject, type, component.getObject("properties"));
+    auto& value = component.getValue("properties");
+    assert(value.isObject());
+    itr->second(gameObject, type, value.getObject());
 }
 
 bool GameObjectFactory::isValidType(std::string& outType, const JsonObject& inObj) const {

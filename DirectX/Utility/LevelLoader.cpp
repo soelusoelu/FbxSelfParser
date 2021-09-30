@@ -6,8 +6,10 @@
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../GameObject/GameObject.h"
 #include "../System/Game.h"
+#include "../System/Json/JsonObject.h"
 #include "../System/Json/JsonReader.h"
 #include "../System/Json/JsonStream.h"
+#include "../System/Json/JsonValue.h"
 #include "../System/Json/JsonWriter.h"
 #include <memory>
 
@@ -23,6 +25,14 @@ bool LevelLoader::loadJson(
     reader->parse(*stream, rootObject);
 
     return true;
+}
+
+void LevelLoader::saveJson(
+    const JsonObject& rootObject,
+    const std::string& filename,
+    const std::string& directoryPath
+) {
+    writeBuffer(rootObject, directoryPath + filename);
 }
 
 void LevelLoader::saveGameObject(
@@ -44,15 +54,15 @@ void LevelLoader::saveGameObject(
     JsonHelper::setString(gameObject.tag(), "tag", rootObject);
 
     //トランスフォーム用のjsonオブジェクトを作る
-    auto props = std::make_shared<JsonObject>();
+    auto props = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
     //トランスフォームを保存
-    gameObject.saveAndLoad(*props, FileMode::SAVE);
-    rootObject.children.emplace("transform", props);
+    gameObject.saveAndLoad(props->getObject(), FileMode::SAVE);
+    rootObject.setValue("transform", props);
 
     //コンポーネントを保存
-    JsonObjectArray components;
-    gameObject.componentManager().saveComponents(components);
-    rootObject.arrayChildren.emplace("components", components);
+    auto components = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    gameObject.componentManager().saveComponents(*components);
+    rootObject.setValue("components", components);
 
     //文字列をファイルに書き込む
     writeBuffer(rootObject, directoryPath + filename);
@@ -67,9 +77,9 @@ void LevelLoader::saveOnlyComponents(
     JsonObject rootObject;
 
     //コンポーネントを保存
-    JsonObjectArray components;
-    gameObject.componentManager().saveComponents(components);
-    rootObject.arrayChildren.emplace("components", components);
+    auto components = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    gameObject.componentManager().saveComponents(*components);
+    rootObject.setValue("components", components);
 
     //文字列をファイルに書き込む
     writeBuffer(rootObject, directoryPath + filename);
@@ -79,6 +89,6 @@ void LevelLoader::writeBuffer(
     const JsonObject& inObj,
     const std::string& filePath
 ) {
-    JsonWriter writer;
-    writer.write(("test" + filePath).c_str(), inObj);
+    auto writer = std::make_unique<JsonWriter>();
+    writer->write(filePath.c_str(), inObj);
 }

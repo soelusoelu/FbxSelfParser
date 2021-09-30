@@ -4,6 +4,8 @@
 #include "SceneManager.h"
 #include "Window.h"
 #include "FpsCounter/FPSCounter.h"
+#include "Json/JsonObject.h"
+#include "Json/JsonValue.h"
 #include "Shader/Shader.h"
 #include "Texture/Texture.h"
 #include "../DirectX/DirectX.h"
@@ -17,7 +19,6 @@
 #include "../Sound/XAudio2/SoundEngine.h"
 #include "../Utility/LevelLoader.h"
 #include "../Utility/Random.h"
-#include "Json/JsonWriter.h"
 
 Game::Game()
     : mWindow(nullptr)
@@ -29,12 +30,8 @@ Game::Game()
 }
 
 Game::~Game() {
-    JsonWriter writer;
-    writer.write("testtt.json", *mRootObject);
-    JsonObject camera;
-    LevelLoader::loadJson(camera, "Camera.json");
-    writer.write("testttCamera.json", camera);
-    //saveGlobalFile();
+    saveGlobalFile();
+    LevelLoader::saveJson(*mRootObject, GLOBAL_DATA_FILE_NAME);
 
     safeDelete(mSceneManager);
 
@@ -131,17 +128,19 @@ void Game::mainLoop() {
 }
 
 void Game::loadGlobalFile() {
-    auto& globalProperties = *mRootObject->getObjectPtr("globalProperties");
-    mWindow->writeAndRead(globalProperties, FileMode::LOAD);
-    mFPSCounter->writeAndRead(globalProperties, FileMode::LOAD);
-    InputManager::saveAndLoad(globalProperties, FileMode::LOAD);
-    mSceneManager->writeAndRead(globalProperties, FileMode::LOAD);
+    auto& globalPropertiesValue = mRootObject->getValue("globalProperties");
+    auto& globalPropertiesObj = globalPropertiesValue.getObject();
+    mWindow->writeAndRead(globalPropertiesObj, FileMode::LOAD);
+    mFPSCounter->writeAndRead(globalPropertiesObj, FileMode::LOAD);
+    InputManager::saveAndLoad(globalPropertiesObj, FileMode::LOAD);
+    mSceneManager->writeAndRead(globalPropertiesObj, FileMode::LOAD);
 }
 
 void Game::saveGlobalFile() {
-    auto& globalProperties = *mRootObject->getObjectPtr("globalProperties");
-    mWindow->writeAndRead(globalProperties, FileMode::SAVE);
-    mFPSCounter->writeAndRead(globalProperties, FileMode::SAVE);
-    InputManager::saveAndLoad(globalProperties, FileMode::SAVE);
-    mSceneManager->writeAndRead(globalProperties, FileMode::SAVE);
+    auto& globalPropertiesValue = mRootObject->getValue("globalProperties");
+    auto& globalPropertiesObj = globalPropertiesValue.getObject();
+    mWindow->writeAndRead(globalPropertiesObj, FileMode::SAVE);
+    mFPSCounter->writeAndRead(globalPropertiesObj, FileMode::SAVE);
+    InputManager::saveAndLoad(globalPropertiesObj, FileMode::SAVE);
+    mSceneManager->writeAndRead(globalPropertiesObj, FileMode::SAVE);
 }
