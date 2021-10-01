@@ -13,10 +13,10 @@ struct FbxProperties {
 };
 
 struct FbxConnections {
-    std::string unknown;
+    std::string related;
     unsigned child = 0;
     unsigned parent = 0;
-    std::string unknown2;
+    std::string value;
 };
 
 using FbxValueArray = std::vector<std::string>;

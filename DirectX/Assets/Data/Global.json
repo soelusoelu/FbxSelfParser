@@ -36,7 +36,7 @@
 			"textureSize": 64,
 			"textureDisplayInterval": 32,
 			"texturesFilePath": [
-				"Assets\\Model\\cone_ascii.fbx"
+				"Assets\Model\animTest2_ascii.fbx"
 			]
 		},
 		"AssetsRenderTextureAdder": {

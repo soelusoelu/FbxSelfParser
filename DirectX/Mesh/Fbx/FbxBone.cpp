@@ -32,6 +32,10 @@ void FbxBone::parse(
     }
 }
 
+const std::unordered_map<unsigned, unsigned short>& FbxBone::getBoneConnections() const {
+    return mBoneConnections;
+}
+
 void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
     const auto& children = mObjectsObject.children;
     auto range = children.equal_range("Model");

@@ -39,14 +39,21 @@ void FbxParser::parse(
     mMeshParser = std::make_unique<FbxMesh>(objects, mConnectionsMultimap);
     mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultimap);
     mBoneParser = std::make_unique<FbxBone>(objects, mConnectionsMultimap);
-    mAnimationParser = std::make_unique<FbxAnimation>(getObject("GlobalSettings"), objects);
 
     mMeshParser->parse(meshesVertices, meshesIndices);
     auto meshCount = meshesVertices.size();
     materials.resize(meshCount);
     mMaterialParser->parse(materials, filePath, mMeshParser->getLclModelNodeIDs());
-    //mBoneParser->parse(bones, meshesVertices, meshesIndices, *mMeshParser);
-    //mAnimationParser->parse(motions, bones);
+    mBoneParser->parse(bones, meshesVertices, meshesIndices, *mMeshParser);
+    if (bones.size() > 0) {
+        mAnimationParser = std::make_unique<FbxAnimation>(
+            getObject("GlobalSettings"),
+            objects,
+            *mBoneParser,
+            connections
+        );
+        mAnimationParser->parse(motions, bones);
+    }
 }
 
 const FbxObject& FbxParser::getRootObject() const {

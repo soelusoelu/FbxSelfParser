@@ -303,7 +303,7 @@ void FbxReader::parseProperties70Value(FbxStream& in, FbxProperties70& out) cons
 }
 
 void FbxReader::parseConnections(FbxStream& in, FbxConnections& out) const {
-    parseString(in, out.unknown);
+    parseString(in, out.related);
     skipSpace(in);
     assert(in.peek() == ',');
     in.take(); //skip ,
@@ -330,7 +330,7 @@ void FbxReader::parseConnections(FbxStream& in, FbxConnections& out) const {
     in.take(); //skip ,
     skipSpace(in);
 
-    parseString(in, out.unknown2);
+    parseString(in, out.value);
 }
 
 void FbxReader::skipSpaceAndComments(FbxStream& in) const {

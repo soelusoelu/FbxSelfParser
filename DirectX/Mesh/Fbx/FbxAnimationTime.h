@@ -4,16 +4,16 @@
 
 struct FbxAnimationTime {
     FbxTimeMode timeMode = FbxTimeMode::DEFAULT_MODE;
-    long long timeSpanStart = 0;
-    long long timeSpanStop = 0;
-    long long start = 0;
-    long long stop = 0;
-    long long period = 0;
+    long long timeSpanStart = 0ll;
+    long long timeSpanStop = 0ll;
+    long long localStart = 0ll;
+    long long localStop = 0ll;
+    long long period = 0ll;
     int startFrame = 0;
     int stopFrame = 0;
 
     //指定フレームの時間を取得する
     long long getTime(int frame) const {
-        return start + period * frame;
+        return localStart + period * frame;
     }
 };

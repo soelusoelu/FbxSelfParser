@@ -27,6 +27,8 @@ public:
         const FbxMesh& mesh
     );
 
+    const std::unordered_map<unsigned, unsigned short>& getBoneConnections() const;
+
 private:
     void parseLimbNode(std::vector<Bone>& bones);
     void parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) const;
