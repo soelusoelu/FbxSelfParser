@@ -52,38 +52,28 @@ FbxMesh::FbxMesh(
 
 FbxMesh::~FbxMesh() = default;
 
-void FbxMesh::parse(
-    std::vector<MeshVertices>& meshesVertices,
-    std::vector<Indices>& meshesIndices
-) const {
-    auto meshCount = mVertices.size();
-    meshesVertices.resize(meshCount);
-    meshesIndices.resize(meshCount);
-    for (size_t i = 0; i < meshCount; ++i) {
-        auto& meshVertices = meshesVertices[i];
-        auto& meshIndices = meshesIndices[i];
-        auto& vertices = mVertices[i];
-        auto& indices = mIndices[i];
-        const auto& normals = mNormals[i];
-        const auto& uvs = mUVs[i];
-        const auto& uvIndices = mUVIndices[i];
-
-        auto size = mNormals[i].size();
-        meshVertices.resize(size);
-        meshIndices.resize(size);
-
-        for (size_t j = 0; j < size; ++j) {
-            auto& v = meshVertices[j];
-            meshIndices[j] = static_cast<unsigned short>(j);
-            v.pos = vertices[indices[j]];
-            v.normal = normals[j];
-            v.uv = uvs[uvIndices[j]];
-        }
-    }
+int FbxMesh::getMeshCount() const {
+    return mVertices.size();
 }
 
-const std::vector<unsigned short>& FbxMesh::getDefaultIndices(unsigned index) const {
+const std::vector<Vector3>& FbxMesh::getVertices(unsigned index) const {
+    return mVertices[index];
+}
+
+const std::vector<unsigned short>& FbxMesh::getIndices(unsigned index) const {
     return mIndices[index];
+}
+
+const std::vector<Vector3>& FbxMesh::getNormals(unsigned index) const {
+    return mNormals[index];
+}
+
+const std::vector<Vector2>& FbxMesh::getUVs(unsigned index) const {
+    return mUVs[index];
+}
+
+const std::vector<unsigned short>& FbxMesh::getUVIndices(unsigned index) const {
+    return mUVIndices[index];
 }
 
 const std::unordered_map<unsigned, unsigned>& FbxMesh::getLclModelNodeIDs() const {

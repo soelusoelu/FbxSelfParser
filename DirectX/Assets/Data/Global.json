@@ -36,7 +36,7 @@
 			"textureSize": 64,
 			"textureDisplayInterval": 32,
 			"texturesFilePath": [
-				"Assets\Model\animTest2_ascii.fbx"
+				"Assets\Model\octopus_born_ascii.fbx"
 			]
 		},
 		"AssetsRenderTextureAdder": {
@@ -49,10 +49,10 @@
 		"ModelViewerLight": {
 			"lengthDirection": 5.000000,
 			"direction": [
-				0.965926,
-				-0.000001,
-				-0.000001,
-				0.258819
+				-0.743280,
+				-0.189942,
+				0.615988,
+				-0.178931
 			],
 			"color": [
 				1.000000,

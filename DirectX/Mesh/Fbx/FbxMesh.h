@@ -23,11 +23,12 @@ public:
     FbxMesh(const FbxMesh&) = delete;
     FbxMesh& operator=(const FbxMesh&) = delete;
 
-    void parse(
-        std::vector<MeshVertices>& meshesVertices,
-        std::vector<Indices>& meshesIndices
-    ) const;
-    const std::vector<unsigned short>& getDefaultIndices(unsigned index) const;
+    int getMeshCount() const;
+    const std::vector<Vector3>& getVertices(unsigned index) const;
+    const std::vector<unsigned short>& getIndices(unsigned index) const;
+    const std::vector<Vector3>& getNormals(unsigned index) const;
+    const std::vector<Vector2>& getUVs(unsigned index) const;
+    const std::vector<unsigned short>& getUVIndices(unsigned index) const;
     const std::unordered_map<unsigned, unsigned>& getLclModelNodeIDs() const;
 
 private:

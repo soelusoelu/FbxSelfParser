@@ -2,113 +2,83 @@
 #include "FbxWeight.h"
 #include <cassert>
 
-FbxBone::FbxBone(
-    const FbxObject& objectsObject,
-    const std::unordered_multimap<unsigned, unsigned>& connections
-)
+FbxBone::FbxBone(const FbxObject& objectsObject)
     : mObjectsObject(objectsObject)
-    , mConnections(connections)
-    , mWeightParser(std::make_unique<FbxWeight>(objectsObject))
+    , mWeightParser(nullptr)
 {
+    parseLimbNode();
+
+    if (mObjectsObject.hasObject("Pose")) {
+        const auto& poseObject = mObjectsObject.getObject("Pose");
+        parsePose(poseObject);
+
+        //ボーンがある場合のみ生成
+        mWeightParser = std::make_unique<FbxWeight>(objectsObject);
+    }
 }
 
 FbxBone::~FbxBone() = default;
 
-void FbxBone::parse(
-    std::vector<Bone>& bones,
-    std::vector<MeshVertices>& meshesVertices,
-    const std::vector<Indices>& meshesIndices,
-    const FbxMesh& mesh
-) {
-    if (mObjectsObject.hasObject("Pose")) {
-        parseLimbNode(bones);
-
-        const auto& poseObject = mObjectsObject.getObject("Pose");
-        parseBone(bones, poseObject);
-
-        connect(bones);
-
-        mWeightParser->parse(meshesVertices, meshesIndices, mesh);
-    }
+const FbxWeight& FbxBone::getWeightParser() const {
+    return *mWeightParser;
 }
 
-const std::unordered_map<unsigned, unsigned short>& FbxBone::getBoneConnections() const {
-    return mBoneConnections;
+const std::unordered_map<unsigned, BoneData>& FbxBone::getBoneData() const {
+    return mBoneData;
 }
 
-void FbxBone::parseLimbNode(std::vector<Bone>& bones) {
+bool FbxBone::hasBone() const {
+    return (mBoneData.size() > 0);
+}
+
+void FbxBone::parseLimbNode() {
     const auto& children = mObjectsObject.children;
-    auto range = children.equal_range("Model");
-    for (auto& r = range.first; r != range.second; ++r) {
-        const auto& obj = r->second;
+    auto models = children.equal_range("Model");
+    unsigned short count = 0;
+    for (auto& itr = models.first; itr != models.second; ++itr) {
+        const auto& obj = itr->second;
         const auto& attributes = obj.attributes;
         if (attributes[2] != "LimbNode") {
             continue;
         }
 
-        auto& bone = bones.emplace_back();
-        auto boneNo = static_cast<unsigned short>(bones.size() - 1);
-        bone.number = boneNo;
-        bone.name = attributes[1].substr(7); //7はModel::の文字数分
+        BoneData data;
+        data.boneIndex = count;
+        data.name = attributes[1].substr(7); //7はModel::の文字数分
 
-        unsigned nodeId = obj.getNodeId();
-        mBoneConnections.emplace(nodeId, boneNo);
+        mBoneData.emplace(obj.getNodeId(), data);
+
+        ++count;
     }
 }
 
-void FbxBone::parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) const {
+void FbxBone::parsePose(const FbxObject& poseObject) {
     const auto& children = poseObject.children;
-    auto childCount = children.size();
-    assert(std::stoi(poseObject.getValue("NbPoseNodes")) == childCount);
 
-    auto range = children.equal_range("PoseNode");
-    for (auto& r = range.first; r != range.second; ++r) {
-        const auto& obj = r->second;
+    auto nodes = children.equal_range("PoseNode");
+    for (auto& itr = nodes.first; itr != nodes.second; ++itr) {
+        const auto& obj = itr->second;
 
         //ノード番号を取得する
         unsigned nodeNo = static_cast<unsigned>(std::stoi(obj.getValue("Node")));
 
-        //mConnectionsに含まれていなければ使用しないボーン(謎)
-        auto itr = mBoneConnections.find(nodeNo);
-        if (itr == mBoneConnections.end()) {
+        //mBoneDataに含まれていなければ使用しないボーン(謎)
+        auto f = mBoneData.find(nodeNo);
+        if (f == mBoneData.end()) {
             continue;
         }
 
-        auto& bone = bones[itr->second];
+        auto& boneData = f->second;
 
         const auto& matrixArray = obj.getArray("Matrix");
         assert(matrixArray.size() == Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT);
 
         //初期姿勢を取得する
-        auto& m = bone.initMat.m;
+        auto& m = boneData.initMatrix.m;
         for (int col = 0; col < Matrix4::COLUMN_COUNT; ++col) {
             for (int row = 0; row < Matrix4::ROW_COUNT; ++row) {
                 m[col][row] = std::stof(matrixArray[col * 4 + row]);
             }
         }
-
-        //初期姿勢からオフセット行列を求める
-        bone.offsetMat = Matrix4::inverse(bone.initMat);
-    }
-}
-
-void FbxBone::connect(std::vector<Bone>& bones) const {
-    for (const auto& c : mConnections) {
-        //子の番号が全ボーンのノード番号と一致しなければ次へ
-        auto itrC = mBoneConnections.find(c.first);
-        if (itrC == mBoneConnections.end()) {
-            continue;
-        }
-        //親の番号が全ボーンのノード番号と一致しなければ次へ
-        auto itrP = mBoneConnections.find(c.second);
-        if (itrP == mBoneConnections.end()) {
-            continue;
-        }
-
-        auto& child = bones[itrC->second];
-        auto& parent = bones[itrP->second];
-
-        child.parent = &parent;
-        parent.children.emplace_back(&child);
     }
 }

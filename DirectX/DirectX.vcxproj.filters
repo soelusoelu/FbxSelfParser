@@ -259,6 +259,7 @@
     <ClCompile Include="System\Json\JsonWriter.cpp" />
     <ClCompile Include="System\Json\JsonValue.cpp" />
     <ClCompile Include="System\Json\JsonObject.cpp" />
+    <ClCompile Include="Mesh\Fbx\FbxToDirectXConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -577,6 +578,7 @@
     <ClInclude Include="System\Json\JsonWriter.h" />
     <ClInclude Include="System\Json\JsonValue.h" />
     <ClInclude Include="System\Json\JsonObject.h" />
+    <ClInclude Include="Mesh\Fbx\FbxToDirectXConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

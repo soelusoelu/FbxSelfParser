@@ -1,42 +1,38 @@
 ﻿#pragma once
 
 #include "Reader/FbxObject.h"
-#include "../Bone.h"
 #include "../IMeshLoader.h"
+#include "../../Math/Math.h"
 #include <memory>
+#include <string>
 #include <unordered_map>
-#include <vector>
 
-class FbxMesh;
 class FbxWeight;
+
+struct BoneData {
+    unsigned short boneIndex = 0;
+    std::string name;
+    Matrix4 initMatrix = Matrix4::identity;
+};
 
 class FbxBone {
 public:
-    FbxBone(
-        const FbxObject& objectsObject,
-        const std::unordered_multimap<unsigned, unsigned>& connections
-    );
+    FbxBone(const FbxObject& objectsObject);
     ~FbxBone();
     FbxBone(const FbxBone&) = delete;
     FbxBone& operator=(const FbxBone&) = delete;
 
-    void parse(
-        std::vector<Bone>& bones,
-        std::vector<MeshVertices>& meshesVertices,
-        const std::vector<Indices>& meshesIndices,
-        const FbxMesh& mesh
-    );
-
-    const std::unordered_map<unsigned, unsigned short>& getBoneConnections() const;
+    const FbxWeight& getWeightParser() const;
+    const std::unordered_map<unsigned, BoneData>& getBoneData() const;
+    bool hasBone() const;
 
 private:
-    void parseLimbNode(std::vector<Bone>& bones);
-    void parseBone(std::vector<Bone>& bones, const FbxObject& poseObject) const;
-    void connect(std::vector<Bone>& bones) const;
+    void parseLimbNode();
+    void parsePose(const FbxObject& poseObject);
 
 private:
     const FbxObject& mObjectsObject;
-    const std::unordered_multimap<unsigned, unsigned>& mConnections;
     std::unique_ptr<FbxWeight> mWeightParser;
-    std::unordered_map<unsigned, unsigned short> mBoneConnections;
+    //key: LimbNodeノード番号、value: ボーン情報
+    std::unordered_map<unsigned, BoneData> mBoneData;
 };

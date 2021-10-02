@@ -1,9 +1,13 @@
 ﻿#pragma once
 
 #include "Reader/FbxObject.h"
-#include "../IMeshLoader.h"
+#include <unordered_map>
+#include <vector>
 
-class FbxMesh;
+struct Cluster {
+    std::vector<unsigned short> indexes;
+    std::vector<float> weights;
+};
 
 class FbxWeight {
 public:
@@ -12,29 +16,15 @@ public:
     FbxWeight(const FbxWeight&) = delete;
     FbxWeight& operator=(const FbxWeight&) = delete;
 
-    void parse(
-        std::vector<MeshVertices>& meshesVertices,
-        const std::vector<Indices>& meshesIndices,
-        const FbxMesh& mesh
-    );
+    const Cluster& getCluster(unsigned nodeIndex) const;
+    bool hasCluster(unsigned nodeIndex) const;
 
 private:
-    void parseWeight(
-        MeshVertices& meshVertices,
-        const Indices& indices,
-        const FbxMesh& mesh,
-        const FbxObject& deformerObject,
-        unsigned meshIndex,
-        unsigned boneIndex
-    );
-
-    //新しいウェイトを格納する
-    void addWeight(MeshVertex& vertex, float weight, int boneIndex);
-    //頂点ウェイトを正規化する
-    void normalizeWeight(MeshVertices& meshVertice);
+    void parseIndexesAndWeights();
 
 private:
     const FbxObject& mObjectsObject;
+    std::unordered_map<unsigned, Cluster> mClusters;
 
     static constexpr int MAX_INFLUENCE = 4;
 };

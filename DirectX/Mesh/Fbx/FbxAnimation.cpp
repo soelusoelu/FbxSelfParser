@@ -136,10 +136,10 @@ void FbxAnimation::loadKeyFrames(Motion& motion, unsigned boneIndex) {
 
 void FbxAnimation::preloadKeyFrames(int boneIndex) {
     unsigned targetBone = 0;
-    auto& boneConnections = mBoneParser.getBoneConnections();
-    for (const auto& b : boneConnections) {
+    auto& boneData = mBoneParser.getBoneData();
+    for (const auto& b : boneData) {
         //second(値)の方にボーンの番号が入っているため
-        if (b.second == boneIndex) {
+        if (b.second.boneIndex == boneIndex) {
             targetBone = b.first;
         }
     }
@@ -206,61 +206,61 @@ void FbxAnimation::getKeyFrameData(
             if (xyz == "d|X") {
                 convertKeyValues(out.values[0][0], values);
                 convertKeyTimes(out.times[0][0], times);
-                for (auto&& v : out.values[0][0]) {
-                    v += t.x;
-                }
+                //for (auto&& v : out.values[0][0]) {
+                //    v += t.x;
+                //}
             } else if (xyz == "d|Y") {
                 convertKeyValues(out.values[0][1], values);
                 convertKeyTimes(out.times[0][1], times);
-                for (auto&& v : out.values[0][1]) {
-                    v += t.y;
-                }
+                //for (auto&& v : out.values[0][1]) {
+                //    v += t.y;
+                //}
             } else if (xyz == "d|Z") {
                 convertKeyValues(out.values[0][2], values);
                 convertKeyTimes(out.times[0][2], times);
-                for (auto&& v : out.values[0][2]) {
-                    v += t.z;
-                }
+                //for (auto&& v : out.values[0][2]) {
+                //    v += t.z;
+                //}
             }
         } else if (type == TRS::R) {
             if (xyz == "d|X") {
                 convertKeyValues(out.values[1][0], values);
                 convertKeyTimes(out.times[1][0], times);
-                for (auto&& v : out.values[1][0]) {
-                    v -= r.x;
-                }
+                //for (auto&& v : out.values[1][0]) {
+                //    v += r.x;
+                //}
             } else if (xyz == "d|Y") {
                 convertKeyValues(out.values[1][1], values);
                 convertKeyTimes(out.times[1][1], times);
-                for (auto&& v : out.values[1][1]) {
-                    v -= r.y;
-                }
+                //for (auto&& v : out.values[1][1]) {
+                //    v += r.y;
+                //}
             } else if (xyz == "d|Z") {
                 convertKeyValues(out.values[1][2], values);
                 convertKeyTimes(out.times[1][2], times);
-                for (auto&& v : out.values[1][2]) {
-                    v -= r.z;
-                }
+                //for (auto&& v : out.values[1][2]) {
+                //    v += r.z;
+                //}
             }
         } else if (type == TRS::S) {
             if (xyz == "d|X") {
                 convertKeyValues(out.values[2][0], values);
                 convertKeyTimes(out.times[2][0], times);
-                for (auto&& v : out.values[2][0]) {
-                    v *= s.x;
-                }
+                //for (auto&& v : out.values[2][0]) {
+                //    v *= s.x;
+                //}
             } else if (xyz == "d|Y") {
                 convertKeyValues(out.values[2][1], values);
                 convertKeyTimes(out.times[2][1], times);
-                for (auto&& v : out.values[2][1]) {
-                    v *= s.y;
-                }
+                //for (auto&& v : out.values[2][1]) {
+                //    v *= s.y;
+                //}
             } else if (xyz == "d|Z") {
                 convertKeyValues(out.values[2][2], values);
                 convertKeyTimes(out.times[2][2], times);
-                for (auto&& v : out.values[2][2]) {
-                    v *= s.z;
-                }
+                //for (auto&& v : out.values[2][2]) {
+                //    v *= s.z;
+                //}
             }
         }
     }

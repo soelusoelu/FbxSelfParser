@@ -17,7 +17,7 @@ SoundFormatConverter::~SoundFormatConverter() {
 bool SoundFormatConverter::mp3ToPCM(WAVEFORMATEX** pcmFormat, MPEGLAYER3WAVEFORMAT& mp3Format) {
     //フォーマット変換できるか
     if (!isConvert(pcmFormat, mp3Format)) {
-        Debug::logError("Failed mp3 to pcm convert.");
+        Debug::logError("Failed mp3 to pcm convertVerticesAndIndices.");
         return false;
     }
     //ACMストリームを開く
