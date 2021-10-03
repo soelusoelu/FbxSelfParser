@@ -2,6 +2,9 @@
 
 #include "../Math/Math.h"
 
+//最大ウェイト数
+constexpr int MAX_NUM_WEIGHT = 4;
+
 //頂点の構造体
 struct MeshVertex {
     Vector3 pos;
@@ -9,8 +12,8 @@ struct MeshVertex {
     Vector2 uv;
 
     //スキンメッシュ用
-    float weight[4];
-    unsigned short index[4];
+    float weight[MAX_NUM_WEIGHT];
+    unsigned short index[MAX_NUM_WEIGHT];
 
     MeshVertex()
         : pos(Vector3::zero)

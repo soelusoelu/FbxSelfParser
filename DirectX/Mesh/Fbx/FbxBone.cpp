@@ -31,6 +31,10 @@ bool FbxBone::hasBone() const {
     return (mBoneData.size() > 0);
 }
 
+unsigned FbxBone::getBoneCount() const {
+    return mBoneData.size();
+}
+
 void FbxBone::parseLimbNode() {
     const auto& children = mObjectsObject.children;
     auto models = children.equal_range("Model");

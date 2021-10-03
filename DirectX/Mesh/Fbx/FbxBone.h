@@ -25,6 +25,7 @@ public:
     const FbxWeight& getWeightParser() const;
     const std::unordered_map<unsigned, BoneData>& getBoneData() const;
     bool hasBone() const;
+    unsigned getBoneCount() const;
 
 private:
     void parseLimbNode();

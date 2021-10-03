@@ -2,10 +2,13 @@
 
 #include "FbxTimeMode.h"
 
-struct FbxAnimationTime {
+struct FbxGlobalTime {
     FbxTimeMode timeMode = FbxTimeMode::DEFAULT_MODE;
     long long timeSpanStart = 0ll;
     long long timeSpanStop = 0ll;
+};
+
+struct FbxAnimationTime {
     long long localStart = 0ll;
     long long localStop = 0ll;
     long long period = 0ll;

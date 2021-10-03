@@ -2,13 +2,24 @@
 
 #include "FbxAnimationTime.h"
 #include "Reader/FbxObject.h"
-#include "../Bone.h"
-#include "../Motion.h"
 #include "../../Math/Math.h"
+#include <string>
 #include <unordered_map>
 #include <vector>
 
 class FbxBone;
+
+struct AnimationStack {
+    std::string name;
+    FbxAnimationTime time;
+};
+
+//キーフレームに関するデータ
+struct KeyFrameData {
+    //t, r, sの3成分のそれぞれx, y, z
+    std::vector<float> values[3][3];
+    std::vector<long long> times[3][3];
+};
 
 class FbxAnimation {
     enum class TRS {
@@ -16,15 +27,13 @@ class FbxAnimation {
     };
 
     struct AnimationCurveNode {
-        Vector3 value;
-        TRS type;
-    };
-
-    //キーフレームに関するデータ
-    struct KeyFrameData {
-        //t, r, sの3成分のそれぞれx, y, z
-        std::vector<float> values[3][3];
-        std::vector<long long> times[3][3];
+        unsigned targetBoneNodeId = 0;
+        unsigned tNodeId = 0;
+        unsigned rNodeId = 0;
+        unsigned sNodeId = 0;
+        Vector3 t = Vector3::zero;
+        Vector3 r = Vector3::zero;
+        Vector3 s = Vector3::one;
     };
 
 public:
@@ -38,24 +47,24 @@ public:
     FbxAnimation(const FbxAnimation&) = delete;
     FbxAnimation& operator=(const FbxAnimation&) = delete;
 
-    void parse(std::vector<Motion>& motions, const std::vector<Bone>& bones);
+    //AnimationStackを取得する
+    const AnimationStack& getAnimationStack(unsigned index) const;
+    //キーフレームに関するデータを取得する
+    const KeyFrameData& getKeyFrameData(unsigned boneIndex) const;
+    //アニメーション数を取得する
+    unsigned getAnimationCount() const;
 
 private:
+    void parseAnimationStack();
+    void parseGlobalSettingsTime(const FbxObject& globalSettingsObject);
     void parseTime();
-    void parseAnimationCurveNode();
-    void parseAnimationStack(std::vector<Motion>& motions);
-    //全キーフレームを読み込む
-    void loadAllKeyFrames(Motion& motion, unsigned boneCount);
-    //キーフレーム読み込み
-    void loadKeyFrames(Motion& motion, unsigned boneIndex);
+    void parseAnimationCurveNode(const FbxBone& boneParser);
     //キーフレームを事前に読み込む
     void preloadKeyFrames(int boneIndex);
     //キーフレームに関するデータを取得する
     void getKeyFrameData(
         KeyFrameData& out,
-        const Vector3& t,
-        const Vector3& r,
-        const Vector3& s,
+        const AnimationCurveNode& animationCurveNode,
         TRS type,
         const std::string& xyz,
         unsigned childNo
@@ -64,34 +73,17 @@ private:
     void convertKeyValues(std::vector<float>& dst, const FbxValueArray& src) const;
     //FbxValueArrayからvector<long long>に変換する
     void convertKeyTimes(std::vector<long long>& dst, const FbxValueArray& src) const;
-    //キーフレームを求める
-    void calcKeyFrame(Matrix4& out, int frame, unsigned boneIndex) const;
-    void calcKeyFrameValues(
-        Vector3& t,
-        Vector3& r,
-        Vector3& s,
-        const KeyFrameData& data,
-        int frame
-    ) const;
-    void calcKeyFrameValue(
-        float& out,
-        const KeyFrameData& data,
-        int frame,
-        long long time,
-        int trs,
-        int xyz
-    ) const;
 
 private:
-    const FbxObject& mGlobalSettingsObject;
     const FbxObject& mObjectsObject;
-    const FbxBone& mBoneParser;
     const std::vector<FbxConnections>& mConnections;
-    FbxAnimationTime mAnimationTime;
-
-    std::unordered_map<unsigned, AnimationCurveNode> mAnimationCurveNode;
-    unsigned mAnimationLayer;
-
+    //アニメーション配列
+    std::vector<AnimationStack> mAnimationStacks;
+    //ボーンのインデックス順
+    std::vector<AnimationCurveNode> mAnimationCurveNode;
     //ボーンの数のキーフレームに関するデータ
     std::vector<KeyFrameData> mKeyFrames;
+
+    //グローバルタイム
+    FbxGlobalTime mGlobalTime;
 };
