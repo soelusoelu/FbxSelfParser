@@ -48,6 +48,8 @@ public:
     const AnimationStack& getAnimationStack(unsigned index) const;
     //キーフレームに関するデータを取得する
     const KeyFrameData& getKeyFrameData(unsigned boneIndex) const;
+    //Armatureキーフレームに関するデータを取得する
+    const KeyFrameData& getArmatureKeyFrameData() const;
     //アニメーション数を取得する
     unsigned getAnimationCount() const;
 
@@ -57,7 +59,7 @@ private:
     void parseTime();
     void parseAnimationCurveNode(const FbxBone& boneParser);
     //キーフレームを事前に読み込む
-    void preloadKeyFrames(int boneIndex);
+    void preloadKeyFrames(KeyFrameData& out, const AnimationCurveNode& animationCurveNode);
     //キーフレームに関するデータを取得する
     void getKeyFrameData(
         KeyFrameData& out,
@@ -79,7 +81,10 @@ private:
     std::vector<AnimationCurveNode> mAnimationCurveNode;
     //ボーンの数のキーフレームに関するデータ
     std::vector<KeyFrameData> mKeyFrames;
-
     //グローバルタイム
     FbxGlobalTime mGlobalTime;
+
+    //Armatureアニメーションカーブノード
+    AnimationCurveNode mArmatureAnimationCurveNode;
+    KeyFrameData mArmatureKeyFrames;
 };

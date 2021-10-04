@@ -11,6 +11,7 @@ FbxAnimation::FbxAnimation(
     : mObjectsObject(objectsObject)
     , mConnections(connections)
     , mGlobalTime()
+    , mArmatureAnimationCurveNode()
 {
     //ボーン数
     unsigned boneCount = boneParser.getBoneCount();
@@ -31,15 +32,16 @@ FbxAnimation::FbxAnimation(
     parseTime();
     parseAnimationCurveNode(boneParser);
 
-    //キーフレームはnullボーンの分も含む
-    mKeyFrames.resize(mAnimationCurveNode.size());
+    //キーフレームはボーン数
+    mKeyFrames.resize(boneCount);
     const auto& boneData = boneParser.getBoneData();
     for (const auto& b : boneData) {
         //キーフレームに関するデータを事前に読み込んでおく
-        preloadKeyFrames(b.second.boneIndex);
+        auto i = b.second.boneIndex;
+        preloadKeyFrames(mKeyFrames[i], mAnimationCurveNode[i]);
     }
-    //nullボーンに関するキーフレームを読み込む
-    preloadKeyFrames(mKeyFrames.size() - 1);
+    //Armatureに関するキーフレームを読み込む
+    preloadKeyFrames(mArmatureKeyFrames, mArmatureAnimationCurveNode);
 }
 
 FbxAnimation::~FbxAnimation() = default;
@@ -52,6 +54,10 @@ const AnimationStack& FbxAnimation::getAnimationStack(unsigned index) const {
 const KeyFrameData& FbxAnimation::getKeyFrameData(unsigned boneIndex) const {
     assert(boneIndex < mKeyFrames.size());
     return mKeyFrames[boneIndex];
+}
+
+const KeyFrameData& FbxAnimation::getArmatureKeyFrameData() const {
+    return mArmatureKeyFrames;
 }
 
 unsigned FbxAnimation::getAnimationCount() const {
@@ -124,46 +130,44 @@ void FbxAnimation::parseAnimationCurveNode(const FbxBone& boneParser) {
                 continue;
             }
 
-            unsigned boneIndex = mAnimationCurveNode.size() - 1;
+            AnimationCurveNode* node = nullptr;
             auto f = boneData.find(c.parent);
             if (f == boneData.end()) {
-                if (c.parent != boneParser.getNullBoneNodeID()) {
-                    //ボーンではなくnullボーンでもなければ次へ
+                if (c.parent != boneParser.getArmatureNodeID()) {
+                    //ボーンではなくArmatureでもなければ次へ
                     continue;
+                } else {
+                    node = &mArmatureAnimationCurveNode;
                 }
             } else {
-                boneIndex = f->second.boneIndex;
+                node = &mAnimationCurveNode[f->second.boneIndex];
             }
 
-            auto& node = mAnimationCurveNode[boneIndex];
-            node.targetBoneNodeId = c.parent;
+            node->targetBoneNodeId = c.parent;
 
             auto attr = obj.attributes[1].substr(15); //15はAnimCurveNode::の文字数分
             if (attr == "T") {
-                node.tNodeId = nodeId;
+                node->tNodeId = nodeId;
             } else if (attr == "R") {
-                node.rNodeId = nodeId;
+                node->rNodeId = nodeId;
             } else if (attr == "S") {
-                node.sNodeId = nodeId;
+                node->sNodeId = nodeId;
             }
         }
     }
 }
 
-void FbxAnimation::preloadKeyFrames(int boneIndex) {
-    const auto& animationCurveNode = mAnimationCurveNode[boneIndex];
-
+void FbxAnimation::preloadKeyFrames(KeyFrameData& out, const AnimationCurveNode& animationCurveNode) {
     //キーフレームの値を取得する
-    auto& keyFrames = mKeyFrames[boneIndex];
     for (const auto& c : mConnections) {
         if (c.parent == animationCurveNode.tNodeId) {
-            getKeyFrameData(keyFrames, TRS::T, c.value, c.child);
+            getKeyFrameData(out, TRS::T, c.value, c.child);
         }
         if (c.parent == animationCurveNode.rNodeId) {
-            getKeyFrameData(keyFrames, TRS::R, c.value, c.child);
+            getKeyFrameData(out, TRS::R, c.value, c.child);
         }
         if (c.parent == animationCurveNode.sNodeId) {
-            getKeyFrameData(keyFrames, TRS::S, c.value, c.child);
+            getKeyFrameData(out, TRS::S, c.value, c.child);
         }
     }
 }

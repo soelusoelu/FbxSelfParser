@@ -5,6 +5,7 @@
 FbxBone::FbxBone(const FbxObject& objectsObject)
     : mObjectsObject(objectsObject)
     , mWeightParser(nullptr)
+    , mArmatureNodeId(0)
 {
     parseLimbNode();
 
@@ -39,8 +40,8 @@ unsigned FbxBone::getBoneCount() const {
     return mBoneData.size();
 }
 
-unsigned FbxBone::getNullBoneNodeID() const {
-    return mNullBoneNodeId;
+unsigned FbxBone::getArmatureNodeID() const {
+    return mArmatureNodeId;
 }
 
 void FbxBone::parseLimbNode() {
@@ -66,7 +67,7 @@ void FbxBone::parseLimbNode() {
 
 void FbxBone::parseNullBone() {
     const auto& nullBone = mObjectsObject.getObject("Model", "Null");
-    mNullBoneNodeId = nullBone.getNodeId();
+    mArmatureNodeId = nullBone.getNodeId();
 }
 
 void FbxBone::parsePose(const FbxObject& poseObject) {

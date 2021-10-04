@@ -22,11 +22,16 @@ public:
     FbxBone(const FbxBone&) = delete;
     FbxBone& operator=(const FbxBone&) = delete;
 
+    //ウェイトパーサーを取得する(ボーンがある場合のみ)
     const FbxWeight& getWeightParser() const;
+    //ボーンデータをすべて取得する
     const std::unordered_map<unsigned, BoneData>& getBoneData() const;
+    //ボーンがあるか
     bool hasBone() const;
+    //ボーン数を取得する
     unsigned getBoneCount() const;
-    unsigned getNullBoneNodeID() const;
+    //Armatureのノード番号
+    unsigned getArmatureNodeID() const;
 
 private:
     void parseLimbNode();
@@ -38,6 +43,6 @@ private:
     std::unique_ptr<FbxWeight> mWeightParser;
     //key: LimbNodeノード番号、value: ボーン情報
     std::unordered_map<unsigned, BoneData> mBoneData;
-    //null bone
-    unsigned mNullBoneNodeId;
+    //Armatureノード番号
+    unsigned mArmatureNodeId;
 };
