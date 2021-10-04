@@ -94,84 +94,75 @@ void FbxToDirectXAnimationConverter::loadAllKeyFrames(
     const std::vector<Bone>& bones,
     const FbxAnimationTime& animationTime
 ) const {
-    //ボーン数分拡張しとく
+    //事前に拡張しとく
+    auto numFrame = motion.numFrame;
     motion.frameMatrix.resize(bones.size());
+    for (auto&& fm : motion.frameMatrix) {
+        fm.resize(numFrame);
+    }
 
     //親のいないボーン(ルートボーン)を探す
     const Bone* rootBone = nullptr;
     for (const auto& b : bones) {
         if (!b.parent) {
             rootBone = &b;
-            loadKeyFrames(
-                motion,
-                nullptr,
-                mAnimationParser.getArmatureKeyFrameData(),
-                animationTime,
-                rootBone->number
-            );
-
             break;
         }
     }
 
     assert(rootBone);
-    //ルートボーンからキーフレームを読み込み、子に降りていく
-    loadChildrenKeyFrames(motion, *rootBone, animationTime);
+
+    //フレーム数分フレーム時姿勢を取得する
+    const auto& armKeyFrames = mAnimationParser.getArmatureKeyFrameData();
+    for (int i = 0; i < numFrame; ++i) {
+        //指定フレームでの時間を取得する
+        auto time = animationTime.getTime(i);
+
+        //Armatureの行列を求める
+        Matrix4 arm;
+        calcKeyFrame(arm, armKeyFrames, time, i);
+
+        //ルートボーンからキーフレームを読み込み、子に降りていく
+        loadChildrenKeyFrames(motion, *rootBone, arm, time, i);
+    }
 }
 
 void FbxToDirectXAnimationConverter::loadChildrenKeyFrames(
     Motion& motion,
     const Bone& bone,
-    const FbxAnimationTime& animationTime
+    const Matrix4& armatureMatrix,
+    long long time,
+    int frame
 ) const {
     auto boneIndex = bone.number;
-    const std::vector<Matrix4>* parentFrameMatrix = nullptr;
-    if (bone.parent) {
-        parentFrameMatrix = &motion.frameMatrix[bone.parent->number];
-    }
 
     //キーフレーム読み込み
-    loadKeyFrames(
-        motion,
-        parentFrameMatrix,
+    calcKeyFrame(
+        motion.frameMatrix[boneIndex][frame],
         mAnimationParser.getKeyFrameData(boneIndex),
-        animationTime,
-        boneIndex
+        time,
+        frame
     );
 
+    //ボーンの子で再帰呼び出し
     for (const auto& c : bone.children) {
-        //ボーンの子で再帰呼び出し
-        loadChildrenKeyFrames(motion, *c, animationTime);
+        loadChildrenKeyFrames(motion, *c, armatureMatrix, time, frame);
     }
-}
 
-void FbxToDirectXAnimationConverter::loadKeyFrames(
-    Motion& motion,
-    const std::vector<Matrix4>* parentFrameMatrix,
-    const KeyFrameData& keyFrames,
-    const FbxAnimationTime& animationTime,
-    unsigned boneIndex
-) const {
-    auto& m = motion.frameMatrix[boneIndex];
-    auto numFrame = motion.numFrame;
-    m.resize(numFrame);
-
-    //フレーム数分フレーム時姿勢を取得する
-    for (int i = 0; i < numFrame; ++i) {
-        //指定フレームでの時間を取得する
-        auto time = animationTime.getTime(i);
-        //指定フレームでの姿勢
-        const Matrix4* parentMat = nullptr;
-        if (parentFrameMatrix) {
-            parentMat = &parentFrameMatrix->at(i);
-        }
-        calcKeyFrame(m[i], parentMat, keyFrames, time, i);
+    //親がいるなら親の行列も掛け合わせる
+    auto parent = bone.parent;
+    auto& fm = motion.frameMatrix;
+    while (parent) {
+        fm[boneIndex][frame] *= fm[parent->number][frame];
+        parent = parent->parent;
     }
+
+    //最後にArmature行列を掛ける
+    fm[boneIndex][frame] *= armatureMatrix;
 }
 
 void FbxToDirectXAnimationConverter::calcKeyFrame(
     Matrix4& out,
-    const Matrix4* parent,
     const KeyFrameData& keyFrames,
     long long time,
     int frame
@@ -181,21 +172,9 @@ void FbxToDirectXAnimationConverter::calcKeyFrame(
     auto s = Vector3::one;
     calcKeyFrameValues(t, r, s, keyFrames, time, frame);
 
-    static bool is = true;
-    if (is) {
-        is = false;
-        out = Matrix4::createFromQuaternion(Quaternion(r));
-        out *= Matrix4::createScale(s);
-    } else {
-        out *= Matrix4::createScale(s);
-        out *= Matrix4::createFromQuaternion(Quaternion(r));
-        out *= Matrix4::createTranslation(t);
-    }
-
-    //親がいるなら親の行列も掛け合わせる
-    if (parent) {
-        out *= *parent;
-    }
+    out = Matrix4::createScale(s);
+    out *= Matrix4::createFromQuaternion(Quaternion(r));
+    out *= Matrix4::createTranslation(t);
 }
 
 void FbxToDirectXAnimationConverter::calcKeyFrameValues(

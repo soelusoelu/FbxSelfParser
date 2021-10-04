@@ -51,22 +51,14 @@ private:
     void loadChildrenKeyFrames(
         Motion& motion,
         const Bone& bone,
-        const FbxAnimationTime& animationTime
-    ) const;
-
-    //指定ボーンの全キーフレーム読み込み
-    void loadKeyFrames(
-        Motion& motion,
-        const std::vector<Matrix4>* parentFrameMatrix,
-        const KeyFrameData& keyFrames,
-        const FbxAnimationTime& animationTime,
-        unsigned boneIndex
+        const Matrix4& armatureMatrix,
+        long long time,
+        int frame
     ) const;
 
     //キーフレームを求める
     void calcKeyFrame(
         Matrix4& out,
-        const Matrix4* parent,
         const KeyFrameData& keyFrames,
         long long time,
         int frame
