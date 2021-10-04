@@ -8,13 +8,17 @@ FbxBone::FbxBone(const FbxObject& objectsObject)
 {
     parseLimbNode();
 
-    if (mObjectsObject.hasObject("Pose")) {
-        const auto& poseObject = mObjectsObject.getObject("Pose");
-        parsePose(poseObject);
-
-        //ボーンがある場合のみ生成
-        mWeightParser = std::make_unique<FbxWeight>(objectsObject);
+    //ボーンがないなら終了
+    if (getBoneCount() == 0) {
+        return;
     }
+
+    parseNullBone();
+
+    parsePose(mObjectsObject.getObject("Pose"));
+
+    //ボーンがある場合のみ生成
+    mWeightParser = std::make_unique<FbxWeight>(objectsObject);
 }
 
 FbxBone::~FbxBone() = default;
@@ -33,6 +37,10 @@ bool FbxBone::hasBone() const {
 
 unsigned FbxBone::getBoneCount() const {
     return mBoneData.size();
+}
+
+unsigned FbxBone::getNullBoneNodeID() const {
+    return mNullBoneNodeId;
 }
 
 void FbxBone::parseLimbNode() {
@@ -54,6 +62,11 @@ void FbxBone::parseLimbNode() {
 
         ++count;
     }
+}
+
+void FbxBone::parseNullBone() {
+    const auto& nullBone = mObjectsObject.getObject("Model", "Null");
+    mNullBoneNodeId = nullBone.getNodeId();
 }
 
 void FbxBone::parsePose(const FbxObject& poseObject) {

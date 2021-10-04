@@ -49,8 +49,8 @@ struct FbxObject {
         auto range = children.equal_range(name);
         for (auto& r = range.first; r != range.second; ++r) {
             //次にattributeと一致するか確かめる
-            const auto& atributes = r->second.attributes;
-            for (const auto& a : attributes) {
+            const auto& attr = r->second.attributes;
+            for (const auto& a : attr) {
                 if (a == attribute) {
                     return r->second;
                 }

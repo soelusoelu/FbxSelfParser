@@ -26,9 +26,11 @@ public:
     const std::unordered_map<unsigned, BoneData>& getBoneData() const;
     bool hasBone() const;
     unsigned getBoneCount() const;
+    unsigned getNullBoneNodeID() const;
 
 private:
     void parseLimbNode();
+    void parseNullBone();
     void parsePose(const FbxObject& poseObject);
 
 private:
@@ -36,4 +38,6 @@ private:
     std::unique_ptr<FbxWeight> mWeightParser;
     //key: LimbNodeノード番号、value: ボーン情報
     std::unordered_map<unsigned, BoneData> mBoneData;
+    //null bone
+    unsigned mNullBoneNodeId;
 };

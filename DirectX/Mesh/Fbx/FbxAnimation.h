@@ -31,9 +31,6 @@ class FbxAnimation {
         unsigned tNodeId = 0;
         unsigned rNodeId = 0;
         unsigned sNodeId = 0;
-        Vector3 t = Vector3::zero;
-        Vector3 r = Vector3::zero;
-        Vector3 s = Vector3::one;
     };
 
 public:
@@ -64,7 +61,6 @@ private:
     //キーフレームに関するデータを取得する
     void getKeyFrameData(
         KeyFrameData& out,
-        const AnimationCurveNode& animationCurveNode,
         TRS type,
         const std::string& xyz,
         unsigned childNo

@@ -3,7 +3,7 @@
 #include "FbxBone.h"
 #include "FbxMaterial.h"
 #include "FbxMesh.h"
-#include "FbxToDirectXConverter.h"
+#include "Converter/FbxToDirectXConverter.h"
 #include "Reader/FbxObject.h"
 #include "Reader/FbxReader.h"
 #include "Reader/FbxStream.h"
@@ -45,14 +45,14 @@ void FbxParser::parse(
         objects,
         *mBoneParser,
         connections
-        );
+    );
 
-    auto converter = std::make_unique<FbxToDirectXConverter>(mConnectionsMultimap);
-    converter->convertVerticesAndIndices(meshesVertices, meshesIndices, *mMeshParser, *mBoneParser);
+    auto converter = std::make_unique<FbxToDirectXConverter>(*mMeshParser, *mBoneParser, *mAnimationParser, mConnectionsMultimap);
+    converter->convertVerticesAndIndices(meshesVertices, meshesIndices);
     auto meshCount = meshesVertices.size();
     materials.resize(meshCount);
     mMaterialParser->parse(materials, filePath, mMeshParser->getLclModelNodeIDs());
-    converter->convertBoneAnimation(bones, motions, *mBoneParser, *mAnimationParser);
+    converter->convertBoneAnimation(bones, motions);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
