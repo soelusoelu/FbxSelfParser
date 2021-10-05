@@ -48,10 +48,15 @@ public:
     const AnimationStack& getAnimationStack(unsigned index) const;
     //キーフレームに関するデータを取得する
     const KeyFrameData& getKeyFrameData(unsigned boneIndex) const;
+    //キーフレームに関するデータを保持しているか
+    bool hasKeyFrameData(unsigned boneIndex, int trs, int xyz) const;
+    bool hasKeyFrameData(const KeyFrameData& keyFrames, int trs, int xyz) const;
     //Armatureキーフレームに関するデータを取得する
     const KeyFrameData& getArmatureKeyFrameData() const;
     //アニメーション数を取得する
     unsigned getAnimationCount() const;
+    //FbxTimeModeのタイムを取得する
+    long long getTimeModeTime() const;
 
 private:
     void parseAnimationStack();

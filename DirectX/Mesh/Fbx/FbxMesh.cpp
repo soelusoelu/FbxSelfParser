@@ -6,12 +6,9 @@
 FbxMesh::FbxMesh(
     const FbxObject& objectsObject,
     const std::unordered_multimap<unsigned, unsigned>& connections
-)
-    : mObjectsObject(objectsObject)
-    , mConnections(connections)
-{
+) {
     //Lcl行列は先に取得しておく必要がある
-    const auto& children = mObjectsObject.children;
+    const auto& children = objectsObject.children;
     //Modelに一致する子オブジェクトを取得する
     auto models = children.equal_range("Model");
     for (auto& m = models.first; m != models.second; ++m) {
@@ -26,26 +23,38 @@ FbxMesh::FbxMesh(
         parseLclMatrix(obj);
     }
 
+    //メッシュの数はlclModelオブジェクトのノード数と一致する
+    auto lclNodeCount = mLclModelNodeIDMap.size();
+    mVertices.resize(lclNodeCount);
+    mIndices.resize(lclNodeCount);
+    mNormals.resize(lclNodeCount);
+    mUVs.resize(lclNodeCount);
+    mUVIndices.resize(lclNodeCount);
+
     //Geometryに一致する子オブジェクトを取得する
     auto geometrys = children.equal_range("Geometry");
     for (auto& g = geometrys.first; g != geometrys.second; ++g) {
         const auto& obj = g->second;
         unsigned nodeID = obj.getNodeId();
         //ConnectionsからノードIDと一致するものを取得する
-        auto range = mConnections.equal_range(nodeID);
+        auto range = connections.equal_range(nodeID);
         for (auto& r = range.first; r != range.second; ++r) {
             //lcl行列のノードIDと一致するか
             auto itr = mLclMatrixConnections.find(r->second);
             if (itr == mLclMatrixConnections.end()) {
                 continue;
             }
-            const auto& lclMatrix = itr->second;
+
+            //Geometry管理用マップに追加する
+            auto index = mLclModelNodeIDMap[r->second];
+            mGeometryNodeIDMap.emplace(nodeID, index);
 
             //デフォルトの頂点成分を解析する
-            parseVertices(mVertices.emplace_back(), obj, lclMatrix.lclMatrix);
-            parseIndices(mIndices.emplace_back(), obj);
-            parseNormals(mNormals.emplace_back(), obj, lclMatrix.lclRotation);
-            parseUV(mUVs.emplace_back(), mUVIndices.emplace_back(), obj);
+            const auto& lclMatrix = itr->second;
+            parseVertices(mVertices[index], obj, lclMatrix.lclMatrix);
+            parseIndices(mIndices[index], obj);
+            parseNormals(mNormals[index], obj, lclMatrix.lclRotation);
+            parseUV(mUVs[index], mUVIndices[index], obj);
         }
     }
 }
@@ -76,7 +85,11 @@ const std::vector<unsigned short>& FbxMesh::getUVIndices(unsigned index) const {
     return mUVIndices[index];
 }
 
-const std::unordered_map<unsigned, unsigned>& FbxMesh::getLclModelNodeIDs() const {
+const std::unordered_map<unsigned, unsigned short>& FbxMesh::geGeometryNodeIDs() const {
+    return mGeometryNodeIDMap;
+}
+
+const std::unordered_map<unsigned, unsigned short>& FbxMesh::getLclModelNodeIDs() const {
     return mLclModelNodeIDMap;
 }
 

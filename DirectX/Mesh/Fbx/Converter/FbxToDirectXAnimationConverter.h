@@ -78,8 +78,8 @@ private:
     void calcKeyFrameValue(
         float& out,
         const KeyFrameData& keyFrames,
-        int frame,
         long long time,
+        int frame,
         int trs,
         int xyz
     ) const;

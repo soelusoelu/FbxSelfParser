@@ -112,15 +112,22 @@ void FbxToDirectXAnimationConverter::loadAllKeyFrames(
 
     assert(rootBone);
 
+    //Armatureノードがあればキーフレームを取得する
+    const KeyFrameData* armKeyFrames = nullptr;
+    if (mBoneParser.hasArmatureNode()) {
+        armKeyFrames = &mAnimationParser.getArmatureKeyFrameData();
+    }
+
     //フレーム数分フレーム時姿勢を取得する
-    const auto& armKeyFrames = mAnimationParser.getArmatureKeyFrameData();
     for (int i = 0; i < numFrame; ++i) {
         //指定フレームでの時間を取得する
         auto time = animationTime.getTime(i);
 
         //Armatureの行列を求める
         Matrix4 arm;
-        calcKeyFrame(arm, armKeyFrames, time, i);
+        if (armKeyFrames) {
+            calcKeyFrame(arm, *armKeyFrames, time, i);
+        }
 
         //ルートボーンからキーフレームを読み込み、子に降りていく
         loadChildrenKeyFrames(motion, *rootBone, arm, time, i);
@@ -185,22 +192,42 @@ void FbxToDirectXAnimationConverter::calcKeyFrameValues(
     long long time,
     int frame
 ) const {
-    calcKeyFrameValue(t.x, keyFrames, frame, time, 0, 0); //tx
-    calcKeyFrameValue(t.y, keyFrames, frame, time, 0, 1); //ty
-    calcKeyFrameValue(t.z, keyFrames, frame, time, 0, 2); //tz
-    calcKeyFrameValue(r.x, keyFrames, frame, time, 1, 0); //rx
-    calcKeyFrameValue(r.y, keyFrames, frame, time, 1, 1); //ry
-    calcKeyFrameValue(r.z, keyFrames, frame, time, 1, 2); //rz
-    calcKeyFrameValue(s.x, keyFrames, frame, time, 2, 0); //sx
-    calcKeyFrameValue(s.y, keyFrames, frame, time, 2, 1); //sy
-    calcKeyFrameValue(s.z, keyFrames, frame, time, 2, 2); //sz
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 0, 0)) {
+        calcKeyFrameValue(t.x, keyFrames, time, frame, 0, 0); //tx
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 0, 1)) {
+        calcKeyFrameValue(t.y, keyFrames, time, frame, 0, 1); //ty
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 0, 2)) {
+        calcKeyFrameValue(t.z, keyFrames, time, frame, 0, 2); //tz
+    }
+
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 1, 0)) {
+        calcKeyFrameValue(r.x, keyFrames, time, frame, 1, 0); //rx
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 1, 1)) {
+        calcKeyFrameValue(r.y, keyFrames, time, frame, 1, 1); //ry
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 1, 2)) {
+        calcKeyFrameValue(r.z, keyFrames, time, frame, 1, 2); //rz
+    }
+
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 2, 0)) {
+        calcKeyFrameValue(s.x, keyFrames, time, frame, 2, 0); //sx
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 2, 1)) {
+        calcKeyFrameValue(s.y, keyFrames, time, frame, 2, 1); //sy
+    }
+    if (mAnimationParser.hasKeyFrameData(keyFrames, 2, 2)) {
+        calcKeyFrameValue(s.z, keyFrames, time, frame, 2, 2); //sz
+    }
 }
 
 void FbxToDirectXAnimationConverter::calcKeyFrameValue(
     float& out,
     const KeyFrameData& keyFrames,
-    int frame,
     long long time,
+    int frame,
     int trs,
     int xyz
 ) const {
@@ -223,20 +250,29 @@ void FbxToDirectXAnimationConverter::calcKeyFrameValue(
         }
     }
 
-    //キーフレームがフレーム数分無い場合、timeから値を補間して取得する
-    int idx = 1;
-    for (; idx < times.size(); ++idx) {
-        if (times[idx] > time) {
-            break;
-        }
-    }
+    //キーフレームがフレーム数分無い、または一致しない場合timeから値を補間して取得する
+    //int idx = 1;
+    //for (; idx < times.size(); ++idx) {
+    //    if (times[idx] > time) {
+    //        break;
+    //    }
+    //}
 
-    auto aT = static_cast<long double>(times[idx - 1]);
-    auto bT = static_cast<long double>(times[idx]);
+    //auto aT = static_cast<long double>(times[idx - 1]);
+    //auto bT = static_cast<long double>(times[idx]);
+    //auto f = static_cast<float>(aT / bT);
+
+    //auto aV = values[idx - 1];
+    //auto bV = values[idx];
+
+    //out = Math::lerp(aV, bV, f);
+
+    auto aT = static_cast<long double>(mAnimationParser.getTimeModeTime() * frame);
+    auto bT = static_cast<long double>(times.back());
     auto f = static_cast<float>(aT / bT);
 
-    auto aV = values[idx - 1];
-    auto bV = values[idx];
+    auto aV = values.front();
+    auto bV = values.back();
 
     out = Math::lerp(aV, bV, f);
 }

@@ -75,6 +75,11 @@ struct FbxObject {
         return valueArray.at(key);
     }
 
+    //keyと一致する配列が存在するか
+    bool hasArray(const std::string& key) const {
+        return (valueArray.find(key) != valueArray.end());
+    }
+
     //nameと一致するプロパティを取得する
     const FbxProperties& getProperties(const std::string& name) const {
         return properties.at(name);

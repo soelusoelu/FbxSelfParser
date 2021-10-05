@@ -161,7 +161,7 @@ void ModelViewerColliderManager::onModeChange(ModelViewerMode mode) {
         mIsDrawBone = true;
 
         //OBB作成
-        createObbCollider();
+        //createObbCollider();
 
         //ワイヤーフレーム表示に変更する
         fillMode = FillMode::WIREFRAME;

@@ -19,7 +19,7 @@ public:
     void parse(
         std::vector<Material>& materials,
         const std::string& filePath,
-        const std::unordered_map<unsigned, unsigned>& lclModelNodeIDMap
+        const std::unordered_map<unsigned, unsigned short>& lclModelNodeIDMap
     );
 
 private:

@@ -29,7 +29,8 @@ public:
     const std::vector<Vector3>& getNormals(unsigned index) const;
     const std::vector<Vector2>& getUVs(unsigned index) const;
     const std::vector<unsigned short>& getUVIndices(unsigned index) const;
-    const std::unordered_map<unsigned, unsigned>& getLclModelNodeIDs() const;
+    const std::unordered_map<unsigned, unsigned short>& geGeometryNodeIDs() const;
+    const std::unordered_map<unsigned, unsigned short>& getLclModelNodeIDs() const;
 
 private:
     void parseLclMatrix(
@@ -60,9 +61,6 @@ private:
     );
 
 private:
-    const FbxObject& mObjectsObject;
-    const std::unordered_multimap<unsigned, unsigned>& mConnections;
-
     //頂点配列
     std::vector<std::vector<Vector3>> mVertices;
     //インデックス配列
@@ -74,8 +72,10 @@ private:
     //UVインデックス配列
     std::vector<std::vector<unsigned short>> mUVIndices;
 
+    //key: GeometryオブジェクトのノードID, value: 添字
+    std::unordered_map<unsigned, unsigned short> mGeometryNodeIDMap;
     //lcl行列とノードIDのマップ
     std::unordered_map<unsigned, LclMatrix> mLclMatrixConnections;
     //key: lclModelオブジェクトのノードID, value: 添字
-    std::unordered_map<unsigned, unsigned> mLclModelNodeIDMap;
+    std::unordered_map<unsigned, unsigned short> mLclModelNodeIDMap;
 };

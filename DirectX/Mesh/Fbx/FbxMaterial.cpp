@@ -19,7 +19,7 @@ FbxMaterial::~FbxMaterial() = default;
 void FbxMaterial::parse(
     std::vector<Material>& materials,
     const std::string& filePath,
-    const std::unordered_map<unsigned, unsigned>& lclModelNodeIDMap
+    const std::unordered_map<unsigned, unsigned short>& lclModelNodeIDMap
 ) {
     const auto& children = mObjectsObject.children;
     auto matRange = children.equal_range("Material");

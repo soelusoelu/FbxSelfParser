@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 
+class FbxMesh;
 class FbxWeight;
 
 struct BoneData {
@@ -17,7 +18,11 @@ struct BoneData {
 
 class FbxBone {
 public:
-    FbxBone(const FbxObject& objectsObject);
+    FbxBone(
+        const FbxObject& objectsObject,
+        const FbxMesh& meshParser,
+        const std::unordered_multimap<unsigned, unsigned>& connections
+    );
     ~FbxBone();
     FbxBone(const FbxBone&) = delete;
     FbxBone& operator=(const FbxBone&) = delete;
@@ -32,6 +37,8 @@ public:
     unsigned getBoneCount() const;
     //Armatureのノード番号
     unsigned getArmatureNodeID() const;
+    //Armatureノードがあるか
+    bool hasArmatureNode() const;
 
 private:
     void parseLimbNode();

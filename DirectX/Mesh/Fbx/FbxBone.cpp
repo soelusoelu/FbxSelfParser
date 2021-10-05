@@ -2,7 +2,11 @@
 #include "FbxWeight.h"
 #include <cassert>
 
-FbxBone::FbxBone(const FbxObject& objectsObject)
+FbxBone::FbxBone(
+    const FbxObject& objectsObject,
+    const FbxMesh& meshParser,
+    const std::unordered_multimap<unsigned, unsigned>& connections
+)
     : mObjectsObject(objectsObject)
     , mWeightParser(nullptr)
     , mArmatureNodeId(0)
@@ -19,7 +23,7 @@ FbxBone::FbxBone(const FbxObject& objectsObject)
     parsePose(mObjectsObject.getObject("Pose"));
 
     //ボーンがある場合のみ生成
-    mWeightParser = std::make_unique<FbxWeight>(objectsObject);
+    mWeightParser = std::make_unique<FbxWeight>(objectsObject, meshParser, connections);
 }
 
 FbxBone::~FbxBone() = default;
@@ -44,6 +48,10 @@ unsigned FbxBone::getArmatureNodeID() const {
     return mArmatureNodeId;
 }
 
+bool FbxBone::hasArmatureNode() const {
+    return (mArmatureNodeId != 0);
+}
+
 void FbxBone::parseLimbNode() {
     const auto& children = mObjectsObject.children;
     auto models = children.equal_range("Model");
@@ -66,8 +74,14 @@ void FbxBone::parseLimbNode() {
 }
 
 void FbxBone::parseNullBone() {
-    const auto& nullBone = mObjectsObject.getObject("Model", "Null");
-    mArmatureNodeId = nullBone.getNodeId();
+    auto models = mObjectsObject.children.equal_range("Model");
+    for (auto& itr = models.first; itr != models.second; ++itr) {
+        const auto& obj = itr->second;
+        if (obj.attributes[2] == "Null") {
+            mArmatureNodeId = obj.getNodeId();
+            break;
+        }
+    }
 }
 
 void FbxBone::parsePose(const FbxObject& poseObject) {

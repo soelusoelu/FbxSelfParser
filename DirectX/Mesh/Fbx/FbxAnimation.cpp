@@ -56,12 +56,36 @@ const KeyFrameData& FbxAnimation::getKeyFrameData(unsigned boneIndex) const {
     return mKeyFrames[boneIndex];
 }
 
+bool FbxAnimation::hasKeyFrameData(unsigned boneIndex, int trs, int xyz) const {
+    assert(trs >= 0 && trs < 3 && xyz >= 0 && xyz < 3);
+    return (getKeyFrameData(boneIndex).values[trs][xyz].size() > 0);
+}
+
+bool FbxAnimation::hasKeyFrameData(const KeyFrameData& keyFrames, int trs, int xyz) const {
+    assert(trs >= 0 && trs < 3 && xyz >= 0 && xyz < 3);
+    return (keyFrames.values[trs][xyz].size() > 0);
+}
+
 const KeyFrameData& FbxAnimation::getArmatureKeyFrameData() const {
     return mArmatureKeyFrames;
 }
 
 unsigned FbxAnimation::getAnimationCount() const {
     return mAnimationStacks.size();
+}
+
+long long FbxAnimation::getTimeModeTime() const {
+    if (mGlobalTime.timeMode == FbxTimeMode::FRAMES_24) {
+        return FbxTimeModeTime::FRAMES_24_TIME;
+    } else if (mGlobalTime.timeMode == FbxTimeMode::FRAMES_30) {
+        return FbxTimeModeTime::FRAMES_30_TIME;
+    } else if (mGlobalTime.timeMode == FbxTimeMode::FRAMES_60) {
+        return FbxTimeModeTime::FRAMES_60_TIME;
+    } else if (mGlobalTime.timeMode == FbxTimeMode::FRAMES_120) {
+        return FbxTimeModeTime::FRAMES_120_TIME;
+    }
+
+    return 0;
 }
 
 void FbxAnimation::parseAnimationStack() {
@@ -104,10 +128,8 @@ void FbxAnimation::parseTime() {
     for (auto&& stack : mAnimationStacks) {
         auto& time = stack.time;
 
-        //TimeModeから各種時間を求める
-        if (mGlobalTime.timeMode == FbxTimeMode::FRAMES_24) {
-            time.period = mGlobalTime.timeSpanStop / 24;
-        }
+        //TimeModeから1フレームごとの時間を取得する
+        time.period = getTimeModeTime();
 
         //開始・終了フレームを求める
         time.startFrame = static_cast<int>(time.localStart / time.period);
@@ -117,8 +139,7 @@ void FbxAnimation::parseTime() {
 
 void FbxAnimation::parseAnimationCurveNode(const FbxBone& boneParser) {
     const auto& boneData = boneParser.getBoneData();
-    //nullボーンの分も含むから+1
-    mAnimationCurveNode.resize(boneData.size() + 1);
+    mAnimationCurveNode.resize(boneData.size());
 
     auto nodes = mObjectsObject.children.equal_range("AnimationCurveNode");
     for (auto& itr = nodes.first; itr != nodes.second; ++itr) {
@@ -133,11 +154,11 @@ void FbxAnimation::parseAnimationCurveNode(const FbxBone& boneParser) {
             AnimationCurveNode* node = nullptr;
             auto f = boneData.find(c.parent);
             if (f == boneData.end()) {
-                if (c.parent != boneParser.getArmatureNodeID()) {
-                    //ボーンではなくArmatureでもなければ次へ
-                    continue;
-                } else {
+                if (boneParser.hasArmatureNode() && c.parent == boneParser.getArmatureNodeID()) {
                     node = &mArmatureAnimationCurveNode;
+                } else {
+                    //ボーンでもArmatureでもなければ次へ
+                    continue;
                 }
             } else {
                 node = &mAnimationCurveNode[f->second.boneIndex];

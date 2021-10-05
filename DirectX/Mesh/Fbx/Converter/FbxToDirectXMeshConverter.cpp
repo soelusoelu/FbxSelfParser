@@ -87,12 +87,12 @@ void FbxToDirectXMeshConverter::positionNormalUVAndWeight(
         for (auto& itr = range.first; itr != range.second; ++itr) {
             //コネクションの右側がクラスターのノード番号と一致するか
             auto nodeIndex = itr->second;
-            if (!weightParser.hasCluster(nodeIndex)) {
+            if (!weightParser.hasCluster(meshIndex, nodeIndex)) {
                 continue;
             }
 
             //ここまできたらボーンとクラスターが一致している
-            const auto& srcCluster = weightParser.getCluster(nodeIndex);
+            const auto& srcCluster = weightParser.getCluster(meshIndex, nodeIndex);
             const auto& weights = srcCluster.weights;
             const auto& indexes = srcCluster.indexes;
             auto weightCount = weights.size();
