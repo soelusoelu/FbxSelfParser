@@ -62,10 +62,16 @@ void FbxBone::parseLimbNode() {
         if (attributes[2] != "LimbNode") {
             continue;
         }
+        //ボーン名の最後が"_end"だったらリーフボーンなので無視する
+        auto name = attributes[1].substr(7); //7はModel::の文字数分
+        auto fEnd = name.find("_end");
+        if (fEnd != std::string::npos && fEnd == name.rfind("_end")) {
+            continue;
+        }
 
         BoneData data;
         data.boneIndex = count;
-        data.name = attributes[1].substr(7); //7はModel::の文字数分
+        data.name = name; //7はModel::の文字数分
 
         mBoneData.emplace(obj.getNodeId(), data);
 

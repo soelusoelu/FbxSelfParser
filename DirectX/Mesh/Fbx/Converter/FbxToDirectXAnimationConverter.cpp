@@ -84,15 +84,19 @@ void FbxToDirectXAnimationConverter::convertAnimation(
         const auto& time = stack.time;
         motion.numFrame = time.stopFrame - time.startFrame;
 
+        //キーフレームに関するデータを取得
+        const auto& keyFrames = mAnimationParser.getKeyFramesData(i);
+
         //キーフレームの読み込み
-        loadAllKeyFrames(motion, bones, time);
+        loadAllKeyFrames(motion, bones, time, keyFrames);
     }
 }
 
 void FbxToDirectXAnimationConverter::loadAllKeyFrames(
     Motion& motion,
     const std::vector<Bone>& bones,
-    const FbxAnimationTime& animationTime
+    const FbxAnimationTime& animationTime,
+    const std::vector<KeyFrameData>& keyFrames
 ) const {
     //事前に拡張しとく
     auto numFrame = motion.numFrame;
@@ -130,13 +134,14 @@ void FbxToDirectXAnimationConverter::loadAllKeyFrames(
         }
 
         //ルートボーンからキーフレームを読み込み、子に降りていく
-        loadChildrenKeyFrames(motion, *rootBone, arm, time, i);
+        loadChildrenKeyFrames(motion, *rootBone, keyFrames, arm, time, i);
     }
 }
 
 void FbxToDirectXAnimationConverter::loadChildrenKeyFrames(
     Motion& motion,
     const Bone& bone,
+    const std::vector<KeyFrameData>& keyFrames,
     const Matrix4& armatureMatrix,
     long long time,
     int frame
@@ -146,14 +151,14 @@ void FbxToDirectXAnimationConverter::loadChildrenKeyFrames(
     //キーフレーム読み込み
     calcKeyFrame(
         motion.frameMatrix[boneIndex][frame],
-        mAnimationParser.getKeyFrameData(boneIndex),
+        keyFrames[boneIndex],
         time,
         frame
     );
 
     //ボーンの子で再帰呼び出し
     for (const auto& c : bone.children) {
-        loadChildrenKeyFrames(motion, *c, armatureMatrix, time, frame);
+        loadChildrenKeyFrames(motion, *c, keyFrames, armatureMatrix, time, frame);
     }
 
     //親がいるなら親の行列も掛け合わせる

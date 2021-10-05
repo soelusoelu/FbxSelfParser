@@ -12,6 +12,7 @@ class FbxBone;
 struct AnimationStack {
     std::string name;
     FbxAnimationTime time;
+    unsigned short animationNo = 0;
 };
 
 //キーフレームに関するデータ
@@ -26,6 +27,11 @@ class FbxAnimation {
         T, R, S
     };
 
+    struct AnimationNodeID {
+        unsigned animationStackID = 0;
+        unsigned animationLayerID = 0;
+    };
+
     struct AnimationCurveNode {
         unsigned targetBoneNodeId = 0;
         unsigned tNodeId = 0;
@@ -38,7 +44,8 @@ public:
         const FbxObject& globalSettingsObject,
         const FbxObject& objectsObject,
         const FbxBone& boneParser,
-        const std::vector<FbxConnections>& connections
+        const std::unordered_multimap<unsigned, unsigned>& connections,
+        const std::vector<FbxConnections>& connectionsVector
     );
     ~FbxAnimation();
     FbxAnimation(const FbxAnimation&) = delete;
@@ -47,9 +54,8 @@ public:
     //AnimationStackを取得する
     const AnimationStack& getAnimationStack(unsigned index) const;
     //キーフレームに関するデータを取得する
-    const KeyFrameData& getKeyFrameData(unsigned boneIndex) const;
+    const std::vector<KeyFrameData>& getKeyFramesData(unsigned animationIndex) const;
     //キーフレームに関するデータを保持しているか
-    bool hasKeyFrameData(unsigned boneIndex, int trs, int xyz) const;
     bool hasKeyFrameData(const KeyFrameData& keyFrames, int trs, int xyz) const;
     //Armatureキーフレームに関するデータを取得する
     const KeyFrameData& getArmatureKeyFrameData() const;
@@ -59,9 +65,10 @@ public:
     long long getTimeModeTime() const;
 
 private:
-    void parseAnimationStack();
     void parseGlobalSettingsTime(const FbxObject& globalSettingsObject);
-    void parseTime();
+    void parseAnimationStack();
+    void parseTime(FbxAnimationTime& time);
+    void parseAnimationLayer();
     void parseAnimationCurveNode(const FbxBone& boneParser);
     //キーフレームを事前に読み込む
     void preloadKeyFrames(KeyFrameData& out, const AnimationCurveNode& animationCurveNode);
@@ -79,13 +86,17 @@ private:
 
 private:
     const FbxObject& mObjectsObject;
-    const std::vector<FbxConnections>& mConnections;
-    //アニメーション配列
-    std::vector<AnimationStack> mAnimationStacks;
-    //ボーンのインデックス順
-    std::vector<AnimationCurveNode> mAnimationCurveNode;
-    //ボーンの数のキーフレームに関するデータ
-    std::vector<KeyFrameData> mKeyFrames;
+    const std::unordered_multimap<unsigned, unsigned>& mConnections;
+    const std::vector<FbxConnections>& mConnectionsVector;
+
+    //アニメーションスタック
+    std::unordered_map<unsigned, AnimationStack> mAnimationStacks;
+    //Key: アニメーションレイヤーノード番号, value: 添え字
+    std::unordered_map<unsigned, unsigned short> mAnimationLayers;
+    //アニメーション数分のボーンのインデックス順
+    std::vector<std::vector<AnimationCurveNode>> mAnimationCurveNodes;
+    //アニメーション数分のボーンの数のキーフレームに関するデータ
+    std::vector<std::vector<KeyFrameData>> mKeyFrames;
     //グローバルタイム
     FbxGlobalTime mGlobalTime;
 

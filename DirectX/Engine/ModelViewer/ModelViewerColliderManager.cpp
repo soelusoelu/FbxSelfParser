@@ -148,7 +148,7 @@ void ModelViewerColliderManager::onChangeModel(const GameObject& newModel) {
     }
 }
 
-void ModelViewerColliderManager::onModeChange(ModelViewerMode mode) { 
+void ModelViewerColliderManager::onModeChange(ModelViewerMode mode) {
     FillMode fillMode = FillMode::SOLID;
 
     if (mode == ModelViewerMode::COLLIDER_OPERATE) {
@@ -161,7 +161,7 @@ void ModelViewerColliderManager::onModeChange(ModelViewerMode mode) {
         mIsDrawBone = true;
 
         //OBB作成
-        //createObbCollider();
+        createObbCollider();
 
         //ワイヤーフレーム表示に変更する
         fillMode = FillMode::WIREFRAME;

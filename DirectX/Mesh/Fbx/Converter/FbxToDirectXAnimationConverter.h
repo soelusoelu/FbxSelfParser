@@ -44,13 +44,15 @@ private:
     void loadAllKeyFrames(
         Motion& motion,
         const std::vector<Bone>& bones,
-        const FbxAnimationTime& animationTime
+        const FbxAnimationTime& animationTime,
+        const std::vector<KeyFrameData>& keyFrames
     ) const;
 
     //指定ボーンのキーフレームを読み込み、次に子ボーンのキーフレームを読み込んでいく
     void loadChildrenKeyFrames(
         Motion& motion,
         const Bone& bone,
+        const std::vector<KeyFrameData>& keyFrames,
         const Matrix4& armatureMatrix,
         long long time,
         int frame

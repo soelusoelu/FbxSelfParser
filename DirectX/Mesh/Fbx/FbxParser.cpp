@@ -44,6 +44,7 @@ void FbxParser::parse(
         getObject("GlobalSettings"),
         objects,
         *mBoneParser,
+        mConnectionsMultimap,
         connections
     );
 
