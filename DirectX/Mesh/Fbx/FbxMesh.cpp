@@ -70,19 +70,19 @@ const std::unordered_map<unsigned, unsigned short>& FbxMesh::getLclModelNodeIDs(
 void FbxMesh::parseAxis(
     const FbxObject& globalSettingsObject
 ) {
+    const auto& coordAxis = globalSettingsObject.getProperties("CoordAxis").value;
+    mCoordAxis = std::stoi(coordAxis);
     const auto& upAxis = globalSettingsObject.getProperties("UpAxis").value;
     mUpAxis = std::stoi(upAxis);
     const auto& frontAxis = globalSettingsObject.getProperties("FrontAxis").value;
     mFrontAxis = std::stoi(frontAxis);
-    const auto& coordAxis = globalSettingsObject.getProperties("CoordAxis").value;
-    mCoordAxis = std::stoi(coordAxis);
 
+    const auto& coordAxisSign = globalSettingsObject.getProperties("CoordAxisSign").value;
+    mCoordAxisSign = std::stoi(coordAxisSign);
     const auto& upAxisSign = globalSettingsObject.getProperties("UpAxisSign").value;
     mUpAxisSign = std::stoi(upAxisSign);
     const auto& frontAxisSign = globalSettingsObject.getProperties("FrontAxisSign").value;
     mFrontAxisSign = std::stoi(frontAxisSign);
-    const auto& coordAxisSign = globalSettingsObject.getProperties("CoordAxisSign").value;
-    mCoordAxisSign = std::stoi(coordAxisSign);
 }
 
 void FbxMesh::parseLclMatrices(
@@ -116,6 +116,15 @@ void FbxMesh::parseLclMatrix(
 
         auto& s = lclMatrix.lclScaling;
         iss >> s.x >> s.y >> s.z;
+
+        //float tmp[3] = { 0.f, 0.f, 0.f };
+        //iss >> tmp[0] >> tmp[1] >> tmp[2];
+
+        //auto& s = lclMatrix.lclScaling;
+        //s.x = tmp[mCoordAxis] * mCoordAxisSign;
+        //s.y = tmp[mUpAxis] * mUpAxisSign;
+        //s.z = tmp[mFrontAxis] * mFrontAxisSign;
+
         lclMatrix.lclMatrix = Matrix4::createScale(s);
     }
     if (lclModelObject.hasProperties("Lcl Rotation")) {
@@ -124,6 +133,15 @@ void FbxMesh::parseLclMatrix(
 
         Vector3 euler;
         iss >> euler.x >> euler.y >> euler.z;
+
+        //float tmp[3] = { 0.f, 0.f, 0.f };
+        //iss >> tmp[0] >> tmp[1] >> tmp[2];
+
+        //Vector3 euler;
+        //euler.x = tmp[mCoordAxis] * mCoordAxisSign;
+        //euler.y = tmp[mUpAxis] * mUpAxisSign;
+        //euler.z = tmp[mFrontAxis] * mFrontAxisSign;
+
         lclMatrix.lclRotation.setEuler(euler);
 
         lclMatrix.lclMatrix *= Matrix4::createFromQuaternion(lclMatrix.lclRotation);
@@ -134,6 +152,15 @@ void FbxMesh::parseLclMatrix(
 
         auto& t = lclMatrix.lclTranslation;
         iss >> t.x >> t.y >> t.z;
+
+        //float tmp[3] = { 0.f, 0.f, 0.f };
+        //iss >> tmp[0] >> tmp[1] >> tmp[2];
+
+        //auto& t = lclMatrix.lclTranslation;
+        //t.x = tmp[mCoordAxis] * mCoordAxisSign;
+        //t.y = tmp[mUpAxis] * mUpAxisSign;
+        //t.z = tmp[mFrontAxis] * mFrontAxisSign;
+
         lclMatrix.lclMatrix *= Matrix4::createTranslation(t);
     }
 
@@ -190,6 +217,10 @@ void FbxMesh::parseVertices(
         v.y = std::stof(vertices[idx + 1]);
         v.z = std::stof(vertices[idx + 2]);
 
+        //v.x = std::stof(vertices[idx + mCoordAxis]) * mCoordAxisSign;
+        //v.y = std::stof(vertices[idx + mUpAxis]) * mUpAxisSign;
+        //v.z = std::stof(vertices[idx + mFrontAxis]) * mFrontAxisSign;
+
         v = Vector3::transform(v, lclMatrix);
     }
 }
@@ -230,6 +261,10 @@ void FbxMesh::parseNormals(
         n.x = std::stof(normals[idx]);
         n.y = std::stof(normals[idx + 1]);
         n.z = std::stof(normals[idx + 2]);
+
+        //n.x = std::stof(normals[idx + mCoordAxis]) * mCoordAxisSign;
+        //n.y = std::stof(normals[idx + mUpAxis]) * mUpAxisSign;
+        //n.z = std::stof(normals[idx + mFrontAxis]) * mFrontAxisSign;
 
         n = Vector3::transform(n, lclRotation);
     }

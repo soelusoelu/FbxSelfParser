@@ -31,17 +31,18 @@ void FbxParser::parse(
     FbxStream stream(filePath.c_str());
     mReader->parse(stream, *mRootObject);
 
+    const auto& globalSettings = getObject("GlobalSettings");
     const auto& objects = getObject("Objects");
     const auto& connections = getObject("Connections").connections;
     for (const auto& c : connections) {
         mConnectionsMultimap.emplace(c.child, c.parent);
     }
 
-    mMeshParser = std::make_unique<FbxMesh>(getObject("GlobalSettings"), objects, mConnectionsMultimap);
+    mMeshParser = std::make_unique<FbxMesh>(globalSettings, objects, mConnectionsMultimap);
     mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultimap);
     mBoneParser = std::make_unique<FbxBone>(objects, *mMeshParser, mConnectionsMultimap);
     mAnimationParser = std::make_unique<FbxAnimation>(
-        getObject("GlobalSettings"),
+        globalSettings,
         objects,
         *mBoneParser,
         mConnectionsMultimap,

@@ -1,10 +1,10 @@
 {
 	"globalProperties": {
 		"ShadowMap": {
-			"nearClip": 10.000000,
 			"shadowTextureSize": 8192,
-			"farClip": 300.000000,
-			"lightDistance": 290.000000
+			"nearClip": 10.000000,
+			"lightDistance": 290.000000,
+			"farClip": 300.000000
 		},
 		"Window": {
 			"title": "ModelViewer",
@@ -13,17 +13,17 @@
 			"windowStandardWidth": 1920,
 			"windowStandardHeight": 1080
 		},
-		"Keyboard": {
-			"enterKey": "Space"
-		},
 		"FPSCounter": {
 			"fps": 60.000000
 		},
-		"EngineFunctionManager": {},
-		"SceneManager": {},
+		"Keyboard": {
+			"enterKey": "Space"
+		},
 		"JoyPad": {
 			"enterPad": "A"
 		},
+		"SceneManager": {},
+		"EngineFunctionManager": {},
 		"DebugManager": {},
 		"DebugUtility": {},
 		"Log": {
@@ -36,7 +36,7 @@
 			"textureSize": 64,
 			"textureDisplayInterval": 32,
 			"texturesFilePath": [
-				"Assets\Model\monkey_rotate_ascii.fbx"
+				"Assets\Model\monkey_ascii.fbx"
 			]
 		},
 		"AssetsRenderTextureAdder": {
@@ -47,13 +47,13 @@
 			"spriteButtonFilePath": "System/add_mesh.png"
 		},
 		"ModelViewerLight": {
-			"lengthDirection": 5.000000,
 			"direction": [
-				-0.748539,
-				0.163582,
-				-0.610494,
-				-0.200568
+				0.965926,
+				-0.000002,
+				0.000001,
+				0.258817
 			],
+			"lengthDirection": 5.000000,
 			"color": [
 				1.000000,
 				0.999990,
@@ -66,8 +66,8 @@
 			]
 		},
 		"DrawString": {
-			"font": "System/font2.png",
-			"number": "System/number2.png"
+			"number": "System/number2.png",
+			"font": "System/font2.png"
 		}
 	}
 }

@@ -87,11 +87,11 @@ private:
     //UVインデックス配列
     std::vector<std::vector<unsigned short>> mUVIndices;
 
-    //key: GeometryオブジェクトのノードID, value: 添字
+    //key: GeometryオブジェクトのノードID, value: 添え字
     std::unordered_map<unsigned, unsigned short> mGeometryNodeIDMap;
     //lcl行列とノードIDのマップ
     std::unordered_map<unsigned, LclMatrix> mLclMatrixConnections;
-    //key: lclModelオブジェクトのノードID, value: 添字
+    //key: lclModelオブジェクトのノードID, value: 添え字
     std::unordered_map<unsigned, unsigned short> mLclModelNodeIDMap;
 
     //各軸のインデックス
