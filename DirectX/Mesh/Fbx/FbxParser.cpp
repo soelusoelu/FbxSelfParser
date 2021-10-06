@@ -37,7 +37,7 @@ void FbxParser::parse(
         mConnectionsMultimap.emplace(c.child, c.parent);
     }
 
-    mMeshParser = std::make_unique<FbxMesh>(objects, mConnectionsMultimap);
+    mMeshParser = std::make_unique<FbxMesh>(getObject("GlobalSettings"), objects, mConnectionsMultimap);
     mMaterialParser = std::make_unique<FbxMaterial>(objects, mConnectionsMultimap);
     mBoneParser = std::make_unique<FbxBone>(objects, *mMeshParser, mConnectionsMultimap);
     mAnimationParser = std::make_unique<FbxAnimation>(

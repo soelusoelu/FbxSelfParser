@@ -16,6 +16,7 @@ class FbxMesh {
 
 public:
     FbxMesh(
+        const FbxObject& globalSettingsObject,
         const FbxObject& objectsObject,
         const std::unordered_multimap<unsigned, unsigned>& connections
     );
@@ -33,8 +34,22 @@ public:
     const std::unordered_map<unsigned, unsigned short>& getLclModelNodeIDs() const;
 
 private:
+    //各軸の読み込みに必要な成分を読み込む
+    void parseAxis(
+        const FbxObject& globalSettingsObject
+    );
+    //各lcl行列を読み込む
+    void parseLclMatrices(
+        const FbxObject& objectsObject
+    );
+    //lcl行列を読み込む
     void parseLclMatrix(
         const FbxObject& lclModelObject
+    );
+    //Geometryオブジェクトを読み込む
+    void parseGeometry(
+        const FbxObject& objectsObject,
+        const std::unordered_multimap<unsigned, unsigned>& connections
     );
     //頂点を読み込む
     void parseVertices(
@@ -78,4 +93,13 @@ private:
     std::unordered_map<unsigned, LclMatrix> mLclMatrixConnections;
     //key: lclModelオブジェクトのノードID, value: 添字
     std::unordered_map<unsigned, unsigned short> mLclModelNodeIDMap;
+
+    //各軸のインデックス
+    int mCoordAxis;
+    int mUpAxis;
+    int mFrontAxis;
+    //各軸の向き
+    int mCoordAxisSign;
+    int mUpAxisSign;
+    int mFrontAxisSign;
 };

@@ -36,7 +36,7 @@
 			"textureSize": 64,
 			"textureDisplayInterval": 32,
 			"texturesFilePath": [
-				"Assets\Model\test_ascii.fbx"
+				"Assets\Model\monkey_rotate_ascii.fbx"
 			]
 		},
 		"AssetsRenderTextureAdder": {
@@ -49,10 +49,10 @@
 		"ModelViewerLight": {
 			"lengthDirection": 5.000000,
 			"direction": [
-				0.965927,
-				-0.000000,
-				0.000001,
-				0.258816
+				-0.748539,
+				0.163582,
+				-0.610494,
+				-0.200568
 			],
 			"color": [
 				1.000000,
