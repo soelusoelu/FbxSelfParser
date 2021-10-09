@@ -38,20 +38,22 @@ void JsonWriter::writeValues(JsonOutputStream& out, const JsonObject& inObject, 
     ++tabCount;
 
     const auto& values = inObject.values;
+    const auto& keys = inObject.keys;
+    assert(values.size() == keys.size());
     int num = values.size();
     //オブジェクトが保有している全要素を出力していく
-    for (const auto& value : values) {
+    for (const auto& key : keys) {
         writeTab(out, tabCount);
 
         //名前がない要素もある(オブジェクト配列など)ため、名前がある場合のみ出力
-        if (value.first.size() > 0) {
-            writeString(out, value.first);
+        if (key.length() > 0) {
+            writeString(out, key);
 
             writeColon(out);
         }
 
         //要素を出力する
-        const auto& v = *value.second;
+        const auto& v = *values.at(key);
         writeValue(out, v, tabCount);
 
         --num;

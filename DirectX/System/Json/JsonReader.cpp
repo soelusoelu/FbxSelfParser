@@ -61,6 +61,7 @@ void JsonReader::parseObject(JsonInputStream& in, JsonObject& value) const {
 
         auto v = std::make_shared<JsonValue>();
         value.values.emplace(name, v);
+        value.keys.emplace_back(name);
 
         skipSpaceAndComments(in);
 
