@@ -2,9 +2,9 @@
 	"globalProperties": {
 		"ShadowMap": {
 			"shadowTextureSize": 8192,
-			"nearClip": 10.000000,
-			"lightDistance": 290.000000,
-			"farClip": 300.000000
+			"nearClip": 10.0,
+			"lightDistance": 290.0,
+			"farClip": 300.0
 		},
 		"Window": {
 			"title": "ModelViewer",
@@ -14,7 +14,7 @@
 			"windowStandardHeight": 1080
 		},
 		"FPSCounter": {
-			"fps": 60.000000
+			"fps": 60.0
 		},
 		"Keyboard": {
 			"enterKey": "Space"
@@ -28,23 +28,23 @@
 		"DebugUtility": {},
 		"Log": {
 			"scale": [
-				0.312500,
-				0.312500
+				0.3125,
+				0.3125
 			]
 		},
 		"AssetsRenderTextureList": {
 			"textureSize": 64,
 			"textureDisplayInterval": 32,
 			"texturesFilePath": [
-				"Assets\Model\monkey_ascii.fbx"
+				"Assets\\Model\\Monkey_ascii.fbx"
 			]
 		},
 		"AssetsRenderTextureAdder": {
 			"renderPosition": [
-				0.000000,
-				1016.000000
+				0.0,
+				1016.0
 			],
-			"spriteButtonFilePath": "System/add_mesh.png"
+			"spriteButtonFilePath": "System\\add_mesh.png"
 		},
 		"ModelViewerLight": {
 			"direction": [
@@ -53,21 +53,21 @@
 				0.000001,
 				0.258817
 			],
-			"lengthDirection": 5.000000,
+			"lengthDirection": 5.0,
 			"color": [
-				1.000000,
-				0.999990,
-				0.999990
+				1.0,
+				0.99999,
+				0.99999
 			],
 			"directionDrawPosition": [
-				30.000000,
-				20.000000,
-				0.000000
+				30.0,
+				20.0,
+				0.0
 			]
 		},
 		"DrawString": {
-			"number": "System/number2.png",
-			"font": "System/font2.png"
+			"number": "System\\number2.png",
+			"font": "System\\font2.png"
 		}
 	}
 }

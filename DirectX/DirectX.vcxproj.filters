@@ -262,6 +262,7 @@
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXConverter.cpp" />
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXMeshConverter.cpp" />
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXAnimationConverter.cpp" />
+    <ClCompile Include="System\Json\JsonOutputStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -583,6 +584,7 @@
     <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXConverter.h" />
     <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXMeshConverter.h" />
     <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXAnimationConverter.h" />
+    <ClInclude Include="System\Json\JsonOutputStream.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />
