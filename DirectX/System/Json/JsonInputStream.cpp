@@ -1,8 +1,8 @@
-﻿#include "JsonStream.h"
+﻿#include "JsonInputStream.h"
 #include <fstream>
 #include <cassert>
 
-JsonStream::JsonStream(const char* filePath)
+JsonInputStream::JsonInputStream(const char* filePath)
     : mReadPos(0)
 {
     //バイナリモードで開き、末尾に移動
@@ -23,13 +23,13 @@ JsonStream::JsonStream(const char* filePath)
     file.read(mFileStr.data(), static_cast<size_t>(fileSize));
 }
 
-JsonStream::~JsonStream() = default;
+JsonInputStream::~JsonInputStream() = default;
 
-char JsonStream::peek() const {
+char JsonInputStream::peek() const {
     return mFileStr[mReadPos];
 }
 
-char JsonStream::take() {
+char JsonInputStream::take() {
     ++mReadPos;
     return mFileStr[mReadPos];
 }

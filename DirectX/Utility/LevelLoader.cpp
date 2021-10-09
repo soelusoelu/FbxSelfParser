@@ -6,9 +6,9 @@
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../GameObject/GameObject.h"
 #include "../System/Game.h"
+#include "../System/Json/JsonInputStream.h"
 #include "../System/Json/JsonObject.h"
 #include "../System/Json/JsonReader.h"
-#include "../System/Json/JsonStream.h"
 #include "../System/Json/JsonValue.h"
 #include "../System/Json/JsonWriter.h"
 #include <memory>
@@ -20,7 +20,7 @@ bool LevelLoader::loadJson(
 ) {
     const auto& filePath = directoryPath + filename;
 
-    auto stream = std::make_unique<JsonStream>(filePath.c_str());
+    auto stream = std::make_unique<JsonInputStream>(filePath.c_str());
     auto reader = std::make_unique<JsonReader>();
     reader->parse(*stream, rootObject);
 

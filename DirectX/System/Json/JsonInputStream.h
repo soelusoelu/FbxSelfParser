@@ -2,12 +2,12 @@
 
 #include <vector>
 
-class JsonStream {
+class JsonInputStream {
 public:
-    JsonStream(const char* filePath);
-    ~JsonStream();
-    JsonStream(const JsonStream&) = delete;
-    JsonStream& operator=(const JsonStream&) = delete;
+    JsonInputStream(const char* filePath);
+    ~JsonInputStream();
+    JsonInputStream(const JsonInputStream&) = delete;
+    JsonInputStream& operator=(const JsonInputStream&) = delete;
 
     //現在の読み取り位置の文字を返す
     char peek() const;

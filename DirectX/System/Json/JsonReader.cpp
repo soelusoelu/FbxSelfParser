@@ -1,6 +1,6 @@
 ﻿#include "JsonReader.h"
+#include "JsonInputStream.h"
 #include "JsonObject.h"
-#include "JsonStream.h"
 #include "JsonValue.h"
 #include <cassert>
 
@@ -8,7 +8,7 @@ JsonReader::JsonReader() = default;
 
 JsonReader::~JsonReader() = default;
 
-void JsonReader::parse(JsonStream& in, JsonObject& value) const {
+void JsonReader::parse(JsonInputStream& in, JsonObject& value) const {
     //中身の先頭までスキップ
     skipSpaceAndComments(in);
 
@@ -28,7 +28,7 @@ void JsonReader::parse(JsonStream& in, JsonObject& value) const {
     }
 }
 
-void JsonReader::parseValue(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseValue(JsonInputStream& in, JsonValue& value) const {
     char c = in.peek();
     if (c == 't') {
         parseTrue(in, value);
@@ -46,7 +46,7 @@ void JsonReader::parseValue(JsonStream& in, JsonValue& value) const {
     }
 }
 
-void JsonReader::parseObject(JsonStream& in, JsonObject& value) const {
+void JsonReader::parseObject(JsonInputStream& in, JsonObject& value) const {
     assert(in.peek() == '{');
     in.take(); //skip {
     skipSpaceAndComments(in);
@@ -81,7 +81,7 @@ void JsonReader::parseObject(JsonStream& in, JsonObject& value) const {
     }
 }
 
-void JsonReader::parseNumber(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseNumber(JsonInputStream& in, JsonValue& value) const {
     //文字列で取得してから数値に変換するための一時変数
     std::string num;
 
@@ -133,11 +133,11 @@ void JsonReader::parseNumber(JsonStream& in, JsonValue& value) const {
     value.setFloat(std::stof(num));
 }
 
-void JsonReader::parseString(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseString(JsonInputStream& in, JsonValue& value) const {
     value.setString(parseString(in));
 }
 
-std::string JsonReader::parseString(JsonStream& in) const {
+std::string JsonReader::parseString(JsonInputStream& in) const {
     assert(in.peek() == '"');
 
     std::string result;
@@ -152,7 +152,7 @@ std::string JsonReader::parseString(JsonStream& in) const {
     return result;
 }
 
-void JsonReader::parseTrue(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseTrue(JsonInputStream& in, JsonValue& value) const {
     assert(in.peek() == 't');
     in.take(); //skip t
 
@@ -163,7 +163,7 @@ void JsonReader::parseTrue(JsonStream& in, JsonValue& value) const {
     }
 }
 
-void JsonReader::parseFalse(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseFalse(JsonInputStream& in, JsonValue& value) const {
     assert(in.peek() == 'f');
     in.take(); //skip f
 
@@ -174,7 +174,7 @@ void JsonReader::parseFalse(JsonStream& in, JsonValue& value) const {
     }
 }
 
-void JsonReader::parseArray(JsonStream& in, JsonValue& value) const {
+void JsonReader::parseArray(JsonInputStream& in, JsonValue& value) const {
     assert(in.peek() == '[');
     in.take(); //skip [
     skipSpaceAndComments(in);
@@ -204,7 +204,7 @@ void JsonReader::parseArray(JsonStream& in, JsonValue& value) const {
     }
 }
 
-void JsonReader::skipSpaceAndComments(JsonStream& in) const {
+void JsonReader::skipSpaceAndComments(JsonInputStream& in) const {
     skipSpace(in);
 
     //スラッシュならコメント
@@ -238,7 +238,7 @@ void JsonReader::skipSpaceAndComments(JsonStream& in) const {
     }
 }
 
-void JsonReader::skipSpace(JsonStream& in) const {
+void JsonReader::skipSpace(JsonInputStream& in) const {
     //スペース、改行、リターン、タブをスキップする
     char c = in.peek();
     while (c == ' ' || c == '\n' || c == '\r' || c == '\t') {
@@ -246,7 +246,7 @@ void JsonReader::skipSpace(JsonStream& in) const {
     }
 }
 
-bool JsonReader::consume(JsonStream& in, char expect) const {
+bool JsonReader::consume(JsonInputStream& in, char expect) const {
     if (in.peek() == expect) {
         in.take();
         return true;
