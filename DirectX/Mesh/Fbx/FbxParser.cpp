@@ -7,6 +7,7 @@
 #include "Reader/FbxObject.h"
 #include "Reader/FbxReader.h"
 #include "Reader/FbxStream.h"
+#include "../OriginalFormat/OriginalFormatWriter.h"
 
 FbxParser::FbxParser()
     : mReader(std::make_unique<FbxReader>())
@@ -55,6 +56,9 @@ void FbxParser::parse(
     materials.resize(meshCount);
     mMaterialParser->parse(materials, filePath, mMeshParser->getLclModelNodeIDs());
     converter->convertBoneAnimation(bones, motions);
+
+    OriginalFormatWriter originalWriter;
+    //originalWriter.writeFbxToOriginal(filePath, *this);
 }
 
 const FbxObject& FbxParser::getRootObject() const {
@@ -63,4 +67,20 @@ const FbxObject& FbxParser::getRootObject() const {
 
 const FbxObject& FbxParser::getObject(const std::string& name) const {
     return mRootObject->getObject(name);
+}
+
+const FbxMesh& FbxParser::getMeshParser() const {
+    return *mMeshParser;
+}
+
+const FbxMaterial& FbxParser::getMaterialParser() const {
+    return *mMaterialParser;
+}
+
+const FbxBone& FbxParser::getBoneParser() const {
+    return *mBoneParser;
+}
+
+const FbxAnimation& FbxParser::getAnimationParser() const {
+    return *mAnimationParser;
 }

@@ -31,6 +31,10 @@ public:
 
     const FbxObject& getRootObject() const;
     const FbxObject& getObject(const std::string& name) const;
+    const FbxMesh& getMeshParser() const;
+    const FbxMaterial& getMaterialParser() const;
+    const FbxBone& getBoneParser() const;
+    const FbxAnimation& getAnimationParser() const;
 
 private:
     std::unique_ptr<FbxReader> mReader;

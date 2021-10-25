@@ -1,6 +1,7 @@
 ﻿#include "Mesh.h"
 #include "OBJ.h"
 #include "FBX/FBX.h"
+#include "OriginalFormat/OriginalFormatReader.h"
 #include "../Collision/Collision.h"
 #include "../DirectX/DirectXInclude.h"
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
@@ -150,6 +151,8 @@ void Mesh::createMesh(const std::string& filePath) {
         mMesh = std::make_unique<OBJ>();
     } else if (ext == ".fbx") {
         mMesh = std::make_unique<FBX>();
+    } else if (ext == ".tknmesh") {
+        mMesh = std::make_unique<OriginalFormatReader>();
     } else {
         Debug::windowMessage(filePath + ": 対応していない拡張子です");
         return;
