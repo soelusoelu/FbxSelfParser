@@ -2,21 +2,25 @@
 
 #include "../../IMeshLoader.h"
 #include "../../Bone.h"
+#include "../../Material.h"
 #include "../../Motion.h"
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 class FbxMesh;
+class FbxMaterial;
 class FbxBone;
 class FbxAnimation;
 class FbxToDirectXMeshConverter;
+class FbxToDirectXMaterialConverter;
 class FbxToDirectXAnimationConverter;
 
 class FbxToDirectXConverter {
 public:
     FbxToDirectXConverter(
         const FbxMesh& meshParser,
+        const FbxMaterial& materialParser,
         const FbxBone& boneParser,
         const FbxAnimation& animationParser,
         const std::unordered_multimap<unsigned, unsigned>& connections
@@ -31,6 +35,11 @@ public:
         std::vector<Indices>& meshesIndices
     ) const;
 
+    //マテリアルをDirectXで求められる形に変換する
+    void convertMaterials(
+        std::vector<Material>& materials
+    ) const;
+
     //アニメーション・ボーンをDirectXで求められる形に変換する
     void convertBoneAnimation(
         std::vector<Bone>& bones,
@@ -39,5 +48,6 @@ public:
 
 private:
     std::unique_ptr<FbxToDirectXMeshConverter> mMeshConverter;
+    std::unique_ptr<FbxToDirectXMaterialConverter> mMaterialConverter;
     std::unique_ptr<FbxToDirectXAnimationConverter> mAnimationConverter;
 };

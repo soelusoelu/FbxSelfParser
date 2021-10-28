@@ -9,6 +9,17 @@ void OriginalFormatToDirectXConverter::convert(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
+    std::vector<Material>& materials,
+    const JsonObject& rootObj
+) const {
+    convertMeshes(meshesVertices, meshesVerticesPosition, meshesIndices, rootObj);
+    convertMaterials(materials, rootObj);
+}
+
+void OriginalFormatToDirectXConverter::convertMeshes(
+    std::vector<MeshVertices>& meshesVertices,
+    std::vector<MeshVerticesPosition>& meshesVerticesPosition,
+    std::vector<Indices>& meshesIndices,
     const JsonObject& rootObj
 ) const {
     const auto& meshVal = rootObj.getValue("mesh");
@@ -62,4 +73,18 @@ void OriginalFormatToDirectXConverter::convertMesh(
         v.uv.x = srcUVs[idx2].getFloat();
         v.uv.x = srcUVs[idx2 + 1].getFloat();
     }
+}
+
+void OriginalFormatToDirectXConverter::convertMaterials(
+    std::vector<Material>& materials,
+    const JsonObject& rootObj
+) const {
+
+}
+
+void OriginalFormatToDirectXConverter::convertMaterial(
+    Material& material,
+    const JsonObject& matObj
+) const {
+
 }

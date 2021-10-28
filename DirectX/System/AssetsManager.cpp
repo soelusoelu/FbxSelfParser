@@ -53,6 +53,10 @@ const Texture& AssetsManager::getTextureFromID(int id) const {
     return *mTextures[id].texture;
 }
 
+const std::string& AssetsManager::getTextureFilePathFromID(int id) const {
+    return mTextures[id].filePath;
+}
+
 int AssetsManager::createShader(const std::string& filename, const std::string& directoryPath) {
     auto filePath = directoryPath + filename;
 

@@ -29,6 +29,8 @@ public:
     int addTexture(const std::shared_ptr<Texture>& texture);
     //IDからテクスチャを取得する
     const Texture& getTextureFromID(int id) const;
+    //IDからテクスチャのファイルパスを取得する
+    const std::string& getTextureFilePathFromID(int id) const;
 
     //ファイルパスからシェーダーを取得する
     int createShader(const std::string& filename, const std::string& directoryPath = AssetsDirectoryPath::SHADER_PATH);

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "../Material.h"
 #include "../../Math/Math.h"
 #include "../../System/Json/JsonObject.h"
 #include <string>
@@ -7,6 +8,7 @@
 
 class FbxParser;
 class FbxMesh;
+class FbxMaterial;
 
 class OriginalFormatWriter {
 public:
@@ -27,4 +29,7 @@ private:
         const std::vector<Vector2>& uvs,
         const std::vector<unsigned short>& uvIndices
     ) const;
+
+    void writeMaterials(JsonObject& out, const FbxMaterial& material) const;
+    void writeMaterial(JsonObject& out, const Material& material) const;
 };

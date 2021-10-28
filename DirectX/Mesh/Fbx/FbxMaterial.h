@@ -9,18 +9,19 @@
 class FbxMaterial {
 public:
     FbxMaterial(
+        const std::string& filePath,
         const FbxObject& objectsObject,
-        const std::unordered_multimap<unsigned, unsigned>& connections
+        const std::unordered_multimap<unsigned, unsigned>& connections,
+        const std::unordered_map<unsigned, unsigned short>& lclModelNodeIDMap
     );
     ~FbxMaterial();
     FbxMaterial(const FbxMaterial&) = delete;
     FbxMaterial& operator=(const FbxMaterial&) = delete;
 
-    void parse(
-        std::vector<Material>& materials,
-        const std::string& filePath,
-        const std::unordered_map<unsigned, unsigned short>& lclModelNodeIDMap
-    );
+    //マテリアル配列を取得する
+    const Material& getMaterial(unsigned index) const;
+    //マテリアル数を取得する
+    unsigned getMaterialCount() const;
 
 private:
     //マテリアルを読み込む
@@ -37,8 +38,6 @@ private:
     ) const;
 
 private:
-    const FbxObject& mObjectsObject;
-    const std::unordered_multimap<unsigned, unsigned>& mConnections;
-    //key: ノードID, value: マテリアルの添字
-    std::unordered_map<unsigned, unsigned> mMaterialMap;
+    //メッシュ順のマテリアル
+    std::vector<Material> mMaterials;
 };

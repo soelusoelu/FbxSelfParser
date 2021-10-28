@@ -23,7 +23,5 @@ void OriginalFormatReader::parse(
     reader.parse(stream, root);
 
     OriginalFormatToDirectXConverter converter;
-    converter.convert(meshesVertices, meshesVerticesPosition, meshesIndices, root);
-
-    materials.resize(1);
+    converter.convert(meshesVertices, meshesVerticesPosition, meshesIndices, materials, root);
 }

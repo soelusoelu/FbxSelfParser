@@ -266,6 +266,7 @@
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatWriter.cpp" />
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatReader.cpp" />
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.cpp" />
+    <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -592,6 +593,7 @@
     <ClInclude Include="Mesh\OriginalFormat\OriginalFormatReader.h" />
     <ClInclude Include="Mesh\VertexType.h" />
     <ClInclude Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.h" />
+    <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

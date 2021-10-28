@@ -6,27 +6,22 @@
 #include <string>
 
 FbxMaterial::FbxMaterial(
-    const FbxObject& objectsObject,
-    const std::unordered_multimap<unsigned, unsigned>& connections
-)
-    : mObjectsObject(objectsObject)
-    , mConnections(connections)
-{
-}
-
-FbxMaterial::~FbxMaterial() = default;
-
-void FbxMaterial::parse(
-    std::vector<Material>& materials,
     const std::string& filePath,
+    const FbxObject& objectsObject,
+    const std::unordered_multimap<unsigned, unsigned>& connections,
     const std::unordered_map<unsigned, unsigned short>& lclModelNodeIDMap
 ) {
-    const auto& children = mObjectsObject.children;
+    //key: マテリアルノードID, value: マテリアルの添字
+    std::unordered_map<unsigned, unsigned short> materialNodeMap;
+
+    mMaterials.resize(lclModelNodeIDMap.size());
+
+    const auto& children = objectsObject.children;
     auto matRange = children.equal_range("Material");
     for (auto& r = matRange.first; r != matRange.second; ++r) {
         const auto& obj = r->second;
         unsigned nodeID = obj.getNodeId();
-        auto range = mConnections.equal_range(nodeID);
+        auto range = connections.equal_range(nodeID);
         for (auto& r = range.first; r != range.second; ++r) {
             auto itr = lclModelNodeIDMap.find(r->second);
             if (itr == lclModelNodeIDMap.end()) {
@@ -34,8 +29,8 @@ void FbxMaterial::parse(
             }
 
             auto index = itr->second;
-            parseMaterial(materials[index], obj);
-            mMaterialMap.emplace(nodeID, index);
+            parseMaterial(mMaterials[index], obj);
+            materialNodeMap.emplace(nodeID, index);
         }
     }
 
@@ -43,16 +38,27 @@ void FbxMaterial::parse(
     for (auto& r = texRange.first; r != texRange.second; ++r) {
         const auto& obj = r->second;
         unsigned nodeID = obj.getNodeId();
-        auto range = mConnections.equal_range(nodeID);
+        auto range = connections.equal_range(nodeID);
         for (auto& r = range.first; r != range.second; ++r) {
-            auto itr = mMaterialMap.find(r->second);
-            if (itr == mMaterialMap.end()) {
+            auto itr = materialNodeMap.find(r->second);
+            if (itr == materialNodeMap.end()) {
                 continue;
             }
 
-            parseTexture(materials[itr->second], filePath, obj);
+            parseTexture(mMaterials[itr->second], filePath, obj);
         }
     }
+}
+
+FbxMaterial::~FbxMaterial() = default;
+
+const Material& FbxMaterial::getMaterial(unsigned index) const {
+    assert(index < getMaterialCount());
+    return mMaterials[index];
+}
+
+unsigned FbxMaterial::getMaterialCount() const {
+    return mMaterials.size();
 }
 
 void FbxMaterial::parseMaterial(

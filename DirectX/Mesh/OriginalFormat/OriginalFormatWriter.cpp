@@ -1,6 +1,8 @@
 ﻿#include "OriginalFormatWriter.h"
+#include "../Fbx/FbxMaterial.h"
 #include "../Fbx/FbxMesh.h"
 #include "../Fbx/FbxParser.h"
+#include "../../System/AssetsManager.h"
 #include "../../System/Json/JsonValue.h"
 #include "../../System/Json/JsonWriter.h"
 #include "../../Utility/FileUtil.h"
@@ -13,13 +15,18 @@ OriginalFormatWriter::~OriginalFormatWriter() = default;
 void OriginalFormatWriter::writeFbxToOriginal(const std::string& filePath, const FbxParser& fbx) const {
     assert(FileUtil::getFileExtension(filePath) == ".fbx");
 
-    JsonObject root;
-    writeMeshes(root, fbx.getMeshParser());
+    JsonObject meshRoot;
+    writeMeshes(meshRoot, fbx.getMeshParser());
+
+    JsonObject matRoot;
+    writeMaterials(matRoot, fbx.getMaterialParser());
 
     //jsonに書き込む
     JsonWriter writer;
-    auto path = filePath.substr(0, filePath.length() - 4) + ".tknmesh";
-    writer.write(path.c_str(), root);
+    auto path = filePath.substr(0, filePath.length() - 4);
+    writer.write((path + ".tknmesh").c_str(), meshRoot);
+
+    writer.write((path + ".tknmat").c_str(), matRoot);
 }
 
 void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh) const {
@@ -95,4 +102,72 @@ void OriginalFormatWriter::writeMesh(
     out.setValue("indices", indicesValue);
     out.setValue("normals", normalsValue);
     out.setValue("uvs", uvsValue);
+}
+
+void OriginalFormatWriter::writeMaterials(JsonObject& out, const FbxMaterial& material) const {
+    auto matValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
+    auto& matObj = matValue->getObject();
+
+    //マテリアル数をjsonオブジェクトに登録する
+    auto materialCount = material.getMaterialCount();
+    out.setValue("materialCount", static_cast<int>(materialCount));
+
+    auto materials = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    auto& a = materials->a;
+    a.resize(materialCount);
+
+    //全マテリアルを登録する
+    for (size_t i = 0; i < materialCount; ++i) {
+        a[i].setObject();
+        writeMaterial(a[i].getObject(), material.getMaterial(i));
+    }
+
+    out.setValue("materials", materials);
+}
+
+void OriginalFormatWriter::writeMaterial(JsonObject& out, const Material& material) const {
+    const auto& ambient = material.ambient;
+    auto ambientValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    ambientValue->pushBack(ambient.x);
+    ambientValue->pushBack(ambient.y);
+    ambientValue->pushBack(ambient.z);
+    out.setValue("ambient", ambientValue);
+
+    const auto& diffuse = material.diffuse;
+    auto diffuseValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    diffuseValue->pushBack(diffuse.x);
+    diffuseValue->pushBack(diffuse.y);
+    diffuseValue->pushBack(diffuse.z);
+    out.setValue("diffuse", diffuseValue);
+
+    const auto& specular = material.specular;
+    auto specularValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    specularValue->pushBack(specular.x);
+    specularValue->pushBack(specular.y);
+    specularValue->pushBack(specular.z);
+    out.setValue("specular", specularValue);
+
+    const auto& emissive = material.emissive;
+    auto emissiveValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    emissiveValue->pushBack(emissive.x);
+    emissiveValue->pushBack(emissive.y);
+    emissiveValue->pushBack(emissive.z);
+    out.setValue("emissive", emissiveValue);
+
+    const auto& bump = material.bump;
+    auto bumpValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    bumpValue->pushBack(bump.x);
+    bumpValue->pushBack(bump.y);
+    bumpValue->pushBack(bump.z);
+    out.setValue("bump", bumpValue);
+
+    out.setValue("transparency", material.transparency);
+    out.setValue("shininess", material.shininess);
+
+    auto texID = material.textureID;
+    if (texID != Material::INVALID_ID) {
+        const auto& filePath = AssetsManager::instance().getTextureFilePathFromID(texID);
+        auto filename = FileUtil::getFileNameFromDirectry(filePath);
+        out.setValue("texture", filename);
+    }
 }
