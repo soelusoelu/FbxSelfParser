@@ -25,7 +25,7 @@ void FbxParser::parse(
     const std::string& filePath,
     std::vector<MeshVertices>& meshesVertices,
     std::vector<Indices>& meshesIndices,
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     std::vector<Bone>& bones,
     std::vector<Motion>& motions
 ) {
@@ -59,8 +59,8 @@ void FbxParser::parse(
     );
     converter->convertVerticesAndIndices(meshesVertices, meshesIndices);
     auto meshCount = meshesVertices.size();
-    materials.resize(meshCount);
-    converter->convertMaterials(materials);
+    materialIDs.resize(meshCount);
+    converter->convertMaterials(materialIDs);
     converter->convertBoneAnimation(bones, motions);
 
     OriginalFormatWriter originalWriter;

@@ -14,7 +14,7 @@ void OBJ::parse(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>&meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     std::vector<Motion>& motions,
     std::vector<Bone>& bones
 ) {
@@ -32,7 +32,7 @@ void OBJ::parse(
     meshesVertices.resize(1);
     meshesVerticesPosition.resize(1);
     meshesIndices.resize(1);
-    materials.resize(1);
+    materialIDs.resize(1);
 
     //解析開始
     std::string line;
@@ -61,7 +61,7 @@ void OBJ::parse(
         } else if (key == "f") { //先頭文字列がfならポリゴン
             loadFace(meshesVertices.back(), meshesVerticesPosition.back(), meshesIndices.back(), lineStream);
         } else if (key == "mtllib") {
-            loadMaterial(materials.back(), lineStream, directoryPath);
+            loadMaterial(materialIDs.back(), lineStream, directoryPath);
         }
     }
 }
@@ -145,7 +145,7 @@ void OBJ::loadFace(
 }
 
 void OBJ::loadMaterial(
-    Material& material,
+    int& materialID,
     std::istringstream& iss,
     const std::string& directoryPath
 ) {
@@ -162,6 +162,8 @@ void OBJ::loadMaterial(
         Debug::windowMessage(filePath + ": ファイルが存在しません");
         return;
     }
+
+    Material material;
 
     //解析開始
     std::string line;
@@ -200,10 +202,12 @@ void OBJ::loadMaterial(
             loadTexture(material, lineStream, directoryPath);
         }
     }
+
+    materialID = AssetsManager::instance().createMaterial(material);
 }
 
 void OBJ::loadMaterialName(Material& material, std::istringstream& iss) {
-    //iss >> material.materialName;
+    iss >> material.name;
 }
 
 void OBJ::loadAmbient(Material& material, std::istringstream& iss) {

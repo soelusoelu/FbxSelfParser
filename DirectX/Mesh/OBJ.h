@@ -16,7 +16,7 @@ public:
         std::vector<MeshVertices>& meshesVertices,
         std::vector<MeshVerticesPosition>& meshesVerticesPosition,
         std::vector<Indices>& meshesIndices,
-        std::vector<Material>& materials,
+        std::vector<int>& materialIDs,
         std::vector<Motion>& motions,
         std::vector<Bone>& bones
     ) override;
@@ -35,7 +35,7 @@ private:
 
     //マテリアル関連
     void loadMaterial(
-        Material& material,
+        int& materialID,
         std::istringstream& iss,
         const std::string& directoryPath
     );

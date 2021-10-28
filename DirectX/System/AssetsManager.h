@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "AssetsDirectoryPath.h"
+#include "../Mesh/Material.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -32,10 +33,17 @@ public:
     //IDからテクスチャのファイルパスを取得する
     const std::string& getTextureFilePathFromID(int id) const;
 
-    //ファイルパスからシェーダーを取得する
+    //ファイルパスからシェーダーIDを取得する
     int createShader(const std::string& filename, const std::string& directoryPath = AssetsDirectoryPath::SHADER_PATH);
     //IDからシェーダーを取得する
     const Shader& getShaderFormID(int id) const;
+
+    //マテリアルからマテリアルIDを取得する
+    int createMaterial(const Material& material);
+    //マテリアルを変更する
+    void changeMaterial(int id, const Material& material);
+    //IDからマテリアルを取得する
+    const Material& getMaterialFormID(int id) const;
 
     //メッシュを読み込む
     void loadMesh(const std::string& fileName, const std::string& directoryPath = AssetsDirectoryPath::MODEL_PATH);
@@ -54,6 +62,8 @@ private:
     bool loadedTexture(const std::string& filePath, int* outID = nullptr) const;
     //読み込み済みのシェーダーか
     bool loadedShader(const std::string& filePath, int* outID = nullptr) const;
+    //読み込み済みのマテリアルか
+    bool loadedMaterial(const std::string& name, int* outID = nullptr) const;
     //読み込み済みのメッシュか
     bool loadedMesh(const std::string& filePath) const;
 
@@ -73,5 +83,6 @@ private:
 
     std::vector<TextureParam> mTextures;
     std::vector<ShaderParam> mShaders;
+    std::vector<Material> mMaterials;
     std::unordered_map<std::string, std::shared_ptr<Mesh>> mMeshes;
 };

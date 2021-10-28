@@ -17,7 +17,7 @@ void FBX::parse(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     std::vector<Motion>& motions,
     std::vector<Bone>& bones
 ) {
@@ -26,7 +26,7 @@ void FBX::parse(
 
     //解析開始
     FbxParser parser;
-    parser.parse(filePath, meshesVertices, meshesIndices, materials, bones, motions);
+    parser.parse(filePath, meshesVertices, meshesIndices, materialIDs, bones, motions);
 
     auto meshCount = meshesVertices.size();
     meshesVerticesPosition.resize(meshCount);

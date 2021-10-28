@@ -1,5 +1,6 @@
 ﻿#include "FbxToDirectXMaterialConverter.h"
 #include "../FbxMaterial.h"
+#include "../../../System/AssetsManager.h"
 
 FbxToDirectXMaterialConverter::FbxToDirectXMaterialConverter(
     const FbxMaterial& materialParser,
@@ -13,10 +14,10 @@ FbxToDirectXMaterialConverter::FbxToDirectXMaterialConverter(
 FbxToDirectXMaterialConverter::~FbxToDirectXMaterialConverter() = default;
 
 void FbxToDirectXMaterialConverter::convert(
-    std::vector<Material>& materials
+    std::vector<int>& materialIDs
 ) const {
     auto materialCount = mMaterialParser.getMaterialCount();
     for (size_t i = 0; i < materialCount; ++i) {
-        materials[i] = mMaterialParser.getMaterial(i);
+        materialIDs[i] = AssetsManager::instance().createMaterial(mMaterialParser.getMaterial(i));
     }
 }

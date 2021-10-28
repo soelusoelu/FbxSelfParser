@@ -13,7 +13,7 @@ void OriginalFormatReader::parse(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     std::vector<Motion>& motions,
     std::vector<Bone>& bones
 ) {
@@ -23,5 +23,5 @@ void OriginalFormatReader::parse(
     reader.parse(stream, root);
 
     OriginalFormatToDirectXConverter converter;
-    converter.convert(meshesVertices, meshesVerticesPosition, meshesIndices, materials, root);
+    converter.convert(meshesVertices, meshesVerticesPosition, meshesIndices, materialIDs, root);
 }

@@ -78,6 +78,28 @@ const Shader& AssetsManager::getShaderFormID(int id) const {
     return *mShaders[id].shader;
 }
 
+int AssetsManager::createMaterial(const Material& material) {
+    //読み込み済みなら何もしない
+    int id = -1;
+    if (loadedMaterial(material.name, &id)) {
+        return id;
+    }
+
+    //マテリアルを格納
+    id = mMaterials.size();
+    mMaterials.emplace_back(material);
+
+    return id;
+}
+
+void AssetsManager::changeMaterial(int id, const Material& material) {
+    mMaterials[id] = material;
+}
+
+const Material& AssetsManager::getMaterialFormID(int id) const {
+    return mMaterials[id];
+}
+
 void AssetsManager::loadMesh(const std::string& fileName, const std::string& directoryPath) {
     loadMeshFromFilePath(directoryPath + fileName);
 }
@@ -128,6 +150,20 @@ bool AssetsManager::loadedShader(const std::string& filePath, int* outID) const 
         if (s.filePath == filePath) {
             if (outID) {
                 *outID = s.id;
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool AssetsManager::loadedMaterial(const std::string& name, int* outID) const {
+    auto size = mMaterials.size();
+    for (size_t i = 0; i < size; ++i) {
+        if (mMaterials[i].name == name) {
+            if (outID) {
+                *outID = i;
             }
             return true;
         }

@@ -26,9 +26,9 @@ void FbxToDirectXConverter::convertVerticesAndIndices(
 }
 
 void FbxToDirectXConverter::convertMaterials(
-    std::vector<Material>& materials
+    std::vector<int>& materialIDs
 ) const {
-    mMaterialConverter->convert(materials);
+    mMaterialConverter->convert(materialIDs);
 }
 
 void FbxToDirectXConverter::convertBoneAnimation(

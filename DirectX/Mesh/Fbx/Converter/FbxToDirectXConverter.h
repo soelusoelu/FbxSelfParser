@@ -2,7 +2,6 @@
 
 #include "../../IMeshLoader.h"
 #include "../../Bone.h"
-#include "../../Material.h"
 #include "../../Motion.h"
 #include <memory>
 #include <unordered_map>
@@ -37,7 +36,7 @@ public:
 
     //マテリアルをDirectXで求められる形に変換する
     void convertMaterials(
-        std::vector<Material>& materials
+        std::vector<int>& materialIDs
     ) const;
 
     //アニメーション・ボーンをDirectXで求められる形に変換する

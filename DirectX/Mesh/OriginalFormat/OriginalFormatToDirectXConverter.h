@@ -15,7 +15,7 @@ public:
         std::vector<MeshVertices>& meshesVertices,
         std::vector<MeshVerticesPosition>& meshesVerticesPosition,
         std::vector<Indices>& meshesIndices,
-        std::vector<Material>& materials,
+        std::vector<int>& materialIDs,
         const JsonObject& rootObj
     ) const;
 
@@ -34,7 +34,7 @@ private:
     ) const;
 
     void convertMaterials(
-        std::vector<Material>& materials,
+        std::vector<int>& materialIDs,
         const JsonObject& rootObj
     ) const;
     void convertMaterial(

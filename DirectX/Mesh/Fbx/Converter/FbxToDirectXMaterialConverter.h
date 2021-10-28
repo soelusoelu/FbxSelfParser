@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "../../Material.h"
 #include <unordered_map>
 #include <vector>
 
@@ -17,7 +16,7 @@ public:
     FbxToDirectXMaterialConverter& operator=(const FbxToDirectXMaterialConverter&) = delete;
 
     void convert(
-        std::vector<Material>& materials
+        std::vector<int>& materialIDs
     ) const;
 
 private:

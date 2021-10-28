@@ -9,11 +9,11 @@ void OriginalFormatToDirectXConverter::convert(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     const JsonObject& rootObj
 ) const {
     convertMeshes(meshesVertices, meshesVerticesPosition, meshesIndices, rootObj);
-    convertMaterials(materials, rootObj);
+    convertMaterials(materialIDs, rootObj);
 }
 
 void OriginalFormatToDirectXConverter::convertMeshes(
@@ -76,7 +76,7 @@ void OriginalFormatToDirectXConverter::convertMesh(
 }
 
 void OriginalFormatToDirectXConverter::convertMaterials(
-    std::vector<Material>& materials,
+    std::vector<int>& materialIDs,
     const JsonObject& rootObj
 ) const {
 

@@ -18,13 +18,13 @@ Mesh::Mesh()
 Mesh::~Mesh() = default;
 
 void Mesh::setMaterial(const Material& material, unsigned index) {
-    assert(index < mMaterials.size());
-    mMaterials[index] = material;
+    assert(index < mMaterialIDs.size());
+    AssetsManager::instance().changeMaterial(mMaterialIDs[index], material);
 }
 
 const Material& Mesh::getMaterial(unsigned index) const {
-    assert(index < mMaterials.size());
-    return mMaterials[index];
+    assert(index < mMaterialIDs.size());
+    return AssetsManager::instance().getMaterialFormID(mMaterialIDs[index]);
 }
 
 unsigned Mesh::getMeshCount() const {
@@ -134,7 +134,7 @@ void Mesh::initialize(const std::string& filePath) {
 
     //それぞれは同じサイズのはず
     assert(mMeshesVertices.size() == mMeshesIndices.size());
-    assert(mMeshesVertices.size() == mMaterials.size());
+    assert(mMeshesVertices.size() == mMaterialIDs.size());
 
     //メッシュの数だけバッファを作る
     auto size = getMeshCount();
@@ -164,7 +164,7 @@ void Mesh::createMesh(const std::string& filePath) {
         mMeshesVertices,
         mMeshesVerticesPosition,
         mMeshesIndices,
-        mMaterials,
+        mMaterialIDs,
         mMotions,
         mBones
     );
@@ -172,15 +172,20 @@ void Mesh::createMesh(const std::string& filePath) {
     //メッシュ数分アクティブ化
     mMeshesActive.resize(getMeshCount(), true);
 
-    for (auto&& mat : mMaterials) {
+    for (const auto& id : mMaterialIDs) {
+        auto& mat = AssetsManager::instance().getMaterialFormID(id);
         //テクスチャがないマテリアルは白テクスチャを代替する
         if (mat.textureID == Material::INVALID_ID) {
-            mat.textureID = AssetsManager::instance().addTexture(std::make_shared<TextureFromMemory>(1, 1));
+            Material newMat = mat;
+            newMat.textureID = AssetsManager::instance().addTexture(std::make_shared<TextureFromMemory>(1, 1));
+            AssetsManager::instance().changeMaterial(id, newMat);
         }
 
         //透明値が0のときは1にする
         if (Math::nearZero(mat.transparency)) {
-            mat.transparency = 1.f;
+            Material newMat = mat;
+            newMat.transparency = 1.f;
+            AssetsManager::instance().changeMaterial(id, newMat);
         }
     }
 }

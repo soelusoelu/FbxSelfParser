@@ -14,6 +14,10 @@ FbxMaterial::FbxMaterial(
     //key: マテリアルノードID, value: マテリアルの添字
     std::unordered_map<unsigned, unsigned short> materialNodeMap;
 
+    //ファイルパスからファイル名を取得しておく
+    auto filename = FileUtil::getFileNameFromDirectry(filePath);
+    filename = filename.substr(0, filename.length() - 4);
+
     mMaterials.resize(lclModelNodeIDMap.size());
 
     const auto& children = objectsObject.children;
@@ -30,6 +34,7 @@ FbxMaterial::FbxMaterial(
 
             auto index = itr->second;
             parseMaterial(mMaterials[index], obj);
+            mMaterials[index].name = filename + std::to_string(index);
             materialNodeMap.emplace(nodeID, index);
         }
     }

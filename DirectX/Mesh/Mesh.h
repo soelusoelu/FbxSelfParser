@@ -82,7 +82,7 @@ private:
     std::vector<MeshVertices> mMeshesVertices;
     std::vector<MeshVerticesPosition> mMeshesVerticesPosition;
     std::vector<Indices> mMeshesIndices;
-    std::vector<Material> mMaterials;
+    std::vector<int> mMaterialIDs;
     std::vector<Motion> mMotions;
     std::vector<Bone> mBones;
     std::vector<std::unique_ptr<VertexBuffer>> mVertexBuffers;
