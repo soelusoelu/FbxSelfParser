@@ -36,14 +36,18 @@ public:
     //ファイルパスからシェーダーIDを取得する
     int createShader(const std::string& filename, const std::string& directoryPath = AssetsDirectoryPath::SHADER_PATH);
     //IDからシェーダーを取得する
-    const Shader& getShaderFormID(int id) const;
+    const Shader& getShaderFromID(int id) const;
 
     //マテリアルからマテリアルIDを取得する
     int createMaterial(const Material& material);
     //マテリアルを変更する
     void changeMaterial(int id, const Material& material);
     //IDからマテリアルを取得する
-    const Material& getMaterialFormID(int id) const;
+    const Material& getMaterialFromID(int id) const;
+    //マテリアル名からマテリアルを取得する
+    const Material* getMaterialFromName(const std::string& name) const;
+    //マテリアル名からマテリアルIDを取得する
+    int getMaterialIDFromName(const std::string& name) const;
 
     //メッシュを読み込む
     void loadMesh(const std::string& fileName, const std::string& directoryPath = AssetsDirectoryPath::MODEL_PATH);

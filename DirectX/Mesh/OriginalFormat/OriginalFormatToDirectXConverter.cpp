@@ -1,5 +1,6 @@
 ﻿#include "OriginalFormatToDirectXConverter.h"
 #include "../../System/Json/JsonValue.h"
+#include "../../System/AssetsManager.h"
 
 OriginalFormatToDirectXConverter::OriginalFormatToDirectXConverter() = default;
 
@@ -12,14 +13,14 @@ void OriginalFormatToDirectXConverter::convert(
     std::vector<int>& materialIDs,
     const JsonObject& rootObj
 ) const {
-    convertMeshes(meshesVertices, meshesVerticesPosition, meshesIndices, rootObj);
-    convertMaterials(materialIDs, rootObj);
+    convertMeshes(meshesVertices, meshesVerticesPosition, meshesIndices, materialIDs, rootObj);
 }
 
 void OriginalFormatToDirectXConverter::convertMeshes(
     std::vector<MeshVertices>& meshesVertices,
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
+    std::vector<int>& materialIDs,
     const JsonObject& rootObj
 ) const {
     const auto& meshVal = rootObj.getValue("mesh");
@@ -28,11 +29,12 @@ void OriginalFormatToDirectXConverter::convertMeshes(
     meshesVertices.resize(meshCount);
     meshesVerticesPosition.resize(meshCount);
     meshesIndices.resize(meshCount);
+    materialIDs.resize(meshCount);
 
     const auto& meshesVal = meshObj.getValue("meshes");
     const auto& meshesArray = meshesVal.getArray();
     for (int i = 0; i < meshCount; ++i) {
-        convertMesh(meshesVertices[i], meshesVerticesPosition[i], meshesIndices[i], meshesArray[i].getObject());
+        convertMesh(meshesVertices[i], meshesVerticesPosition[i], meshesIndices[i], materialIDs[i], meshesArray[i].getObject());
     }
 }
 
@@ -40,6 +42,7 @@ void OriginalFormatToDirectXConverter::convertMesh(
     MeshVertices& meshVertices,
     MeshVerticesPosition& meshVerticesPosition,
     Indices& meshIndices,
+    int& materialID,
     const JsonObject& meshObj
 ) const {
     int verticesCount = meshObj.getValue("verticesCount").getInt();
@@ -73,18 +76,14 @@ void OriginalFormatToDirectXConverter::convertMesh(
         v.uv.x = srcUVs[idx2].getFloat();
         v.uv.x = srcUVs[idx2 + 1].getFloat();
     }
-}
 
-void OriginalFormatToDirectXConverter::convertMaterials(
-    std::vector<int>& materialIDs,
-    const JsonObject& rootObj
-) const {
-
+    const auto& materialName = meshObj.getValue("material").getString();
+    convertMaterial(materialID, materialName);
 }
 
 void OriginalFormatToDirectXConverter::convertMaterial(
-    Material& material,
-    const JsonObject& matObj
+    int& materialID,
+    const std::string& materialName
 ) const {
-
+    materialID = AssetsManager::instance().getMaterialIDFromName(materialName);
 }

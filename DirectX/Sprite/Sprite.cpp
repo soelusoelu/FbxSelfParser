@@ -157,7 +157,7 @@ int Sprite::getTextureID() const {
 }
 
 const Shader& Sprite::shader() const {
-    return AssetsManager::instance().getShaderFormID(mShaderID);
+    return AssetsManager::instance().getShaderFromID(mShaderID);
 }
 
 int Sprite::getShaderID() const {

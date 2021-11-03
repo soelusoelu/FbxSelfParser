@@ -60,9 +60,9 @@ struct JsonValue {
     //文字列を格納する
     void setString(const std::string& value);
     //配列用要素に設定する
-    void setArray();
+    const std::vector<JsonValue>& setArray();
     //オブジェクト用要素に設定する
-    void setObject();
+    JsonObject& setObject();
 
     //配列の末尾に真偽値を追加する
     void pushBack(bool value);

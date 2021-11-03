@@ -6,7 +6,11 @@
 #include "../Mesh/Mesh.h"
 #include "../Utility/FileUtil.h"
 
-AssetsManager::AssetsManager() = default;
+AssetsManager::AssetsManager() {
+    Material material;
+    material.name = "default";
+    createMaterial(material);
+}
 
 AssetsManager::~AssetsManager() = default;
 
@@ -74,7 +78,7 @@ int AssetsManager::createShader(const std::string& filename, const std::string& 
     return id;
 }
 
-const Shader& AssetsManager::getShaderFormID(int id) const {
+const Shader& AssetsManager::getShaderFromID(int id) const {
     return *mShaders[id].shader;
 }
 
@@ -96,8 +100,19 @@ void AssetsManager::changeMaterial(int id, const Material& material) {
     mMaterials[id] = material;
 }
 
-const Material& AssetsManager::getMaterialFormID(int id) const {
+const Material& AssetsManager::getMaterialFromID(int id) const {
     return mMaterials[id];
+}
+
+const Material* AssetsManager::getMaterialFromName(const std::string& name) const {
+    int id = getMaterialIDFromName(name);
+    return (id == -1) ? nullptr : &getMaterialFromID(id);
+}
+
+int AssetsManager::getMaterialIDFromName(const std::string& name) const {
+    int id = -1;
+    loadedMaterial(name, &id);
+    return id;
 }
 
 void AssetsManager::loadMesh(const std::string& fileName, const std::string& directoryPath) {

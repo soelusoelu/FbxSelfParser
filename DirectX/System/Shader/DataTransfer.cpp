@@ -7,7 +7,7 @@ void DataTransfer::transferConstantBuffer(
     const void* data,
     unsigned constantBufferIndex
 ) {
-    const auto& shader = AssetsManager::instance().getShaderFormID(shaderID);
+    const auto& shader = AssetsManager::instance().getShaderFromID(shaderID);
     auto dc = MyDirectX::DirectX::instance().deviceContext();
 
     //定数バッファを設定する

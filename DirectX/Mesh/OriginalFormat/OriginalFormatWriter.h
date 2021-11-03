@@ -20,7 +20,7 @@ public:
     void writeFbxToOriginal(const std::string& filePath, const FbxParser& fbx) const;
 
 private:
-    void writeMeshes(JsonObject& out, const FbxMesh& mesh) const;
+    void writeMeshes(JsonObject& out, const FbxMesh& mesh, const FbxMaterial& material) const;
     void writeMesh(
         JsonObject& out,
         const std::vector<Vector3>& vertices,
@@ -30,6 +30,6 @@ private:
         const std::vector<unsigned short>& uvIndices
     ) const;
 
-    void writeMaterials(JsonObject& out, const FbxMaterial& material) const;
+    void writeMaterials(const std::string& filePath, const FbxMaterial& material) const;
     void writeMaterial(JsonObject& out, const Material& material) const;
 };

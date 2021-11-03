@@ -243,7 +243,7 @@ const Vector2& Sprite3D::getTextureAspect() const {
 }
 
 const Shader& Sprite3D::shader() const {
-    return AssetsManager::instance().getShaderFormID(mShaderID);
+    return AssetsManager::instance().getShaderFromID(mShaderID);
 }
 
 int Sprite3D::getShaderID() const {

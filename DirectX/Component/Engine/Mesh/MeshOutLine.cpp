@@ -131,7 +131,7 @@ void MeshOutLine::drawOutLine(const Matrix4& view, const Matrix4& projection) co
     OutLineConstantBuffer outlinecb;
     outlinecb.wvp = world * view * projection;
     outlinecb.outlineColor = Vector4(mOutLineColor, 1.f);
-    const auto& shader = AssetsManager::instance().getShaderFormID(mOutLineShaderID);
+    const auto& shader = AssetsManager::instance().getShaderFromID(mOutLineShaderID);
     DataTransfer::transferConstantBuffer(mOutLineShaderID, &outlinecb, 0);
 
     //アニメーションするならボーンのデータも渡す

@@ -25,7 +25,7 @@ MeshShader::~MeshShader() = default;
 
 void MeshShader::saveAndLoad(JsonObject& inObj, FileMode mode) {
     if (mode == FileMode::SAVE) {
-        JsonHelper::setString(AssetsManager::instance().getShaderFormID(mShaderID).getShaderName(), "shaderName", inObj);
+        JsonHelper::setString(AssetsManager::instance().getShaderFromID(mShaderID).getShaderName(), "shaderName", inObj);
     } else {
         //シェーダー名が取得できたら読み込む
         if (std::string shader; JsonHelper::getString(shader, "shaderName", inObj)) {
@@ -39,7 +39,7 @@ void MeshShader::saveAndLoad(JsonObject& inObj, FileMode mode) {
 }
 
 void MeshShader::drawInspector() {
-    ImGui::Text("Shader: %s", AssetsManager::instance().getShaderFormID(mShaderID).getShaderName().c_str());
+    ImGui::Text("Shader: %s", AssetsManager::instance().getShaderFromID(mShaderID).getShaderName().c_str());
 }
 
 void MeshShader::bindShader() const {

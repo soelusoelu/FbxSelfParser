@@ -25,7 +25,7 @@ struct Material {
         , transparency(1.f)
         , shininess(1.f)
         , textureID(INVALID_ID)
-        , name()
+        , name("default")
     {
     }
 };

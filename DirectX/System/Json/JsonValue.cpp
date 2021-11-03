@@ -114,15 +114,19 @@ void JsonValue::setString(const std::string& value) {
     f = JsonValueFlag::STRING;
 }
 
-void JsonValue::setArray() {
+const std::vector<JsonValue>& JsonValue::setArray() {
     f = JsonValueFlag::ARRAY;
+
+    return a;
 }
 
-void JsonValue::setObject() {
+JsonObject& JsonValue::setObject() {
     if (!o) {
         o = std::make_shared<JsonObject>();
     }
     f = JsonValueFlag::OBJECT;
+
+    return *o;
 }
 
 void JsonValue::pushBack(bool value) {

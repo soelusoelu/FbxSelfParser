@@ -24,7 +24,7 @@ void Mesh::setMaterial(const Material& material, unsigned index) {
 
 const Material& Mesh::getMaterial(unsigned index) const {
     assert(index < mMaterialIDs.size());
-    return AssetsManager::instance().getMaterialFormID(mMaterialIDs[index]);
+    return AssetsManager::instance().getMaterialFromID(mMaterialIDs[index]);
 }
 
 unsigned Mesh::getMeshCount() const {
@@ -173,7 +173,7 @@ void Mesh::createMesh(const std::string& filePath) {
     mMeshesActive.resize(getMeshCount(), true);
 
     for (const auto& id : mMaterialIDs) {
-        auto& mat = AssetsManager::instance().getMaterialFormID(id);
+        auto& mat = AssetsManager::instance().getMaterialFromID(id);
         //テクスチャがないマテリアルは白テクスチャを代替する
         if (mat.textureID == Material::INVALID_ID) {
             Material newMat = mat;

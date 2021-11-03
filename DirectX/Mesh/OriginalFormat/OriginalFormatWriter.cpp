@@ -7,6 +7,7 @@
 #include "../../System/Json/JsonWriter.h"
 #include "../../Utility/FileUtil.h"
 #include <cassert>
+#include <unordered_set>
 
 OriginalFormatWriter::OriginalFormatWriter() = default;
 
@@ -16,20 +17,17 @@ void OriginalFormatWriter::writeFbxToOriginal(const std::string& filePath, const
     assert(FileUtil::getFileExtension(filePath) == ".fbx");
 
     JsonObject meshRoot;
-    writeMeshes(meshRoot, fbx.getMeshParser());
+    writeMeshes(meshRoot, fbx.getMeshParser(), fbx.getMaterialParser());
 
-    JsonObject matRoot;
-    writeMaterials(matRoot, fbx.getMaterialParser());
+    writeMaterials(filePath, fbx.getMaterialParser());
 
     //jsonに書き込む
     JsonWriter writer;
     auto path = filePath.substr(0, filePath.length() - 4);
     writer.write((path + ".tknmesh").c_str(), meshRoot);
-
-    writer.write((path + ".tknmat").c_str(), matRoot);
 }
 
-void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh) const {
+void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh, const FbxMaterial& material) const {
     auto meshValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
     auto& meshObj = meshValue->getObject();
 
@@ -48,15 +46,24 @@ void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh) con
 
     //全メッシュを登録する
     for (int i = 0; i < meshCount; ++i) {
-        a[i].setObject();
+        auto& outObj = a[i].setObject();
+
         writeMesh(
-            a[i].getObject(),
+            outObj,
             mesh.getVertices(i),
             mesh.getIndices(i),
             mesh.getNormals(i),
             mesh.getUVs(i),
             mesh.getUVIndices(i)
         );
+
+        //メッシュに対応するマテリアル名を登録する
+        std::string materialName = "default";
+        const auto& tmpMatName = material.getMaterial(i).name;
+        if (tmpMatName.length() > 0) {
+            materialName = tmpMatName;
+        }
+        outObj.setValue("material", materialName);
     }
 
     meshObj.setValue("meshes", meshes);
@@ -104,25 +111,39 @@ void OriginalFormatWriter::writeMesh(
     out.setValue("uvs", uvsValue);
 }
 
-void OriginalFormatWriter::writeMaterials(JsonObject& out, const FbxMaterial& material) const {
-    auto matValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
-    auto& matObj = matValue->getObject();
+void OriginalFormatWriter::writeMaterials(const std::string& filePath, const FbxMaterial& material) const {
+    //ファイルパスからファイルを書き出す階層を取得する
+    auto directoryPath = FileUtil::getDirectryFromFilePath(filePath);
 
-    //マテリアル数をjsonオブジェクトに登録する
+    //マテリアル数
     auto materialCount = material.getMaterialCount();
-    out.setValue("materialCount", static_cast<int>(materialCount));
-
-    auto materials = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
-    auto& a = materials->a;
-    a.resize(materialCount);
 
     //全マテリアルを登録する
+    std::unordered_set<std::string> materialsName;
+    JsonWriter writer;
     for (size_t i = 0; i < materialCount; ++i) {
-        a[i].setObject();
-        writeMaterial(a[i].getObject(), material.getMaterial(i));
-    }
+        const auto& m = material.getMaterial(i);
+        const auto& name = m.name;
 
-    out.setValue("materials", materials);
+        //nameがないならデフォルトマテリアルなので次へ
+        if (name.empty()) {
+            continue;
+        }
+        //すでに書き出し済みなら次へ
+        if (materialsName.find(name) != materialsName.end()) {
+            continue;
+        }
+
+        //マテリアル名を登録
+        materialsName.emplace(name);
+
+        //Jsonオブジェクトにマテリアル情報を登録する
+        JsonObject root;
+        writeMaterial(root, m);
+
+        //ディレクトリパス + マテリアル名で書き出し
+        writer.write((directoryPath + name + ".tknmat").c_str(), root);
+    }
 }
 
 void OriginalFormatWriter::writeMaterial(JsonObject& out, const Material& material) const {

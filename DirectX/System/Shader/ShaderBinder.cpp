@@ -9,7 +9,7 @@ void ShaderBinder::bind(int id) {
         mPreviousShaderID = id;
 
         //IDからシェーダーを取得
-        const auto& s = AssetsManager::instance().getShaderFormID(id);
+        const auto& s = AssetsManager::instance().getShaderFromID(id);
 
         //シェーダーバインド
         auto dc = MyDirectX::DirectX::instance().deviceContext();
