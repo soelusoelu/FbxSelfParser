@@ -64,7 +64,7 @@ void FbxParser::parse(
     converter->convertBoneAnimation(bones, motions);
 
     OriginalFormatWriter originalWriter;
-    originalWriter.writeFbxToOriginal(filePath, *this);
+    originalWriter.writeFbxToOriginal(filePath, meshesVertices, meshesIndices, materialIDs, bones);
 }
 
 const FbxObject& FbxParser::getRootObject() const {

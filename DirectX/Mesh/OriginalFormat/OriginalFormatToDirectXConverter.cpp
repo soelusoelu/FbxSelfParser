@@ -1,6 +1,9 @@
 ﻿#include "OriginalFormatToDirectXConverter.h"
+#include "../../System/Json/JsonInputStream.h"
+#include "../../System/Json/JsonReader.h"
 #include "../../System/Json/JsonValue.h"
 #include "../../System/AssetsManager.h"
+#include "../../Utility/FileUtil.h"
 
 OriginalFormatToDirectXConverter::OriginalFormatToDirectXConverter() = default;
 
@@ -11,9 +14,20 @@ void OriginalFormatToDirectXConverter::convert(
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
     std::vector<int>& materialIDs,
+    std::vector<Bone>& bones,
+    const std::string & filePath,
     const JsonObject& rootObj
 ) const {
-    convertMeshes(meshesVertices, meshesVerticesPosition, meshesIndices, materialIDs, rootObj);
+    auto directoryPath = FileUtil::getDirectryFromFilePath(filePath);
+    convertMeshes(
+        meshesVertices,
+        meshesVerticesPosition,
+        meshesIndices,
+        materialIDs,
+        directoryPath,
+        rootObj
+    );
+    convertBones(bones, rootObj);
 }
 
 void OriginalFormatToDirectXConverter::convertMeshes(
@@ -21,20 +35,31 @@ void OriginalFormatToDirectXConverter::convertMeshes(
     std::vector<MeshVerticesPosition>& meshesVerticesPosition,
     std::vector<Indices>& meshesIndices,
     std::vector<int>& materialIDs,
+    const std::string& directoryPath,
     const JsonObject& rootObj
 ) const {
-    const auto& meshVal = rootObj.getValue("mesh");
-    const auto& meshObj = meshVal.getObject();
+    const auto& meshObj = rootObj.getValue("mesh").getObject();
+    //頂点タイプ
+    int vertexTypeInt = meshObj.getValue("vertexType").getInt();
+    auto vertexType = static_cast<VertexType>(vertexTypeInt);
+    //メッシュ数
     int meshCount = meshObj.getValue("meshCount").getInt();
     meshesVertices.resize(meshCount);
     meshesVerticesPosition.resize(meshCount);
     meshesIndices.resize(meshCount);
     materialIDs.resize(meshCount);
 
-    const auto& meshesVal = meshObj.getValue("meshes");
-    const auto& meshesArray = meshesVal.getArray();
+    const auto& meshesArray = meshObj.getValue("meshes").getArray();
     for (int i = 0; i < meshCount; ++i) {
-        convertMesh(meshesVertices[i], meshesVerticesPosition[i], meshesIndices[i], materialIDs[i], meshesArray[i].getObject());
+        convertMesh(
+            meshesVertices[i],
+            meshesVerticesPosition[i],
+            meshesIndices[i],
+            materialIDs[i],
+            directoryPath,
+            meshesArray[i].getObject(),
+            vertexType
+        );
     }
 }
 
@@ -43,7 +68,9 @@ void OriginalFormatToDirectXConverter::convertMesh(
     MeshVerticesPosition& meshVerticesPosition,
     Indices& meshIndices,
     int& materialID,
-    const JsonObject& meshObj
+    const std::string& directoryPath,
+    const JsonObject& meshObj,
+    VertexType vertexType
 ) const {
     int verticesCount = meshObj.getValue("verticesCount").getInt();
     meshVertices.resize(verticesCount);
@@ -77,13 +104,144 @@ void OriginalFormatToDirectXConverter::convertMesh(
         v.uv.x = srcUVs[idx2 + 1].getFloat();
     }
 
+    //頂点タイプがウェイトなら追加読み込み
+    if (vertexType == VertexType::POS_NORM_UV_WEIGHT) {
+        convertWeights(meshVertices, meshObj);
+    }
+
     const auto& materialName = meshObj.getValue("material").getString();
-    convertMaterial(materialID, materialName);
+    convertMaterial(materialID, directoryPath, materialName);
+}
+
+void OriginalFormatToDirectXConverter::convertWeights(
+    MeshVertices& meshVertices,
+    const JsonObject& meshObj
+) const {
+    int verticesCount = static_cast<int>(meshVertices.size());
+    const auto& srcWeights = meshObj.getValue("weights").getArray();
+    const auto& srcWeightIndexes = meshObj.getValue("weightIndexes").getArray();
+
+    for (int i = 0; i < verticesCount; ++i) {
+        auto idx = i * 4;
+
+        auto& v = meshVertices[i];
+        v.weight[0] = srcWeights[idx].getFloat();
+        v.weight[1] = srcWeights[idx + 1].getFloat();
+        v.weight[2] = srcWeights[idx + 2].getFloat();
+        v.weight[3] = srcWeights[idx + 3].getFloat();
+
+        v.index[0] = srcWeightIndexes[idx].getInt();
+        v.index[1] = srcWeightIndexes[idx + 1].getInt();
+        v.index[2] = srcWeightIndexes[idx + 2].getInt();
+        v.index[3] = srcWeightIndexes[idx + 3].getInt();
+    }
 }
 
 void OriginalFormatToDirectXConverter::convertMaterial(
     int& materialID,
+    const std::string& directoryPath,
     const std::string& materialName
 ) const {
+    //既にマテリアルが読み込まれていればIDを取得して終了
     materialID = AssetsManager::instance().getMaterialIDFromName(materialName);
+    if (materialID >= 0) {
+        return;
+    }
+
+    //まだ読み込まれていなければ新たに読み込む
+    JsonInputStream stream((directoryPath + materialName + ".tknmat").c_str());
+    JsonReader reader;
+    JsonObject root;
+    reader.parse(stream, root);
+
+    Material material;
+    material.name = materialName;
+
+    const auto& ambientArray = root.getValue("ambient").getArray();
+    auto& ambient = material.ambient;
+    ambient.x = ambientArray[0].getFloat();
+    ambient.y = ambientArray[1].getFloat();
+    ambient.z = ambientArray[2].getFloat();
+
+    const auto& diffuseArray = root.getValue("diffuse").getArray();
+    auto& diffuse = material.diffuse;
+    diffuse.x = diffuseArray[0].getFloat();
+    diffuse.y = diffuseArray[1].getFloat();
+    diffuse.z = diffuseArray[2].getFloat();
+
+    const auto& specularArray = root.getValue("specular").getArray();
+    auto& specular = material.specular;
+    specular.x = specularArray[0].getFloat();
+    specular.y = specularArray[1].getFloat();
+    specular.z = specularArray[2].getFloat();
+
+    const auto& emissiveArray = root.getValue("emissive").getArray();
+    auto& emissive = material.emissive;
+    emissive.x = emissiveArray[0].getFloat();
+    emissive.y = emissiveArray[1].getFloat();
+    emissive.z = emissiveArray[2].getFloat();
+
+    const auto& bumpArray = root.getValue("bump").getArray();
+    auto& bump = material.bump;
+    bump.x = bumpArray[0].getFloat();
+    bump.y = bumpArray[1].getFloat();
+    bump.z = bumpArray[2].getFloat();
+
+    material.transparency = root.getValue("transparency").getFloat();
+
+    material.shininess = root.getValue("shininess").getFloat();
+
+    materialID = AssetsManager::instance().createMaterial(material);
+}
+
+void OriginalFormatToDirectXConverter::convertBones(
+    std::vector<Bone>& bones,
+    const JsonObject& rootObj
+) const {
+    //boneオブジェクトがなければ終了
+    if (rootObj.values.find("bone") == rootObj.values.end()) {
+        return;
+    }
+
+    const auto& boneObj = rootObj.getValue("bone").getObject();
+    //ボーン数
+    int boneCount = boneObj.getValue("boneCount").getInt();
+    bones.resize(boneCount);
+
+    const auto& bonesArray = boneObj.getValue("bones").getArray();
+
+    //全ボーンを読み込む
+    for (int i = 0; i < boneCount; ++i) {
+        convertBone(bones[i], bones, bonesArray[i].getObject());
+    }
+}
+
+void OriginalFormatToDirectXConverter::convertBone(
+    Bone& bone,
+    std::vector<Bone>& bones,
+    const JsonObject& boneObj
+) const {
+    bone.name = boneObj.getValue("name").getString();
+    bone.number = boneObj.getValue("index").getInt();
+
+    int parentIndex = boneObj.getValue("parent").getInt();
+    if (parentIndex >= 0) {
+        auto& parent = bones[parentIndex];
+        bone.parent = &parent;
+        parent.children.emplace_back(&bone);
+    }
+
+    const auto& initMatrix = boneObj.getValue("initMatrix").getArray();
+    for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+        for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+            bone.initMat.m[y][x] = initMatrix[y * Matrix4::COLUMN_COUNT + x].getFloat();
+        }
+    }
+
+    const auto& offsetMatrix = boneObj.getValue("offsetMatrix").getArray();
+    for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+        for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+            bone.offsetMat.m[y][x] = offsetMatrix[y * Matrix4::COLUMN_COUNT + x].getFloat();
+        }
+    }
 }

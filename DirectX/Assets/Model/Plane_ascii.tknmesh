@@ -1,5 +1,6 @@
 {
 	"mesh": {
+		"vertexType": 0,
 		"meshCount": 1,
 		"meshes": [
 			{

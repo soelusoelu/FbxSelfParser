@@ -23,5 +23,13 @@ void OriginalFormatReader::parse(
     reader.parse(stream, root);
 
     OriginalFormatToDirectXConverter converter;
-    converter.convert(meshesVertices, meshesVerticesPosition, meshesIndices, materialIDs, root);
+    converter.convert(
+        meshesVertices,
+        meshesVerticesPosition,
+        meshesIndices,
+        materialIDs,
+        bones,
+        filePath,
+        root
+    );
 }

@@ -1,7 +1,11 @@
 ﻿#include "OriginalFormatWriter.h"
+#include "../BoneHelper.h"
+#include "../VertexType.h"
+#include "../Fbx/FbxBone.h"
 #include "../Fbx/FbxMaterial.h"
 #include "../Fbx/FbxMesh.h"
 #include "../Fbx/FbxParser.h"
+#include "../Fbx/FbxWeight.h"
 #include "../../System/AssetsManager.h"
 #include "../../System/Json/JsonValue.h"
 #include "../../System/Json/JsonWriter.h"
@@ -13,13 +17,23 @@ OriginalFormatWriter::OriginalFormatWriter() = default;
 
 OriginalFormatWriter::~OriginalFormatWriter() = default;
 
-void OriginalFormatWriter::writeFbxToOriginal(const std::string& filePath, const FbxParser& fbx) const {
+void OriginalFormatWriter::writeFbxToOriginal(
+    const std::string& filePath,
+    const std::vector<MeshVertices>& meshesVertices,
+    const std::vector<Indices>& meshesIndices,
+    const std::vector<int>& materialIDs,
+    const std::vector<Bone>& bones
+) const {
     assert(FileUtil::getFileExtension(filePath) == ".fbx");
 
     JsonObject meshRoot;
-    writeMeshes(meshRoot, fbx.getMeshParser(), fbx.getMaterialParser());
+    bool hasBone = (bones.size() > 0);
+    writeMeshes(meshRoot, meshesVertices, meshesIndices, materialIDs, hasBone);
+    if (hasBone) {
+        writeBones(meshRoot, bones);
+    }
 
-    writeMaterials(filePath, fbx.getMaterialParser());
+    writeMaterials(filePath, materialIDs);
 
     //jsonに書き込む
     JsonWriter writer;
@@ -27,17 +41,25 @@ void OriginalFormatWriter::writeFbxToOriginal(const std::string& filePath, const
     writer.write((path + ".tknmesh").c_str(), meshRoot);
 }
 
-void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh, const FbxMaterial& material) const {
+void OriginalFormatWriter::writeMeshes(
+    JsonObject& out,
+    const std::vector<MeshVertices>& meshesVertices,
+    const std::vector<Indices>& meshesIndices,
+    const std::vector<int>& materialIDs,
+    bool hasBone
+) const {
     auto meshValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
     auto& meshObj = meshValue->getObject();
 
-    //if (mesh.) {
-
-    //}
-    //out.setValue("vertexType", )
+    //頂点タイプを登録する
+    auto vertexType = VertexType::POS_NORM_UV;
+    if (hasBone) {
+        vertexType = VertexType::POS_NORM_UV_WEIGHT;
+    }
+    meshObj.setValue("vertexType", static_cast<int>(vertexType));
 
     //メッシュ数をjsonオブジェクトに登録する
-    auto meshCount = mesh.getMeshCount();
+    auto meshCount = static_cast<int>(meshesVertices.size());
     meshObj.setValue("meshCount", meshCount);
 
     auto meshes = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
@@ -48,18 +70,12 @@ void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh, con
     for (int i = 0; i < meshCount; ++i) {
         auto& outObj = a[i].setObject();
 
-        writeMesh(
-            outObj,
-            mesh.getVertices(i),
-            mesh.getIndices(i),
-            mesh.getNormals(i),
-            mesh.getUVs(i),
-            mesh.getUVIndices(i)
-        );
+        writeMesh(outObj, meshesVertices[i], meshesIndices[i], hasBone);
 
         //メッシュに対応するマテリアル名を登録する
         std::string materialName = "default";
-        const auto& tmpMatName = material.getMaterial(i).name;
+        const auto& tmpMat = AssetsManager::instance().getMaterialFromID(materialIDs[i]);
+        const auto& tmpMatName = tmpMat.name;
         if (tmpMatName.length() > 0) {
             materialName = tmpMatName;
         }
@@ -73,34 +89,36 @@ void OriginalFormatWriter::writeMeshes(JsonObject& out, const FbxMesh& mesh, con
 
 void OriginalFormatWriter::writeMesh(
     JsonObject& out,
-    const std::vector<Vector3>& vertices,
-    const std::vector<unsigned short>& indices,
-    const std::vector<Vector3>& normals,
-    const std::vector<Vector2>& uvs,
-    const std::vector<unsigned short>& uvIndices
+    const MeshVertices& meshVertices,
+    const Indices& meshIndices,
+    bool hasBone
 ) const {
-    auto indicesCount = static_cast<int>(indices.size());
-    out.setValue("verticesCount", indicesCount);
+    //頂点数を登録する
+    auto verticesCount = static_cast<int>(meshVertices.size());
+    out.setValue("verticesCount", verticesCount);
 
+    //登録する各種配列
     auto verticesValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
     auto indicesValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
     auto normalsValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
     auto uvsValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
 
-    for (int i = 0; i < indicesCount; ++i) {
-        const auto& v = vertices[indices[i]];
-        verticesValue->pushBack(v.x);
-        verticesValue->pushBack(v.y);
-        verticesValue->pushBack(v.z);
+    for (int i = 0; i < verticesCount; ++i) {
+        const auto& v = meshVertices[i];
 
-        indicesValue->pushBack(i);
+        const auto& p = v.pos;
+        verticesValue->pushBack(p.x);
+        verticesValue->pushBack(p.y);
+        verticesValue->pushBack(p.z);
 
-        const auto& n = normals[i];
+        indicesValue->pushBack(static_cast<int>(meshIndices[i]));
+
+        const auto& n = v.normal;
         normalsValue->pushBack(n.x);
         normalsValue->pushBack(n.y);
         normalsValue->pushBack(n.z);
 
-        const auto& uv = uvs[uvIndices[i]];
+        const auto& uv = v.uv;
         uvsValue->pushBack(uv.x);
         uvsValue->pushBack(uv.y);
     }
@@ -109,33 +127,129 @@ void OriginalFormatWriter::writeMesh(
     out.setValue("indices", indicesValue);
     out.setValue("normals", normalsValue);
     out.setValue("uvs", uvsValue);
+
+    //ボーンが有るならウェイトを追加登録
+    if (hasBone) {
+        writeWeights(out, meshVertices);
+    }
 }
 
-void OriginalFormatWriter::writeMaterials(const std::string& filePath, const FbxMaterial& material) const {
+void OriginalFormatWriter::writeWeights(
+    JsonObject& out,
+    const MeshVertices& meshVertices
+) const {
+    auto weightsValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    auto weightsIndexValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+
+    for (const auto& v : meshVertices) {
+        const auto& w = v.weight;
+        weightsValue->pushBack(w[0]);
+        weightsValue->pushBack(w[1]);
+        weightsValue->pushBack(w[2]);
+        weightsValue->pushBack(w[3]);
+
+        const auto& idx = v.index;
+        weightsIndexValue->pushBack(idx[0]);
+        weightsIndexValue->pushBack(idx[1]);
+        weightsIndexValue->pushBack(idx[2]);
+        weightsIndexValue->pushBack(idx[3]);
+    }
+
+    out.setValue("weights", weightsValue);
+    out.setValue("weightIndexes", weightsIndexValue);
+}
+
+void OriginalFormatWriter::writeBones(
+    JsonObject& out,
+    const std::vector<Bone>& bones
+) const {
+    auto boneValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
+    auto& boneObj = boneValue->getObject();
+
+    //ボーン数をjsonオブジェクトに登録する
+    auto boneCount = static_cast<int>(bones.size());
+    boneObj.setValue("boneCount", boneCount);
+
+    auto outBones = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    auto& a = outBones->a;
+    a.reserve(boneCount);
+
+    //ルートボーンから全ボーンを再帰的に登録する
+    const auto root = BoneHelper::findRootBone(bones);
+    writeBone(a, *root);
+
+    boneObj.setValue("bones", outBones);
+
+    out.setValue("bone", boneValue);
+}
+
+void OriginalFormatWriter::writeBone(
+    std::vector<JsonValue>& out,
+    const Bone& bone
+) const {
+    auto& outObj = out.emplace_back().setObject();
+
+    outObj.setValue("name", bone.name);
+    outObj.setValue("index", bone.number);
+    int parentID = -1;
+    if (bone.parent) {
+        parentID = bone.parent->number;
+    }
+    outObj.setValue("parent", parentID);
+
+    auto initMatrixValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    const auto& initMat = bone.initMat.m;
+    for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+        for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+            initMatrixValue->pushBack(initMat[y][x]);
+        }
+    }
+    outObj.setValue("initMatrix", initMatrixValue);
+
+    auto offsetMatrixValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    const auto& offsetMat = bone.offsetMat.m;
+    for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+        for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+            offsetMatrixValue->pushBack(offsetMat[y][x]);
+        }
+    }
+    outObj.setValue("offsetMatrix", offsetMatrixValue);
+
+    //ボーンの子を再帰的に呼び出す
+    for (const auto& child : bone.children) {
+        writeBone(out, *child);
+    }
+}
+
+void OriginalFormatWriter::writeMaterials(
+    const std::string& filePath,
+    const std::vector<int>& materialIDs
+) const {
     //ファイルパスからファイルを書き出す階層を取得する
     auto directoryPath = FileUtil::getDirectryFromFilePath(filePath);
 
     //マテリアル数
-    auto materialCount = material.getMaterialCount();
+    auto materialCount = static_cast<int>(materialIDs.size());
 
     //全マテリアルを登録する
-    std::unordered_set<std::string> materialsName;
+    std::unordered_set<int> writenMaterialIDs;
     JsonWriter writer;
     for (size_t i = 0; i < materialCount; ++i) {
-        const auto& m = material.getMaterial(i);
+        int id = materialIDs[i];
+        const auto& m = AssetsManager::instance().getMaterialFromID(id);
         const auto& name = m.name;
 
-        //nameがないならデフォルトマテリアルなので次へ
-        if (name.empty()) {
+        //デフォルトマテリアルなら次へ
+        if (name.empty() || name == "default") {
             continue;
         }
         //すでに書き出し済みなら次へ
-        if (materialsName.find(name) != materialsName.end()) {
+        if (writenMaterialIDs.find(id) != writenMaterialIDs.end()) {
             continue;
         }
 
-        //マテリアル名を登録
-        materialsName.emplace(name);
+        //マテリアルIDを登録
+        writenMaterialIDs.emplace(id);
 
         //Jsonオブジェクトにマテリアル情報を登録する
         JsonObject root;
@@ -146,7 +260,10 @@ void OriginalFormatWriter::writeMaterials(const std::string& filePath, const Fbx
     }
 }
 
-void OriginalFormatWriter::writeMaterial(JsonObject& out, const Material& material) const {
+void OriginalFormatWriter::writeMaterial(
+    JsonObject& out,
+    const Material& material
+) const {
     const auto& ambient = material.ambient;
     auto ambientValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
     ambientValue->pushBack(ambient.x);

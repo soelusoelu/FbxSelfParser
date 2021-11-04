@@ -267,6 +267,7 @@
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatReader.cpp" />
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.cpp" />
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.cpp" />
+    <ClCompile Include="Mesh\BoneHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -594,6 +595,7 @@
     <ClInclude Include="Mesh\VertexType.h" />
     <ClInclude Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.h" />
     <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.h" />
+    <ClInclude Include="Mesh\BoneHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />
