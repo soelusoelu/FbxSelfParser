@@ -19,6 +19,7 @@ public:
         std::vector<Indices>& meshesIndices,
         std::vector<int>& materialIDs,
         std::vector<Bone>& bones,
+        std::vector<Motion>& motions,
         const std::string& filePath,
         const JsonObject& rootObj
     ) const;
@@ -60,5 +61,14 @@ private:
         Bone& bone,
         std::vector<Bone>& bones,
         const JsonObject& boneObj
+    ) const;
+
+    void convertAnimations(
+        std::vector<Motion>& motions,
+        const JsonObject& rootObj
+    ) const;
+    void convertAnimation(
+        Motion& motion,
+        const JsonObject& animationObj
     ) const;
 };

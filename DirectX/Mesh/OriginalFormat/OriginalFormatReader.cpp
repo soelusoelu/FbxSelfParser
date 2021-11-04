@@ -29,6 +29,7 @@ void OriginalFormatReader::parse(
         meshesIndices,
         materialIDs,
         bones,
+        motions,
         filePath,
         root
     );

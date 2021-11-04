@@ -22,7 +22,8 @@ void OriginalFormatWriter::writeFbxToOriginal(
     const std::vector<MeshVertices>& meshesVertices,
     const std::vector<Indices>& meshesIndices,
     const std::vector<int>& materialIDs,
-    const std::vector<Bone>& bones
+    const std::vector<Bone>& bones,
+    const std::vector<Motion>& motions
 ) const {
     assert(FileUtil::getFileExtension(filePath) == ".fbx");
 
@@ -31,6 +32,9 @@ void OriginalFormatWriter::writeFbxToOriginal(
     writeMeshes(meshRoot, meshesVertices, meshesIndices, materialIDs, hasBone);
     if (hasBone) {
         writeBones(meshRoot, bones);
+    }
+    if (motions.size() > 0) {
+        writeAnimations(meshRoot, motions);
     }
 
     writeMaterials(filePath, materialIDs);
@@ -219,6 +223,70 @@ void OriginalFormatWriter::writeBone(
     for (const auto& child : bone.children) {
         writeBone(out, *child);
     }
+}
+
+void OriginalFormatWriter::writeAnimations(
+    JsonObject& out,
+    const std::vector<Motion>& motions
+) const {
+    auto animationValue = std::make_shared<JsonValue>(JsonValueFlag::OBJECT);
+    auto& animationObj = animationValue->getObject();
+
+    //アニメーション数をjsonオブジェクトに登録する
+    auto animationCount = static_cast<int>(motions.size());
+    animationObj.setValue("animationCount", animationCount);
+
+    auto animations = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    auto& a = animations->a;
+    a.resize(animationCount);
+
+    //全アニメーションを登録する
+    for (int i = 0; i < animationCount; ++i) {
+        writeAnimations(a[i].setObject(), motions[i]);
+    }
+
+    animationObj.setValue("animations", animations);
+
+    out.setValue("animation", animationValue);
+}
+
+void OriginalFormatWriter::writeAnimations(
+    JsonObject& out,
+    const Motion& motion
+) const {
+    out.setValue("name", motion.name);
+
+    int numFrame = motion.numFrame;
+    out.setValue("numFrame", numFrame);
+
+    const auto& frameMatrix = motion.frameMatrix;
+    auto boneCount = frameMatrix.size();
+
+    auto allMatricesValue = std::make_shared<JsonValue>(JsonValueFlag::ARRAY);
+    auto& allMatricesArray = allMatricesValue->a;
+    allMatricesArray.resize(boneCount);
+
+    for (int i = 0; i < boneCount; ++i) {
+        const auto& matrices = frameMatrix[i];
+
+        JsonValue matricesValue(JsonValueFlag::ARRAY);
+        auto& a = matricesValue.a;
+        a.resize(numFrame * Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT);
+        for (int j = 0; j < numFrame; ++j) {
+            auto& matrix = matrices[j];
+            int idx = j * Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT;
+
+            for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+                for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+                    a[idx + y * Matrix4::COLUMN_COUNT + x].setFloat(matrix.m[y][x]);
+                }
+            }
+        }
+
+        allMatricesArray[i] = matricesValue;
+    }
+
+    out.setValue("matrices", allMatricesValue);
 }
 
 void OriginalFormatWriter::writeMaterials(

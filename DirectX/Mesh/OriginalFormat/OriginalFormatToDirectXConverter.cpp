@@ -15,6 +15,7 @@ void OriginalFormatToDirectXConverter::convert(
     std::vector<Indices>& meshesIndices,
     std::vector<int>& materialIDs,
     std::vector<Bone>& bones,
+    std::vector<Motion>& motions,
     const std::string & filePath,
     const JsonObject& rootObj
 ) const {
@@ -28,6 +29,7 @@ void OriginalFormatToDirectXConverter::convert(
         rootObj
     );
     convertBones(bones, rootObj);
+    convertAnimations(motions, rootObj);
 }
 
 void OriginalFormatToDirectXConverter::convertMeshes(
@@ -242,6 +244,60 @@ void OriginalFormatToDirectXConverter::convertBone(
     for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
         for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
             bone.offsetMat.m[y][x] = offsetMatrix[y * Matrix4::COLUMN_COUNT + x].getFloat();
+        }
+    }
+}
+
+void OriginalFormatToDirectXConverter::convertAnimations(
+    std::vector<Motion>& motions,
+    const JsonObject& rootObj
+) const {
+    //animationオブジェクトがなければ終了
+    if (rootObj.values.find("animation") == rootObj.values.end()) {
+        return;
+    }
+
+    const auto& animationObj = rootObj.getValue("animation").getObject();
+    //アニメーション数
+    int animationCount = animationObj.getValue("animationCount").getInt();
+    motions.resize(animationCount);
+
+    const auto& animations = animationObj.getValue("animations").getArray();
+
+    //全アニメーションを読み込む
+    for (int i = 0; i < animationCount; ++i) {
+        convertAnimation(motions[i], animations[i].getObject());
+    }
+}
+
+void OriginalFormatToDirectXConverter::convertAnimation(
+    Motion& motion,
+    const JsonObject& animationObj
+) const {
+    motion.name = animationObj.getValue("name").getString();
+
+    int numFrame = animationObj.getValue("numFrame").getInt();
+    motion.numFrame = numFrame;
+
+    const auto& srcRootMatrices = animationObj.getValue("matrices").getArray();
+    int boneCount = static_cast<int>(srcRootMatrices.size());
+
+    auto& frameMatrix = motion.frameMatrix;
+    frameMatrix.resize(boneCount);
+
+    for (int i = 0; i < boneCount; ++i) {
+        const auto& srcMatrices = srcRootMatrices[i].getArray();
+        auto& matrices = frameMatrix[i];
+        matrices.resize(numFrame);
+
+        for (int j = 0; j < numFrame; ++j) {
+            int idx = j * Matrix4::COLUMN_COUNT * Matrix4::ROW_COUNT;
+
+            for (int y = 0; y < Matrix4::COLUMN_COUNT; ++y) {
+                for (int x = 0; x < Matrix4::ROW_COUNT; ++x) {
+                    matrices[j].m[y][x] = srcMatrices[idx + y * Matrix4::COLUMN_COUNT + x].getFloat();
+                }
+            }
         }
     }
 }

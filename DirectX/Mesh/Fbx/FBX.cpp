@@ -6,7 +6,6 @@
 #include "FbxParser.h"
 #include "../../System/AssetsManager.h"
 #include "../../Utility/FileUtil.h"
-#include "../../Device/TimeMeasurement.h"
 
 FBX::FBX() = default;
 
@@ -21,9 +20,6 @@ void FBX::parse(
     std::vector<Motion>& motions,
     std::vector<Bone>& bones
 ) {
-    TimeMeasurement timer;
-    timer.start();
-
     //解析開始
     FbxParser parser;
     parser.parse(filePath, meshesVertices, meshesIndices, materialIDs, bones, motions);
@@ -41,6 +37,4 @@ void FBX::parse(
             meshVerticesPosition[j] = meshVertices[j].pos;
         }
     }
-
-    auto dur = timer.end();
 }

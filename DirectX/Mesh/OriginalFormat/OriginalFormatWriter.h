@@ -20,7 +20,8 @@ public:
         const std::vector<MeshVertices>& meshesVertices,
         const std::vector<Indices>& meshesIndices,
         const std::vector<int>& materialIDs,
-        const std::vector<Bone>& bones
+        const std::vector<Bone>& bones,
+        const std::vector<Motion>& motions
     ) const;
 
 private:
@@ -49,6 +50,15 @@ private:
     void writeBone(
         std::vector<JsonValue>& out,
         const Bone& bone
+    ) const;
+
+    void writeAnimations(
+        JsonObject& out,
+        const std::vector<Motion>& motions
+    ) const;
+    void writeAnimations(
+        JsonObject& out,
+        const Motion& motion
     ) const;
 
     void writeMaterials(
