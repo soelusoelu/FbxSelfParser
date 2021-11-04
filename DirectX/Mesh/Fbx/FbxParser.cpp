@@ -64,14 +64,14 @@ void FbxParser::parse(
     converter->convertBoneAnimation(bones, motions);
 
     OriginalFormatWriter originalWriter;
-    //originalWriter.writeFbxToOriginal(
-    //    filePath,
-    //    meshesVertices,
-    //    meshesIndices,
-    //    materialIDs,
-    //    bones,
-    //    motions
-    //);
+    originalWriter.writeFbxToOriginal(
+        filePath,
+        meshesVertices,
+        meshesIndices,
+        materialIDs,
+        bones,
+        motions
+    );
 }
 
 const FbxObject& FbxParser::getRootObject() const {
