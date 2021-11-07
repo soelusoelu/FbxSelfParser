@@ -268,6 +268,7 @@
     <ClCompile Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.cpp" />
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.cpp" />
     <ClCompile Include="Mesh\BoneHelper.cpp" />
+    <ClCompile Include="System\Texture\Format\PNG\PngReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -596,6 +597,14 @@
     <ClInclude Include="Mesh\OriginalFormat\OriginalFormatToDirectXConverter.h" />
     <ClInclude Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.h" />
     <ClInclude Include="Mesh\BoneHelper.h" />
+    <ClInclude Include="System\Texture\Format\ITextureReader.h" />
+    <ClInclude Include="System\Texture\Format\PNG\PngReader.h" />
+    <ClInclude Include="System\Texture\Format\PNG\ImageHeaderChunk.h" />
+    <ClInclude Include="System\Texture\Format\PNG\Palette.h" />
+    <ClInclude Include="System\Texture\Format\PNG\PhysicalPixelDimension.h" />
+    <ClInclude Include="System\Texture\Format\PNG\ImageTrailer.h" />
+    <ClInclude Include="System\Texture\Format\PNG\TextureData.h" />
+    <ClInclude Include="System\Texture\Format\PNG\ImageData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

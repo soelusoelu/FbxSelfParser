@@ -22,6 +22,14 @@ inline void safeRelease(T*& p) {
     }
 }
 
+//エンディアン変換
+inline int byteSwap(int value) {
+    return (value << 24 | (value & 0x0000FF00) << 8 | (value & 0x00FF0000) >> 8 | value >> 24);
+}
+inline unsigned byteSwap(unsigned value) {
+    return (value << 24 | (value & 0x0000FF00) << 8 | (value & 0x00FF0000) >> 8 | value >> 24);
+}
+
 template<typename To, typename From>
 inline To checkedCast(From obj) {
 #if _DEBUG

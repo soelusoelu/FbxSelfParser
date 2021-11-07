@@ -19,6 +19,7 @@
 #include "../Sound/XAudio2/SoundEngine.h"
 #include "../Utility/LevelLoader.h"
 #include "../Utility/Random.h"
+#include "Texture/Format/PNG/PngReader.h"
 
 Game::Game()
     : mWindow(nullptr)
@@ -97,6 +98,9 @@ void Game::initialize() {
     InputManager::initialize(hwnd);
     GameObjectCreater::initialize();
     mSceneManager->initialize();
+
+    PngReader png;
+    png.read("Assets\\Texture\\System\\add_mesh.png");
 }
 
 void Game::mainLoop() {
