@@ -48,6 +48,8 @@ void PngReader::read(const std::string& filePath) {
             assert(false);
         }
     }
+
+    decode();
 }
 
 bool PngReader::isPng(std::ifstream& in) const {
@@ -117,4 +119,15 @@ void PngReader::readTextureData(std::ifstream& in, int length) const {
 
 void PngReader::skipCRC(std::ifstream& in) const {
     in.seekg(4, std::ios_base::cur);
+}
+
+bool PngReader::decode() {
+    z_stream z = { 0 };
+
+    auto result = inflateInit(&z);
+    if (result != Z_OK) {
+        return false;
+    }
+
+    return true;
 }

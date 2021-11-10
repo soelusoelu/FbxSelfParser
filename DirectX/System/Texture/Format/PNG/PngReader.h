@@ -4,6 +4,13 @@
 #include "../ITextureReader.h"
 #include <vector>
 
+#ifndef ZLIB_WINAPI
+#define ZLIB_WINAPI
+#endif // !ZLIB_WINAPI
+#include <zlib.h>
+
+//#pragma comment(lib, "../Library/zlib/lib/zlibstat.lib")
+
 class PngReader
     : public ITextureReader
 {
@@ -30,6 +37,8 @@ private:
 
     //CRC分を読み飛ばす
     void skipCRC(std::ifstream& in) const;
+
+    bool decode();
 
 private:
     ImageHeaderChunk mHeader;

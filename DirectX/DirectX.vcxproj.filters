@@ -605,6 +605,8 @@
     <ClInclude Include="System\Texture\Format\PNG\ImageTrailer.h" />
     <ClInclude Include="System\Texture\Format\PNG\TextureData.h" />
     <ClInclude Include="System\Texture\Format\PNG\ImageData.h" />
+    <ClInclude Include="Library\zlib\include\zconf.h" />
+    <ClInclude Include="Library\zlib\include\zlib.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />
