@@ -22,7 +22,12 @@ public:
     PngReader(const PngReader&) = delete;
     PngReader& operator=(const PngReader&) = delete;
 
-    virtual void read(const std::string& filePath) override;
+    virtual void read(
+        const std::string& filePath,
+        std::vector<unsigned char>& colors
+    ) override;
+    virtual unsigned getWidth() const override;
+    virtual unsigned getHeight() const override;
 
 private:
     //PNGファイルか判断する
@@ -36,6 +41,12 @@ private:
     void readPhysicalPixelDimension(std::ifstream& in, int length) const;
     //TextureDataを読み込む
     void readTextureData(std::ifstream& in, int length) const;
+    //InternationalTextを読み込む
+    void readInternationalText(std::ifstream& in, int length) const;
+    //BackgroundColorを読み込む
+    void readBackgroundColor(std::ifstream& in, int length) const;
+    //ImageLastModificationTimeを読み込む
+    void readImageLastModificationTime(std::ifstream& in, int length) const;
 
     //CRC分を読み飛ばす
     void skipCRC(std::ifstream& in) const;
@@ -47,7 +58,6 @@ private:
     ImageHeaderChunk mHeader;
     ImageData mData;
     std::vector<unsigned char> mInflateData;
-    std::vector<unsigned char> mRgba;
 
     static constexpr int READ_INFLATE_SIZE = 256;
 };

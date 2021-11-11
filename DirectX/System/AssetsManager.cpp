@@ -2,7 +2,6 @@
 #include "GlobalFunction.h"
 #include "Shader/Shader.h"
 #include "Texture/Texture.h"
-#include "Texture/TextureFromFile.h"
 #include "../Mesh/Mesh.h"
 #include "../Utility/FileUtil.h"
 
@@ -40,7 +39,7 @@ int AssetsManager::createTexture(const std::string& filename, const std::string&
     }
 
     //テクスチャを生成し格納
-    auto texture = std::make_shared<TextureFromFile>(filePath);
+    auto texture = std::make_shared<Texture>(filePath);
     id = mTextures.size();
     mTextures.emplace_back(TextureParam{ texture, filePath, id });
 

@@ -28,7 +28,7 @@ void ShaderResourceView::setPSShaderResources(unsigned start, unsigned numViews)
 }
 
 D3D11_SHADER_RESOURCE_VIEW_DESC ShaderResourceView::toSRVDesc(const ShaderResourceViewDesc& desc) const {
-    D3D11_SHADER_RESOURCE_VIEW_DESC srvd;
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvd{};
     srvd.Format = toFormat(desc.format);
     srvd.ViewDimension = toDimension(desc.viewDimension);
     srvd.Texture2D.MostDetailedMip = desc.texture2D.mostDetailedMip;

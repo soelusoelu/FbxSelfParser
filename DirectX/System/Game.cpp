@@ -100,7 +100,7 @@ void Game::initialize() {
     mSceneManager->initialize();
 
     PngReader png;
-    png.read("Assets\\Texture\\System\\add_mesh.png");
+    //png.read("Assets\\Texture\\System\\add_mesh.png");
 }
 
 void Game::mainLoop() {

@@ -1,12 +1,10 @@
 ﻿#pragma once
 
-struct ImageTrailer {
-    //ChunkDataのサイズ、固定0
-    static constexpr char LENGTH = 0;
+struct InternationalText {
     //チャンクタイプ
-    static constexpr char CHUNK_TYPE[4] = { 'I', 'E', 'N', 'D' };
+    static constexpr char CHUNK_TYPE[4] = { 'i', 'T', 'X', 't' };
 
-    //ImageTrailerか判断する
+    //TextureDataか判断する
     static bool isType(const unsigned char* type) {
         return (type[0] == CHUNK_TYPE[0]
             && type[1] == CHUNK_TYPE[1]

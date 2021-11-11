@@ -326,7 +326,6 @@
     <ClCompile Include="Sound\Effects\TestEffect.cpp" />
     <ClCompile Include="Sound\Effects\TestEffectParameters.cpp" />
     <ClCompile Include="Sound\Effects\Converter\SurroundStereoConverter.cpp" />
-    <ClCompile Include="System\Texture\TextureFromMemory.cpp" />
     <ClCompile Include="System\Texture\TextureFromFile.cpp" />
     <ClCompile Include="Transform\Transform3D.cpp" />
     <ClCompile Include="Component\Engine\Camera\Camera.cpp" />
@@ -420,6 +419,8 @@
     <ClCompile Include="Engine\ModelViewer\VertexSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="System\Texture\Format\PNG\BackgroundColor.h" />
+    <ClInclude Include="System\Texture\Format\PNG\ImageLastModificationTime.h" />
     <ClInclude Include="System\Texture\Format\PNG\InflateDataToColorConverter.h" />
     <ClInclude Include="Library\zlib\include\zconf.h" />
     <ClInclude Include="Library\zlib\include\zlib.h" />
@@ -455,6 +456,7 @@
     <ClInclude Include="System\Texture\Format\PNG\ImageData.h" />
     <ClInclude Include="System\Texture\Format\PNG\ImageHeaderChunk.h" />
     <ClInclude Include="System\Texture\Format\PNG\ImageTrailer.h" />
+    <ClInclude Include="System\Texture\Format\PNG\InternationalText.h" />
     <ClInclude Include="System\Texture\Format\PNG\Palette.h" />
     <ClInclude Include="System\Texture\Format\PNG\PhysicalPixelDimension.h" />
     <ClInclude Include="System\Texture\Format\PNG\PngReader.h" />
@@ -647,7 +649,6 @@
     <ClInclude Include="Sound\Effects\TestEffectParameters.h" />
     <ClInclude Include="Sound\Effects\Converter\SurroundStereoConverter.h" />
     <ClInclude Include="System\Shader\ConstantBuffers.h" />
-    <ClInclude Include="System\Texture\TextureFromMemory.h" />
     <ClInclude Include="System\Texture\TextureFromFile.h" />
     <ClInclude Include="Transform\Transform3D.h" />
     <ClInclude Include="Component\Engine\Camera\Camera.h" />

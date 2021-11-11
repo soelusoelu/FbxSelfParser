@@ -1,13 +1,17 @@
 ﻿#include "Texture.h"
+#include "Format/ITextureReader.h"
+#include "Format/PNG/PngReader.h"
 #include "../GlobalFunction.h"
 #include "../Shader/Shader.h"
 #include "../../DirectX/DirectXInclude.h"
 #include "../../Engine/DebugManager/DebugUtility/Debug.h"
+#include "../../Utility/FileUtil.h"
 
 Texture::Texture() :
     mShaderResourceView(nullptr),
     mSampler(nullptr),
-    mTextureSize() {
+    mTextureSize()
+{
     if (!vertexBuffer || !indexBuffer) {
         //バーテックスバッファー作成
         createVertexBuffer();
@@ -16,6 +20,27 @@ Texture::Texture() :
     }
     //テクスチャー用サンプラー作成
     createSampler();
+}
+
+Texture::Texture(const std::string& filePath)
+    : Texture()
+{
+    createTextureFromFileName(filePath);
+}
+
+Texture::Texture(unsigned width, unsigned height)
+    : Texture()
+{
+    mColors.resize(width * height * PIXEL_DATA_SIZE, 255);
+    createTextureFromMemory(width, height);
+}
+
+Texture::Texture(const std::vector<unsigned char>& data, unsigned width, unsigned height)
+    : Texture()
+{
+    mColors.resize(width * height * PIXEL_DATA_SIZE);
+    std::copy(data.begin(), data.end(), mColors.begin());
+    createTextureFromMemory(width, height);
 }
 
 Texture::Texture(const std::shared_ptr<ShaderResourceView>& view, const Vector2& textureSize)
@@ -34,6 +59,26 @@ Texture::Texture(const std::shared_ptr<ShaderResourceView>& view, const Vector2&
 }
 
 Texture::~Texture() = default;
+
+void Texture::clear() {
+    std::fill(mColors.begin(), mColors.end(), 255);
+}
+
+void Texture::setPixel(unsigned x, unsigned y, const Vector3& color) {
+    setPixel(x, y, color.x * 255, color.y * 255, color.z * 255);
+}
+
+void Texture::setPixel(unsigned x, unsigned y, unsigned char r, unsigned char g, unsigned char b) {
+    //データがunsigned char型で色3つアルファ値1つ並んでるから
+    auto p = y * mTextureSize.x * PIXEL_DATA_SIZE + x * PIXEL_DATA_SIZE;
+    mColors[p] = r;
+    mColors[p + 1] = g;
+    mColors[p + 2] = b;
+}
+
+void Texture::apply() {
+    createTextureFromMemory(mTextureSize.x, mTextureSize.y);
+}
 
 const Vector2& Texture::getTextureSize() const {
     return mTextureSize;
@@ -102,4 +147,38 @@ void Texture::createIndexBuffer() {
 void Texture::createSampler() {
     SamplerDesc sd;
     mSampler = std::make_unique<Sampler>(sd);
+}
+
+void Texture::createTextureFromFileName(const std::string& filePath) {
+    //拡張子によって処理を分ける
+    const auto& ext = FileUtil::getFileExtension(filePath);
+    std::unique_ptr<ITextureReader> reader = nullptr;
+    if (ext == ".png") {
+        reader = std::make_unique<PngReader>();
+    } else {
+        Debug::windowMessage(filePath + ": 対応していない拡張子です");
+        return;
+    }
+
+    //メッシュを解析する
+    reader->read(filePath, mColors);
+
+    //テクスチャを作成する
+    createTextureFromMemory(reader->getWidth(), reader->getHeight());
+}
+
+void Texture::createTextureFromMemory(unsigned width, unsigned height) {
+    mTextureSize = Vector2(width, height);
+
+    Texture2DDesc tex2DDesc{};
+    tex2DDesc.width = width;
+    tex2DDesc.height = height;
+
+    SubResourceDesc sub{};
+    sub.data = mColors.data();
+    sub.pitch = width * PIXEL_DATA_SIZE;
+
+    auto tex2D = std::make_unique<Texture2D>(tex2DDesc, &sub);
+
+    mShaderResourceView = std::make_shared<ShaderResourceView>(*tex2D);
 }

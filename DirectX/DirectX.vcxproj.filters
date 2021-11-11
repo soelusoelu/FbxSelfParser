@@ -134,7 +134,6 @@
     <ClCompile Include="System\Shader\InputElementManager.cpp" />
     <ClCompile Include="System\Texture\Texture.cpp" />
     <ClCompile Include="System\Texture\TextureFromFile.cpp" />
-    <ClCompile Include="System\Texture\TextureFromMemory.cpp" />
     <ClCompile Include="Collision\AABB.cpp" />
     <ClCompile Include="Collision\Circle.cpp" />
     <ClCompile Include="Collision\Intersect.cpp" />
@@ -425,7 +424,6 @@
     <ClInclude Include="Mesh\Vertex.h" />
     <ClInclude Include="System\Texture\Texture.h" />
     <ClInclude Include="System\Texture\TextureFromFile.h" />
-    <ClInclude Include="System\Texture\TextureFromMemory.h" />
     <ClInclude Include="Mesh\IMesh.h" />
     <ClInclude Include="Collision\AABB.h" />
     <ClInclude Include="Collision\Circle.h" />
@@ -609,6 +607,9 @@
     <ClInclude Include="Library\zlib\include\zconf.h" />
     <ClInclude Include="Library\zlib\include\zlib.h" />
     <ClInclude Include="System\Texture\Format\PNG\InflateDataToColorConverter.h" />
+    <ClInclude Include="System\Texture\Format\PNG\BackgroundColor.h" />
+    <ClInclude Include="System\Texture\Format\PNG\ImageLastModificationTime.h" />
+    <ClInclude Include="System\Texture\Format\PNG\InternationalText.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

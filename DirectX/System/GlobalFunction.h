@@ -29,6 +29,12 @@ inline int byteSwap(int value) {
 inline unsigned byteSwap(unsigned value) {
     return (value << 24 | (value & 0x0000FF00) << 8 | (value & 0x00FF0000) >> 8 | value >> 24);
 }
+inline short byteSwap(short value) {
+    return (value << 8 | value >> 8);
+}
+inline unsigned short byteSwap(unsigned short value) {
+    return (value << 8 | value >> 8);
+}
 
 template<typename To, typename From>
 inline To checkedCast(From obj) {

@@ -6,7 +6,7 @@
 #include "../DirectX/DirectXInclude.h"
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../System/AssetsManager.h"
-#include "../System/Texture/TextureFromMemory.h"
+#include "../System/Texture/Texture.h"
 #include "../Utility/FileUtil.h"
 #include <cassert>
 
@@ -177,7 +177,7 @@ void Mesh::createMesh(const std::string& filePath) {
         //テクスチャがないマテリアルは白テクスチャを代替する
         if (mat.textureID == Material::INVALID_ID) {
             Material newMat = mat;
-            newMat.textureID = AssetsManager::instance().addTexture(std::make_shared<TextureFromMemory>(1, 1));
+            newMat.textureID = AssetsManager::instance().addTexture(std::make_shared<Texture>(1, 1));
             AssetsManager::instance().changeMaterial(id, newMat);
         }
 

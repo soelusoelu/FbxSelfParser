@@ -26,18 +26,46 @@ private:
         unsigned height
     ) const;
 
+    //入力データから色を決定する
     void convertColor(
         std::vector<unsigned char>& out,
-        const std::vector<unsigned char>& inData,
         unsigned outStartIndex,
+        const std::vector<unsigned char>& inData,
         unsigned inStartIndex
     ) const;
-    void convertColor(
+    //2つの入力データの合計から色を決定する
+    void convertColorAddition(
         std::vector<unsigned char>& out,
-        unsigned char r,
-        unsigned char g,
-        unsigned char b,
-        unsigned char a,
-        unsigned outStartIndex
+        unsigned outStartIndex,
+        const std::vector<unsigned char>& inData1,
+        unsigned inStartIndex1,
+        const std::vector<unsigned char>& inData2,
+        unsigned inStartIndex2
+    ) const;
+    //2つの入力データの平均値から色を決定する
+    void convertColorAverage(
+        std::vector<unsigned char>& out,
+        unsigned outStartIndex,
+        const std::vector<unsigned char>& inData1,
+        unsigned inStartIndex1,
+        const std::vector<unsigned char>& inData2,
+        unsigned inStartIndex2_1,
+        unsigned inStartIndex2_2
+    ) const;
+    //謎の手法
+    void convertColorPaeth(
+        std::vector<unsigned char>& out,
+        unsigned outStartIndex,
+        const std::vector<unsigned char>& inData1,
+        unsigned inStartIndex1,
+        const std::vector<unsigned char>& inData2,
+        unsigned inStartIndex2_1,
+        unsigned inStartIndex2_2,
+        unsigned inStartIndex2_3
+    ) const;
+    float paethPredictor(
+        float a,
+        float b,
+        float c
     ) const;
 };
