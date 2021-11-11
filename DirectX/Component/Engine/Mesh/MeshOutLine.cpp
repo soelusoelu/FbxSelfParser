@@ -14,7 +14,6 @@
 #include "../../../System/Shader/ConstantBuffers.h"
 #include "../../../System/Shader/DataTransfer.h"
 #include "../../../System/Shader/ShaderBinder.h"
-#include "../../../System/Texture/TextureFromFile.h"
 #include "../../../Transform/Transform3D.h"
 #include "../../../Utility/JsonHelper.h"
 

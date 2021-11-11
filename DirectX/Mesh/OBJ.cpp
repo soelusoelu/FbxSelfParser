@@ -1,7 +1,6 @@
 ﻿#include "OBJ.h"
 #include "../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../System/AssetsManager.h"
-#include "../System/Texture/TextureFromFile.h"
 #include "../Utility/FileUtil.h"
 #include <sstream>
 

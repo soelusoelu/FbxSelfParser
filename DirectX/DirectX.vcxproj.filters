@@ -133,7 +133,6 @@
     <ClCompile Include="System\Shader\Shader.cpp" />
     <ClCompile Include="System\Shader\InputElementManager.cpp" />
     <ClCompile Include="System\Texture\Texture.cpp" />
-    <ClCompile Include="System\Texture\TextureFromFile.cpp" />
     <ClCompile Include="Collision\AABB.cpp" />
     <ClCompile Include="Collision\Circle.cpp" />
     <ClCompile Include="Collision\Intersect.cpp" />
@@ -423,7 +422,6 @@
     <ClInclude Include="System\Shader\InputElementManager.h" />
     <ClInclude Include="Mesh\Vertex.h" />
     <ClInclude Include="System\Texture\Texture.h" />
-    <ClInclude Include="System\Texture\TextureFromFile.h" />
     <ClInclude Include="Mesh\IMesh.h" />
     <ClInclude Include="Collision\AABB.h" />
     <ClInclude Include="Collision\Circle.h" />

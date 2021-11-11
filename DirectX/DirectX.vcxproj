@@ -326,7 +326,6 @@
     <ClCompile Include="Sound\Effects\TestEffect.cpp" />
     <ClCompile Include="Sound\Effects\TestEffectParameters.cpp" />
     <ClCompile Include="Sound\Effects\Converter\SurroundStereoConverter.cpp" />
-    <ClCompile Include="System\Texture\TextureFromFile.cpp" />
     <ClCompile Include="Transform\Transform3D.cpp" />
     <ClCompile Include="Component\Engine\Camera\Camera.cpp" />
     <ClCompile Include="System\AssetsManager.cpp" />
@@ -649,7 +648,6 @@
     <ClInclude Include="Sound\Effects\TestEffectParameters.h" />
     <ClInclude Include="Sound\Effects\Converter\SurroundStereoConverter.h" />
     <ClInclude Include="System\Shader\ConstantBuffers.h" />
-    <ClInclude Include="System\Texture\TextureFromFile.h" />
     <ClInclude Include="Transform\Transform3D.h" />
     <ClInclude Include="Component\Engine\Camera\Camera.h" />
     <ClInclude Include="System\AssetsManager.h" />
@@ -986,11 +984,6 @@
     <None Include="Shader\OutLineHeader.hlsli" />
     <None Include="Shader\ShadowHeader.hlsli" />
     <None Include="Shader\SimpleHeader.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DirectXTex\DirectXTex_Desktop_2019_Win10.vcxproj">
-      <Project>{371b9fa9-4c90-4ac6-a123-aced756d6c77}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
