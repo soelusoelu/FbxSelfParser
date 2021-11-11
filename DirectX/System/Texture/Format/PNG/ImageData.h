@@ -4,7 +4,7 @@
 
 struct ImageData {
     //イメージデータ
-    std::vector<char> data;
+    std::vector<unsigned char> data;
 
     //チャンクタイプ
     static constexpr char CHUNK_TYPE[4] = { 'I', 'D', 'A', 'T' };

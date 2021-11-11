@@ -1,5 +1,4 @@
 ﻿#include "PngReader.h"
-#include "ImageData.h"
 #include "ImageTrailer.h"
 #include "PhysicalPixelDimension.h"
 #include "TextureData.h"
@@ -49,7 +48,12 @@ void PngReader::read(const std::string& filePath) {
         }
     }
 
-    decode();
+    //圧縮データを解凍する
+    if (!decode()) {
+        return;
+    }
+
+
 }
 
 bool PngReader::isPng(std::ifstream& in) const {
@@ -78,20 +82,20 @@ void PngReader::readImageHeaderChunk(std::ifstream& in) {
     mHeader.width = byteSwap(mHeader.width);
     in.read(reinterpret_cast<char*>(&mHeader.height), sizeof(mHeader.height));
     mHeader.height = byteSwap(mHeader.height);
-    in.read(&mHeader.bitDepth, sizeof(mHeader.bitDepth));
-    in.read(&mHeader.colorType, sizeof(mHeader.colorType));
-    in.read(&mHeader.compression, sizeof(mHeader.compression));
-    in.read(&mHeader.filter, sizeof(mHeader.filter));
-    in.read(&mHeader.interlace, sizeof(mHeader.interlace));
+    in.read(reinterpret_cast<char*>(&mHeader.bitDepth), sizeof(mHeader.bitDepth));
+    in.read(reinterpret_cast<char*>(&mHeader.colorType), sizeof(mHeader.colorType));
+    in.read(reinterpret_cast<char*>(&mHeader.compression), sizeof(mHeader.compression));
+    in.read(reinterpret_cast<char*>(&mHeader.filter), sizeof(mHeader.filter));
+    in.read(reinterpret_cast<char*>(&mHeader.interlace), sizeof(mHeader.interlace));
 
     //CRCは必要ないので読み飛ばす
     skipCRC(in);
 }
 
-void PngReader::readImageData(std::ifstream& in, int length) const {
-    ImageData id;
-    id.data.resize(length);
-    in.read(id.data.data(), length);
+void PngReader::readImageData(std::ifstream& in, int length) {
+    auto& data = mData.data;
+    data.resize(length);
+    in.read(reinterpret_cast<char*>(data.data()), length);
 
     //CRCは必要ないので読み飛ばす
     skipCRC(in);
@@ -123,11 +127,43 @@ void PngReader::skipCRC(std::ifstream& in) const {
 
 bool PngReader::decode() {
     z_stream z = { 0 };
+    z.zalloc = Z_NULL;
+    z.zfree = Z_NULL;
+    z.opaque = Z_NULL;
+    z.next_in = mData.data.data();
+    z.avail_in = mData.data.size();
 
+    //初期化
     auto result = inflateInit(&z);
     if (result != Z_OK) {
         return false;
     }
+
+    //解凍
+    while (true) {
+        //現在のサイズに一定量ずつ足して読み込んでいく
+        mInflateData.resize(mInflateData.size() + READ_INFLATE_SIZE);
+
+        z.next_out = &mInflateData[z.total_out];
+        z.avail_out = READ_INFLATE_SIZE;
+        result = inflate(&z, Z_NO_FLUSH);
+
+        //Z_STREAM_ENDなら終了
+        if (result == Z_STREAM_END) {
+            break;
+        }
+        //Z_STREAM_ENDでなく、Z_OKでもなければエラー
+        if (result != Z_OK) {
+            return false;
+        }
+    }
+
+    //実際に読み込んだサイズ分に補正する(実読み込み量のほうが小さいはず)
+    assert(z.total_out <= mInflateData.size());
+    mInflateData.resize(z.total_out);
+
+    result = inflateEnd(&z);
+    assert(result == Z_OK);
 
     return true;
 }

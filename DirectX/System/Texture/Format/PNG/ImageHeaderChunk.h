@@ -16,15 +16,15 @@ struct ImageHeaderChunk {
     //画像の高さ
     unsigned height;
     //ビット深度
-    char bitDepth;
+    unsigned char bitDepth;
     //カラータイプ
-    char colorType;
+    unsigned char colorType;
     //圧縮手法
-    char compression;
+    unsigned char compression;
     //フィルター手法
-    char filter;
+    unsigned char filter;
     //インターレース手法
-    char interlace;
+    unsigned char interlace;
 
     //ChunkDataのサイズ、固定13
     static constexpr char LENGTH = 13;
