@@ -27,7 +27,9 @@ public:
     Texture(const std::vector<unsigned char>& data, unsigned width, unsigned height);
     //シェーダーリソースビューを受け取りこのクラスで管理する
     Texture(const std::shared_ptr<ShaderResourceView>& view, const Vector2& textureSize);
-    virtual ~Texture();
+    ~Texture();
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
 
     //テクスチャを白色で塗りつぶす
     void clear();
@@ -49,9 +51,6 @@ public:
     static void finalize();
 
 private:
-    Texture(const Texture&) = delete;
-    Texture& operator=(const Texture&) = delete;
-
     void createVertexBuffer();
     void createIndexBuffer();
     void createSampler();
@@ -65,7 +64,7 @@ public:
     static inline VertexBuffer* vertexBuffer3D = nullptr;
     static inline IndexBuffer* indexBuffer = nullptr;
 
-protected:
+private:
     std::shared_ptr<ShaderResourceView> mShaderResourceView;
     std::unique_ptr<Sampler> mSampler;
     //RGBA 8bit
