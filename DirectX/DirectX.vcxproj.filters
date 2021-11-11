@@ -269,6 +269,7 @@
     <ClCompile Include="Mesh\Fbx\Converter\FbxToDirectXMaterialConverter.cpp" />
     <ClCompile Include="Mesh\BoneHelper.cpp" />
     <ClCompile Include="System\Texture\Format\PNG\PngReader.cpp" />
+    <ClCompile Include="System\Texture\Format\PNG\InflateDataToColorConverter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component\ComponentManager.h" />
@@ -607,6 +608,7 @@
     <ClInclude Include="System\Texture\Format\PNG\ImageData.h" />
     <ClInclude Include="Library\zlib\include\zconf.h" />
     <ClInclude Include="Library\zlib\include\zlib.h" />
+    <ClInclude Include="System\Texture\Format\PNG\InflateDataToColorConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\MeshCommonHeader.hlsli" />

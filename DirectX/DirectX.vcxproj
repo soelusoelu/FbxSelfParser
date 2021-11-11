@@ -170,6 +170,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="System\Texture\Format\PNG\InflateDataToColorConverter.cpp" />
     <ClCompile Include="Mesh\BoneHelper.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\DebugUtility.cpp" />
     <ClCompile Include="Engine\DebugManager\DebugUtility\Log.cpp" />
@@ -419,6 +420,7 @@
     <ClCompile Include="Engine\ModelViewer\VertexSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="System\Texture\Format\PNG\InflateDataToColorConverter.h" />
     <ClInclude Include="Library\zlib\include\zconf.h" />
     <ClInclude Include="Library\zlib\include\zlib.h" />
     <ClInclude Include="Mesh\BoneHelper.h" />

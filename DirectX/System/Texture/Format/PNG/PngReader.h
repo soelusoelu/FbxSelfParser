@@ -40,6 +40,7 @@ private:
     //CRC分を読み飛ばす
     void skipCRC(std::ifstream& in) const;
 
+    //圧縮データを解凍する
     bool decode();
 
 private:

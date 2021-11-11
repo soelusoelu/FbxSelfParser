@@ -1,5 +1,6 @@
 ﻿#include "PngReader.h"
 #include "ImageTrailer.h"
+#include "InflateDataToColorConverter.h"
 #include "PhysicalPixelDimension.h"
 #include "TextureData.h"
 #include "../../../GlobalFunction.h"
@@ -53,7 +54,9 @@ void PngReader::read(const std::string& filePath) {
         return;
     }
 
-
+    //解凍したデータをRGBAに変換する
+    InflateDataToColorConverter converter;
+    converter.convert(mRgba, mInflateData, mHeader);
 }
 
 bool PngReader::isPng(std::ifstream& in) const {
@@ -139,12 +142,15 @@ bool PngReader::decode() {
         return false;
     }
 
+    //解凍後のデータサイズは
+    //横幅 * 縦幅 * 使用する色の種類数(rgbaのうち使用する数、基本4) + 縦幅
+    auto usedColorNum = mHeader.getBitsPerPixel() / mHeader.bitDepth;
+    mInflateData.resize(mHeader.width * mHeader.height * usedColorNum + mHeader.height);
+
+    z.next_out = mInflateData.data();
+
     //解凍
     while (true) {
-        //現在のサイズに一定量ずつ足して読み込んでいく
-        mInflateData.resize(mInflateData.size() + READ_INFLATE_SIZE);
-
-        z.next_out = &mInflateData[z.total_out];
         z.avail_out = READ_INFLATE_SIZE;
         result = inflate(&z, Z_NO_FLUSH);
 
@@ -158,10 +164,10 @@ bool PngReader::decode() {
         }
     }
 
-    //実際に読み込んだサイズ分に補正する(実読み込み量のほうが小さいはず)
-    assert(z.total_out <= mInflateData.size());
-    mInflateData.resize(z.total_out);
+    //読み込み量と等しいかチェック
+    assert(z.total_out == mInflateData.size());
 
+    //終了処理
     result = inflateEnd(&z);
     assert(result == Z_OK);
 
