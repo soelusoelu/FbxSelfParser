@@ -37,7 +37,7 @@ void Sprite3D::awake() {
     //ファイル名を読み込めてたらテクスチャを生成
     if (!mFileName.empty()) {
         mTextureID = AssetsManager::instance().createTexture(mFileName);
-        mCurrentTextureSize = texture().getTextureSize();
+        mCurrentTextureSize = Vector2(texture().getWidth(), texture().getHeight());
 
         //テクスチャのアスペクト比を計算
         calcAspectRatio();
@@ -195,8 +195,7 @@ void Sprite3D::setUV(float l, float t, float r, float b) {
     mUV.w = b;
 
     //サイズ修正
-    const auto& texSize = texture().getTextureSize();
-    mCurrentTextureSize = Vector2(texSize.x * (r - l), texSize.y * (b - t));
+    mCurrentTextureSize = Vector2(texture().getWidth() * (r - l), texture().getHeight() * (b - t));
 
     //アスペクト比再計算
     calcAspectRatio();
@@ -218,7 +217,7 @@ void Sprite3D::setTextureFromFileName(const std::string& fileName) {
     mTextureID = AssetsManager::instance().createTexture(fileName);
 
     //各種初期化
-    mCurrentTextureSize = texture().getTextureSize();
+    mCurrentTextureSize = Vector2(texture().getWidth(), texture().getHeight());
     mColor = ColorPalette::white;
     mAlpha = 1.f;
     mUV = Vector4(0.f, 0.f, 1.f, 1.f);

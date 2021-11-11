@@ -105,8 +105,7 @@ void Sprite::setUV(float l, float t, float r, float b) {
     mUV.w = b;
 
     //サイズ修正
-    const auto& texSize = texture().getTextureSize();
-    Vector2 size = Vector2(texSize.x * (r - l), texSize.y * (b - t));
+    Vector2 size = Vector2(getWidth() * (r - l), getHeight() * (b - t));
 
     //テクスチャサイズを変更したことを通知
     mTransform->setSize(size);
@@ -116,8 +115,12 @@ const Vector4& Sprite::getUV() const {
     return mUV;
 }
 
-const Vector2& Sprite::getTextureSize() const {
-    return texture().getTextureSize();
+unsigned Sprite::getWidth() const {
+    return texture().getWidth();
+}
+
+unsigned Sprite::getHeight() const {
+    return texture().getHeight();
 }
 
 void Sprite::setActive(bool value) {
@@ -132,7 +135,7 @@ void Sprite::setTextureFromFileName(const std::string& fileName) {
     mTextureID = AssetsManager::instance().createTexture(fileName);
 
     //Transformに通知
-    mTransform->setSize(texture().getTextureSize());
+    mTransform->setSize(Vector2(getWidth(), getHeight()));
 
     //ファイル名変更
     mFileName = fileName;
@@ -142,7 +145,7 @@ void Sprite::setTexture(const std::shared_ptr<Texture>& texture) {
     mTextureID = AssetsManager::instance().addTexture(texture);
 
     //Transformに通知
-    mTransform->setSize(texture->getTextureSize());
+    mTransform->setSize(Vector2(getWidth(), getHeight()));
 
     //ファイル名変更
     mFileName.clear();

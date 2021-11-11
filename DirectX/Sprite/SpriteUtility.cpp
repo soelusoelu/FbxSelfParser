@@ -7,15 +7,15 @@
 #include "../Transform/Transform2D.h"
 
 bool SpriteUtility::contains(const Sprite& sprite, const Vector2& position) {
-    return containsTexture(sprite.transform(), sprite.getTextureSize(), position);
+    return containsTexture(sprite.transform(), Vector2(sprite.getWidth(), sprite.getHeight()), position);
 }
 
 bool SpriteUtility::contains(const SpriteComponent& sprite, const Vector2& position) {
-    return containsTexture(sprite.transform(), sprite.getTextureSize(), position);
+    return containsTexture(sprite.transform(), Vector2(sprite.getWidth(), sprite.getHeight()), position);
 }
 
 bool SpriteUtility::containsDebug(const Sprite& sprite, const Vector2& position) {
-    return containsTextureDebug(sprite.transform(), sprite.getTextureSize(), position);
+    return containsTextureDebug(sprite.transform(), Vector2(sprite.getWidth(), sprite.getHeight()), position);
 }
 
 bool SpriteUtility::clickSprite(const Sprite& sprite) {

@@ -42,8 +42,10 @@ public:
     //切り取り範囲(left, top, right, bottom, 0～1)
     void setUV(float l, float t, float r, float b);
     const Vector4& getUV() const;
-    //テクスチャサイズの取得
-    const Vector2& getTextureSize() const;
+    //テクスチャの横幅を取得
+    unsigned getWidth() const;
+    //テクスチャの縦幅を取得
+    unsigned getHeight() const;
     //状態管理
     void setActive(bool value);
     bool getActive() const;

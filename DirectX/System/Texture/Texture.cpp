@@ -7,10 +7,11 @@
 #include "../../Engine/DebugManager/DebugUtility/Debug.h"
 #include "../../Utility/FileUtil.h"
 
-Texture::Texture() :
-    mShaderResourceView(nullptr),
-    mSampler(nullptr),
-    mTextureSize()
+Texture::Texture()
+    : mShaderResourceView(nullptr)
+    , mSampler(nullptr)
+    , mWidth(0)
+    , mHeight(0)
 {
     if (!vertexBuffer || !indexBuffer) {
         //バーテックスバッファー作成
@@ -25,7 +26,7 @@ Texture::Texture() :
 Texture::Texture(const std::string& filePath)
     : Texture()
 {
-    createTextureFromFileName(filePath);
+    createTextureFromFilePath(filePath);
 }
 
 Texture::Texture(unsigned width, unsigned height)
@@ -43,10 +44,11 @@ Texture::Texture(const std::vector<unsigned char>& data, unsigned width, unsigne
     createTextureFromMemory(width, height);
 }
 
-Texture::Texture(const std::shared_ptr<ShaderResourceView>& view, const Vector2& textureSize)
+Texture::Texture(const std::shared_ptr<ShaderResourceView>& view, unsigned width, unsigned height)
     : mShaderResourceView(view)
     , mSampler(nullptr)
-    , mTextureSize(textureSize)
+    , mWidth(width)
+    , mHeight(height)
 {
     if (!vertexBuffer || !indexBuffer) {
         //バーテックスバッファー作成
@@ -70,18 +72,22 @@ void Texture::setPixel(unsigned x, unsigned y, const Vector3& color) {
 
 void Texture::setPixel(unsigned x, unsigned y, unsigned char r, unsigned char g, unsigned char b) {
     //データがunsigned char型で色3つアルファ値1つ並んでるから
-    auto p = y * mTextureSize.x * PIXEL_DATA_SIZE + x * PIXEL_DATA_SIZE;
+    auto p = y * mWidth * PIXEL_DATA_SIZE + x * PIXEL_DATA_SIZE;
     mColors[p] = r;
     mColors[p + 1] = g;
     mColors[p + 2] = b;
 }
 
 void Texture::apply() {
-    createTextureFromMemory(mTextureSize.x, mTextureSize.y);
+    createTextureFromMemory(mWidth, mHeight);
 }
 
-const Vector2& Texture::getTextureSize() const {
-    return mTextureSize;
+unsigned Texture::getWidth() const {
+    return mWidth;
+}
+
+unsigned Texture::getHeight() const {
+    return mHeight;
 }
 
 const ShaderResourceView& Texture::getShaderResourceView() const {
@@ -149,7 +155,7 @@ void Texture::createSampler() {
     mSampler = std::make_unique<Sampler>(sd);
 }
 
-void Texture::createTextureFromFileName(const std::string& filePath) {
+void Texture::createTextureFromFilePath(const std::string& filePath) {
     //拡張子によって処理を分ける
     const auto& ext = FileUtil::getFileExtension(filePath);
     std::unique_ptr<ITextureReader> reader = nullptr;
@@ -168,7 +174,8 @@ void Texture::createTextureFromFileName(const std::string& filePath) {
 }
 
 void Texture::createTextureFromMemory(unsigned width, unsigned height) {
-    mTextureSize = Vector2(width, height);
+    mWidth = width;
+    mHeight = height;
 
     Texture2DDesc tex2DDesc{};
     tex2DDesc.width = width;

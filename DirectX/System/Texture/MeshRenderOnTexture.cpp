@@ -32,7 +32,7 @@ MeshRenderOnTexture::MeshRenderOnTexture(const std::string& filePath, int width,
     , mWidth(width)
     , mHeight(height)
 {
-    const auto& tex = std::make_shared<Texture>(mRenderTexture->getShaderResourceView(), Vector2(width, height));
+    const auto& tex = std::make_shared<Texture>(mRenderTexture->getShaderResourceView(), width, height);
     mSprite->setTexture(tex);
 }
 
@@ -50,7 +50,7 @@ void MeshRenderOnTexture::saveAndLoad(JsonObject& inObj, FileMode mode) {
 
     mRenderTexture = std::make_unique<RenderTexture>(mWidth, mHeight, Format::FORMAT_D16_UNORM, Format::FORMAT_RGBA8_UNORM);
     mMesh = AssetsManager::instance().createMeshFromFilePath(mFilePath);
-    const auto& tex = std::make_shared<Texture>(mRenderTexture->getShaderResourceView(), Vector2(mWidth, mHeight));
+    const auto& tex = std::make_shared<Texture>(mRenderTexture->getShaderResourceView(), mWidth, mHeight);
     mSprite->setTexture(tex);
 }
 

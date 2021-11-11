@@ -26,7 +26,7 @@ public:
     //入力されたデータからテクスチャを作成する
     Texture(const std::vector<unsigned char>& data, unsigned width, unsigned height);
     //シェーダーリソースビューを受け取りこのクラスで管理する
-    Texture(const std::shared_ptr<ShaderResourceView>& view, const Vector2& textureSize);
+    Texture(const std::shared_ptr<ShaderResourceView>& view, unsigned width, unsigned height);
     ~Texture();
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
@@ -40,8 +40,10 @@ public:
     //clear, setPixel関数での変更を適用する
     void apply();
 
-    //テクスチャサイズを返す
-    const Vector2& getTextureSize() const;
+    //テクスチャの横幅を取得する
+    unsigned getWidth() const;
+    //テクスチャの縦幅を取得する
+    unsigned getHeight() const;
     //シェーダーリソースビューを取得する
     const ShaderResourceView& getShaderResourceView() const;
     //サンプラーを取得する
@@ -55,7 +57,7 @@ private:
     void createIndexBuffer();
     void createSampler();
     //ファイル名からテクスチャを作成する
-    void createTextureFromFileName(const std::string& filePath);
+    void createTextureFromFilePath(const std::string& filePath);
     //テクスチャを作成する
     void createTextureFromMemory(unsigned width, unsigned height);
 
@@ -69,7 +71,10 @@ private:
     std::unique_ptr<Sampler> mSampler;
     //RGBA 8bit
     std::vector<unsigned char> mColors;
-    Vector2 mTextureSize;
+    //テクスチャ横幅
+    unsigned mWidth;
+    //テクスチャ縦幅
+    unsigned mHeight;
 
     //1ピクセルのデータサイズ(RGBA各1バイト)
     static constexpr int PIXEL_DATA_SIZE = sizeof(unsigned char) * 4;

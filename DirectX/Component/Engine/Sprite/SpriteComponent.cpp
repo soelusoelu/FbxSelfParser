@@ -141,8 +141,12 @@ const Vector4& SpriteComponent::getUV() const {
     return mSprite->getUV();
 }
 
-const Vector2& SpriteComponent::getTextureSize() const {
-    return mSprite->getTextureSize();
+unsigned SpriteComponent::getWidth() const {
+    return mSprite->getWidth();
+}
+
+unsigned SpriteComponent::getHeight() const {
+    return mSprite->getHeight();
 }
 
 void SpriteComponent::setActive(bool value) {
