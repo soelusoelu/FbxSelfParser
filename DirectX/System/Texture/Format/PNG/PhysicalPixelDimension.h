@@ -8,7 +8,7 @@ struct PhysicalPixelDimension {
     //単位
     //0: 不明
     //1: メートル
-    char unit;
+    unsigned char unit;
 
     //ChunkDataのサイズ、固定9
     static constexpr char LENGTH = 9;

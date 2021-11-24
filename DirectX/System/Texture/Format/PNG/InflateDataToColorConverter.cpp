@@ -59,14 +59,14 @@ void InflateDataToColorConverter::convertColorAlpha(
                     //yが0のときは真上のピクセルがないのでそのまま代入
                     convertColor(out, outIdx, inData, inIdx);
                 }
-            } else if (filterType == 3) { //2はAverage
+            } else if (filterType == 3) { //3はAverage
                 if (x > 0 && y > 0) {
                     convertColorAverage(out, outIdx, inData, inIdx, out, outIdx - 4, outIdx - rowByteSize);
                 } else {
                     //xもしくはyが0のときはそのまま代入
                     convertColor(out, outIdx, inData, inIdx);
                 }
-            } else if (filterType == 4) {
+            } else if (filterType == 4) { //4はPaeth
                 if (x > 0 && y > 0) {
                     convertColorPaeth(out, outIdx, inData, inIdx, out, outIdx - 4, outIdx - rowByteSize, outIdx - rowByteSize - 4);
                 } else {

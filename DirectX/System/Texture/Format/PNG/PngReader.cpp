@@ -101,15 +101,18 @@ void PngReader::readImageHeaderChunk(std::ifstream& in) {
     in.read(reinterpret_cast<char*>(type), sizeof(type));
     assert(ImageHeaderChunk::isType(type));
 
-    in.read(reinterpret_cast<char*>(&mHeader.width), sizeof(mHeader.width));
+    unsigned char bytes[ImageHeaderChunk::LENGTH] = { 0 };
+    in.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
+
+    mHeader.width = getByte<unsigned, unsigned char>(bytes, 0);
     mHeader.width = byteSwap(mHeader.width);
-    in.read(reinterpret_cast<char*>(&mHeader.height), sizeof(mHeader.height));
+    mHeader.height = getByte<unsigned, unsigned char>(bytes, 4);
     mHeader.height = byteSwap(mHeader.height);
-    in.read(reinterpret_cast<char*>(&mHeader.bitDepth), sizeof(mHeader.bitDepth));
-    in.read(reinterpret_cast<char*>(&mHeader.colorType), sizeof(mHeader.colorType));
-    in.read(reinterpret_cast<char*>(&mHeader.compression), sizeof(mHeader.compression));
-    in.read(reinterpret_cast<char*>(&mHeader.filter), sizeof(mHeader.filter));
-    in.read(reinterpret_cast<char*>(&mHeader.interlace), sizeof(mHeader.interlace));
+    mHeader.bitDepth = getByte<unsigned char, unsigned char>(bytes, 8);
+    mHeader.colorType = getByte<unsigned char, unsigned char>(bytes, 9);
+    mHeader.compression = getByte<unsigned char, unsigned char>(bytes, 10);
+    mHeader.filter = getByte<unsigned char, unsigned char>(bytes, 11);
+    mHeader.interlace = getByte<unsigned char, unsigned char>(bytes, 12);
 
     //CRCは必要ないので読み飛ばす
     skipCRC(in);
@@ -130,14 +133,17 @@ void PngReader::readPhysicalPixelDimension(std::ifstream& in, int length) const 
     assert(length == PhysicalPixelDimension::LENGTH);
 
     //必要ないので読み込まずスキップ
-    //in.seekg(length, std::ios_base::cur);
+    in.seekg(length, std::ios_base::cur);
 
-    PhysicalPixelDimension ppd = { 0 };
-    in.read(reinterpret_cast<char*>(&ppd.numPixelX), sizeof(ppd.numPixelX));
-    ppd.numPixelX = byteSwap(ppd.numPixelX);
-    in.read(reinterpret_cast<char*>(&ppd.numPixelY), sizeof(ppd.numPixelY));
-    ppd.numPixelY = byteSwap(ppd.numPixelY);
-    in.read(&ppd.unit, sizeof(ppd.unit));
+    //PhysicalPixelDimension ppd = { 0 };
+    //unsigned char bytes[PhysicalPixelDimension::LENGTH] = { 0 };
+    //in.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
+
+    //ppd.numPixelX = getByte<unsigned, unsigned char>(bytes, 0);
+    //ppd.numPixelX = byteSwap(ppd.numPixelX);
+    //ppd.numPixelY = getByte<unsigned, unsigned char>(bytes, 4);
+    //ppd.numPixelY = byteSwap(ppd.numPixelY);
+    //ppd.unit = getByte<unsigned char, unsigned char>(bytes, 8);
 
     //CRCは必要ないので読み飛ばす
     skipCRC(in);
@@ -186,13 +192,16 @@ void PngReader::readImageLastModificationTime(std::ifstream& in, int length) con
     //in.seekg(length, std::ios_base::cur);
 
     ImageLastModificationTime ilmt = { 0 };
-    in.read(reinterpret_cast<char*>(&ilmt.year), sizeof(ilmt.year));
+    unsigned char bytes[ImageLastModificationTime::LENGTH] = { 0 };
+    in.read(reinterpret_cast<char*>(&bytes), sizeof(bytes));
+
+    ilmt.year = getByte<unsigned short, unsigned char>(bytes, 0);
     ilmt.year = byteSwap(ilmt.year);
-    in.read(reinterpret_cast<char*>(&ilmt.month), sizeof(ilmt.month));
-    in.read(reinterpret_cast<char*>(&ilmt.day), sizeof(ilmt.day));
-    in.read(reinterpret_cast<char*>(&ilmt.hour), sizeof(ilmt.hour));
-    in.read(reinterpret_cast<char*>(&ilmt.minute), sizeof(ilmt.minute));
-    in.read(reinterpret_cast<char*>(&ilmt.second), sizeof(ilmt.second));
+    ilmt.month = getByte<unsigned char, unsigned char>(bytes, 2);
+    ilmt.day = getByte<unsigned char, unsigned char>(bytes, 3);
+    ilmt.hour = getByte<unsigned char, unsigned char>(bytes, 4);
+    ilmt.minute = getByte<unsigned char, unsigned char>(bytes, 5);
+    ilmt.second = getByte<unsigned char, unsigned char>(bytes, 6);
 
     //CRCは必要ないので読み飛ばす
     skipCRC(in);

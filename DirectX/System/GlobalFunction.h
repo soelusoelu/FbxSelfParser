@@ -36,6 +36,17 @@ inline unsigned short byteSwap(unsigned short value) {
     return (value << 8 | value >> 8);
 }
 
+//配列から指定バイト分取得する
+template<typename To, typename From>
+To getByte(From ary[], int start) {
+    To ret = 0;
+    for (int i = 0; i < sizeof(To); ++i) {
+        ret |= (ary[start + i] << (i * 8));
+    }
+
+    return ret;
+}
+
 template<typename To, typename From>
 inline To checkedCast(From obj) {
 #if _DEBUG
