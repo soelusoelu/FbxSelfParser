@@ -34,9 +34,9 @@
 		"AssetsRenderTextureAdder": {
 			"renderPosition": [
 				0.0,
-				0.0
+				1016.0
 			],
-			"spriteButtonFilePath": "System/owl.png"
+			"spriteButtonFilePath": "System/add_mesh.png"
 		},
 		"ModelViewerLight": {
 			"direction": [
